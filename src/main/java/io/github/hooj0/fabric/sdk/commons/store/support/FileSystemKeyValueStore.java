@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
+import io.github.hooj0.fabric.sdk.commons.FabricStoreException;
 import io.github.hooj0.fabric.sdk.commons.KeyValueFileStore;
 import io.github.hooj0.fabric.sdk.commons.store.KeyValueStore;
 
@@ -59,7 +60,8 @@ public class FileSystemKeyValueStore extends AbstractObject implements KeyValueS
 			properties.store(output, "");
 			output.close();
 		} catch (IOException e) {
-			logger.warn("Could not save the keyvalue store, reason: {}", e.getMessage());
+			logger.warn("Could not set the keyvalue store, reason: {}", e.getMessage());
+			throw new FabricStoreException("Could not set the keyvalue store, reason: %s", e.getMessage());
 		}
 	}
 
@@ -81,8 +83,8 @@ public class FileSystemKeyValueStore extends AbstractObject implements KeyValueS
 			
 			return true;
 		} catch (IOException e) {
-			logger.warn("Could not save the keyvalue store, reason: {}", e.getMessage());
-			return false;
+			logger.warn("Could not remove the keyvalue store, reason: {}", e.getMessage());
+			throw new FabricStoreException("Could not remove the keyvalue store, reason: %s", e.getMessage());
 		}
 	}
 
@@ -93,9 +95,11 @@ public class FileSystemKeyValueStore extends AbstractObject implements KeyValueS
 			properties.load(input);
 			input.close();
 		} catch (FileNotFoundException e) {
-			logger.warn("Could not find the file \"{}\"", storeFile);
+			logger.warn("Could not find the file {}", storeFile);
+			throw new FabricStoreException("Could not find the file {}", storeFile.getAbsoluteFile());
 		} catch (IOException e) {
-			logger.warn("Could not load keyvalue store from file \"{}\", reason:{}", storeFile, e.getMessage());
+			logger.warn("Could not load keyvalue store from file {}, reason:{}", storeFile, e.getMessage());
+			throw new FabricStoreException("Could not load keyvalue store from file %s, reason: %s", storeFile, e.getMessage());
 		}
 
 		return properties;
