@@ -14,7 +14,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public abstract class AbstractObject extends ApplicationLogging {
+public abstract class AbstractObject extends FabricLogging {
 
 	@Override
 	public String toString() {
