@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.FabricStoreException;
-import io.github.hooj0.fabric.sdk.commons.KeyValueFileStore;
-import io.github.hooj0.fabric.sdk.commons.store.KeyValueStore;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
  * 文件系统KeyValue持久化存储
@@ -29,9 +28,9 @@ import io.github.hooj0.fabric.sdk.commons.store.KeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class FileSystemKeyValueStore extends AbstractObject implements KeyValueStore {
+public class FileSystemKeyValueStore extends AbstractObject implements FabricKeyValueStore {
 
-	private final static Logger logger = LoggerFactory.getLogger(KeyValueFileStore.class);
+	private final static Logger logger = LoggerFactory.getLogger(FileSystemKeyValueStore.class);
 	private File storeFile;
 	
 	static {
@@ -75,6 +74,10 @@ public class FileSystemKeyValueStore extends AbstractObject implements KeyValueS
 	@Override
 	public boolean remove(String key) {
 		Properties properties = loadProperties();
+		
+		if (!contains(key)) {
+			return true;
+		}
 		
 		try (OutputStream output = new FileOutputStream(storeFile)) {
 			properties.remove(key);

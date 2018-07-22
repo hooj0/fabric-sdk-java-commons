@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
-import io.github.hooj0.fabric.sdk.commons.store.KeyValueStore;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
  * 内存系统KeyValue持久化存储
@@ -18,7 +18,7 @@ import io.github.hooj0.fabric.sdk.commons.store.KeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class MemoryKeyValueStore extends AbstractObject implements KeyValueStore {
+public class MemoryKeyValueStore extends AbstractObject implements FabricKeyValueStore {
 
 	private Map<String, String> stores = Maps.newConcurrentMap();
 	
@@ -39,7 +39,10 @@ public class MemoryKeyValueStore extends AbstractObject implements KeyValueStore
 
 	@Override
 	public boolean remove(String key) {
-		stores.remove(key);
+		
+		if (contains(key)) {
+			stores.remove(key);
+		}
 		
 		return this.contains(key);
 	}
