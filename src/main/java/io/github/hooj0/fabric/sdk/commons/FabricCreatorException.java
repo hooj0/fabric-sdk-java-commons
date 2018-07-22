@@ -15,10 +15,6 @@ public class FabricCreatorException extends FabricRootException {
 
 	private static final long serialVersionUID = 1L;
 
-	public FabricCreatorException() {
-		super();
-	}
-
 	public FabricCreatorException(Throwable cause, String message, Object... args) {
 		super(String.format(message, args), cause);
 	}
@@ -29,5 +25,9 @@ public class FabricCreatorException extends FabricRootException {
 
 	public FabricCreatorException(Throwable cause) {
 		super(cause);
+	}
+	
+	public FabricCreatorException() {
+		super();
 	}
 }
