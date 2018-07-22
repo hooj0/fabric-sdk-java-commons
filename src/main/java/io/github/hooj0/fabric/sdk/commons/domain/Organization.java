@@ -47,8 +47,8 @@ public class Organization {
     private String caName;
     /** ca 配置位置 */
     private String caLocation;
-    private Properties caProperties = null;
-
+    /** ca 配置 */
+    private Properties caProperties;
     /** 域名 */
     private String domainName;
 
