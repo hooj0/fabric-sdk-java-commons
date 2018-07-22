@@ -1,4 +1,4 @@
-package io.github.hooj0.fabric.sdk.commons.organization;
+package io.github.hooj0.fabric.sdk.commons.domain;
 
 import java.util.Collection;
 import java.util.Collections;

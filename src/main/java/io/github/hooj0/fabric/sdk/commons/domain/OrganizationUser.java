@@ -1,28 +1,21 @@
-package io.github.hooj0.fabric.sdk.commons.organization;
+package io.github.hooj0.fabric.sdk.commons.domain;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
-import io.github.hooj0.fabric.sdk.commons.KeyValueFileStore;
+import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCache;
 import io.netty.util.internal.StringUtil;
 
 public class OrganizationUser extends AbstractObject implements User, Serializable {
-	private static final long serialVersionUID = 8077132186383604355L;
 
-	private final static Logger logger = LoggerFactory.getLogger(OrganizationUser.class);
+	private static final long serialVersionUID = -383568751809394444L;
+	private static final Logger logger = LoggerFactory.getLogger(OrganizationUser.class);
 
 	/** 获取由用户组织提供的会员服务提供商标识符 */
 	private String mspId;
@@ -40,10 +33,9 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	private String enrollmentSecret;
 	/** 注册证书信息  */
 	private Enrollment enrollment = null; // need access in test env.
+	
 	/** 键值存储 */
-	private transient KeyValueFileStore fileStore;
-	/** 键值存在名称 */
-	private String storeKey;
+	private transient FabricStoreCache<OrganizationUser> storeCache;
 
 	/**
 	 * 构建一个用户，如果存在就从缓存中恢复，不存在就保存到缓存
@@ -51,50 +43,37 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	 * @param org 组织名称
 	 * @param fileStore 文件缓存
 	 */
-	public OrganizationUser(String name, String org, KeyValueFileStore fileStore) {
+	public OrganizationUser(String name, String org, FabricStoreCache<OrganizationUser> storeCache) {
 		this.name = name;
-
 		this.organization = org;
-		this.fileStore = fileStore;
-		this.storeKey = toStoreKey(this.name, org);
+		this.storeCache = storeCache;
 		
-		String member = fileStore.get(storeKey);
-		if (StringUtils.isBlank(member)) {
-			storeState();
+		if (storeCache.hasStore(this.name, org)) {
+			setStoreCache();
 		} else {
-			restoreState();
+			bind(storeCache.getStore(this.name, org));
 		}
 	}
-
-	/**
-	 * 转换用户键值存储的名称
-	 * @author hoojo
-	 * @createDate 2018年6月13日 上午11:37:49
-	 * @param name 用户名
-	 * @param org 组织名
-	 * @return 存储的名称
-	 */
-	public static String toStoreKey(String name, String org) {
-		return "user." + name + org;
+	
+	private void bind(OrganizationUser user) {
+		if (user != null) {
+			this.name = user.name;
+			this.roles = user.roles;
+			this.account = user.account;
+			this.affiliation = user.affiliation;
+			this.organization = user.organization;
+			this.enrollmentSecret = user.enrollmentSecret;
+			this.enrollment = user.enrollment;
+			this.mspId = user.mspId;
+			
+			logger.debug("从 store 缓存恢复User：{}", this);
+		}
 	}
 	
-	/**
-	 * 是否存储过，缓存中是否已存在该用户
-	 * @author hoojo
-	 * @createDate 2018年6月13日 上午11:39:54
-	 * @param name 用户名
-	 * @param org 组织名称
-	 * @param fileStore kv对象
-	 * @return boolean
-	 */
-	public static boolean isStored(String name, String org, KeyValueFileStore fileStore) {
-		return fileStore.contains(toStoreKey(name, org));
+	private void setStoreCache() {
+		storeCache.setStore(new String[] { this.name, affiliation }, this);
 	}
-
-	public boolean isStored(String name, String org) {
-		return fileStore.contains(toStoreKey(name, org));
-	}
-
+	
 	/**
 	 * 确定该名称是否已注册
 	 */
@@ -109,84 +88,6 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 		return this.enrollment != null;
 	}
 
-	/**
-	 * 将此用户的状态保存到键值存储区
-	 */
-	public void storeState() {
-		logger.debug("向  store 缓存存储User：{}", this);
-		
-		ByteArrayOutputStream bos = null;
-		ObjectOutputStream oos = null;
-		
-		try {
-			bos = new ByteArrayOutputStream();
-			oos = new ObjectOutputStream(bos);
-			
-			oos.writeObject(this);
-			oos.flush();
-			
-			fileStore.set(storeKey, Hex.toHexString(bos.toByteArray()));
-			// 内存缓存
-			fileStore.cacheMember(storeKey, this);
-		} catch (IOException e) {
-			logger.error("用户的状态保存到键值存储区异常", e);
-		} finally {
-			try {
-				if (oos != null) oos.close();
-				if (bos != null) bos.close();
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-	}
-
-	/**
-	 * 从键值存储中恢复此用户的状态（如果找到）。 如果找不到，什么都不要做。
-	 */
-	public OrganizationUser restoreState() {
-		String member = fileStore.get(storeKey);
-		if (null == member) {
-			return null;
-		}
-		
-		ByteArrayInputStream bis = null;
-		ObjectInputStream ois = null;
-		try {
-			// 用户被发现在关键值存储中，因此恢复状态
-			byte[] serialized = Hex.decode(member);
-
-			// 反序列化，解组对象
-			bis = new ByteArrayInputStream(serialized);
-			ois = new ObjectInputStream(bis);
-
-			OrganizationUser state = (OrganizationUser) ois.readObject();
-			if (state != null) {
-				this.name = state.name;
-				this.roles = state.roles;
-				this.account = state.account;
-				this.affiliation = state.affiliation;
-				this.organization = state.organization;
-				this.enrollmentSecret = state.enrollmentSecret;
-				this.enrollment = state.enrollment;
-				this.mspId = state.mspId;
-				
-				logger.debug("从 store 缓存恢复User：{}", this);
-				return this;
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(String.format("Could not restore state of member %s", this.name), e);
-		} finally {
-			try {
-				if (bis != null) bis.close();
-				if (bis != null) bis.close();
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-		
-		return null;
-	}
-
 	public String getEnrollmentSecret() {
 		return enrollmentSecret;
 	}
@@ -194,13 +95,13 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	public void setEnrollmentSecret(String enrollmentSecret) {
 		this.enrollmentSecret = enrollmentSecret;
 		
-		storeState();
+		setStoreCache();
 	}
 
 	public void setEnrollment(Enrollment enrollment) {
 		this.enrollment = enrollment;
 		
-		storeState();
+		setStoreCache();
 	}
 
 	@Override
@@ -211,7 +112,7 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	public void setMspId(String mspID) {
 		this.mspId = mspID;
 		
-		storeState();
+		setStoreCache();
 	}
 	
 	@Override
@@ -227,7 +128,7 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	public void setRoles(Set<String> roles) {
 		this.roles = roles;
 		
-		storeState();
+		setStoreCache();
 	}
 
 	@Override
@@ -238,7 +139,7 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	public void setAccount(String account) {
 		this.account = account;
 		
-		storeState();
+		setStoreCache();
 	}
 
 	@Override
@@ -249,7 +150,7 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	public void setAffiliation(String affiliation) {
 		this.affiliation = affiliation;
 		
-		storeState();
+		setStoreCache();
 	}
 
 	@Override
