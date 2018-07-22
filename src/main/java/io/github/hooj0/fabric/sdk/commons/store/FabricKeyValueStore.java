@@ -45,7 +45,7 @@ public interface FabricKeyValueStore {
 	 * @author hoojo
 	 * @createDate 2018年7月21日 下午9:40:48
 	 * @param key store key
-	 * @return 删除是否成功 
+	 * @return true | false 删除是否成功 
 	 */
 	public boolean remove(String key);
 }
