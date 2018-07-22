@@ -39,7 +39,6 @@ public class MemoryKeyValueStore extends AbstractObject implements FabricKeyValu
 
 	@Override
 	public boolean remove(String key) {
-		
 		if (contains(key)) {
 			stores.remove(key);
 		}
