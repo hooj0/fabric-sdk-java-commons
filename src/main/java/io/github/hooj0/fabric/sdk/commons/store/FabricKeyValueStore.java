@@ -4,14 +4,14 @@ package io.github.hooj0.fabric.sdk.commons.store;
  * key-value 数据存储接口，可以是文件、缓存、数据库、内存等持久化实现方式
  * @author hoojo
  * @createDate 2018年7月21日 下午9:03:21
- * @file KeyValueStore.java
+ * @file FabricKeyValueStore.java
  * @package io.github.hooj0.fabric.sdk.commons.store
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface KeyValueStore {
+public interface FabricKeyValueStore {
 
 	/**
 	 * 获取 键值信息
