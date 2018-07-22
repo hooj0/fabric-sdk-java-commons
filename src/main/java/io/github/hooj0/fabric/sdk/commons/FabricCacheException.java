@@ -19,15 +19,15 @@ public class FabricCacheException extends FabricRootException {
 		super();
 	}
 
-	public FabricCacheException(Throwable cause, String message, Object... args) {
-		super(String.format(message, args), cause);
+	public FabricCacheException(Throwable cause) {
+		super(cause);
 	}
-
+	
 	public FabricCacheException(String message, Object... args) {
 		super(String.format(message, args));
 	}
-
-	public FabricCacheException(Throwable cause) {
-		super(cause);
+	
+	public FabricCacheException(Throwable cause, String message, Object... args) {
+		super(String.format(message, args), cause);
 	}
 }
