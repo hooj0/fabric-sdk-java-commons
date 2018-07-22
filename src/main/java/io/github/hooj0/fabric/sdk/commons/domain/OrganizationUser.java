@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCache;
@@ -15,7 +13,6 @@ import io.netty.util.internal.StringUtil;
 public class OrganizationUser extends AbstractObject implements User, Serializable {
 
 	private static final long serialVersionUID = -383568751809394444L;
-	private static final Logger logger = LoggerFactory.getLogger(OrganizationUser.class);
 
 	/** 获取由用户组织提供的会员服务提供商标识符 */
 	private String mspId;
