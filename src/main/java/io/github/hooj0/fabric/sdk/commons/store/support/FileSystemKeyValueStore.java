@@ -80,6 +80,7 @@ public class FileSystemKeyValueStore extends AbstractObject implements FabricKey
 		}
 		
 		try (OutputStream output = new FileOutputStream(storeFile)) {
+			
 			properties.remove(key);
 			properties.store(output, "");
 			output.close();
@@ -95,8 +96,10 @@ public class FileSystemKeyValueStore extends AbstractObject implements FabricKey
 		Properties properties = new Properties();
 		
 		try (InputStream input = new FileInputStream(storeFile)) {
+			
 			properties.load(input);
 			input.close();
+			
 		} catch (FileNotFoundException e) {
 			logger.warn("Could not find the file {}", storeFile);
 			throw new FabricStoreException("Could not find the file {}", storeFile.getAbsoluteFile());
