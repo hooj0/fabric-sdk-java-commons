@@ -3,6 +3,8 @@ package io.github.hooj0.fabric.sdk.commons;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import io.github.hooj0.fabric.sdk.commons.log.FabricLogging;
+
 /**
  * 扩展类，提供基础方法
  * @author hoojo
@@ -15,6 +17,10 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @version 1.0
  */
 public abstract class AbstractObject extends FabricLogging {
+
+	public AbstractObject(Class<?> clazz) {
+		super(clazz);
+	}
 
 	@Override
 	public String toString() {
