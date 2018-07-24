@@ -1,10 +1,12 @@
 package io.github.hooj0.fabric.sdk.commons.cache;
 
+import java.io.File;
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
+import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
 
 /**
  * Baisc store cache，implements cache prefix key wrapper and cache object Serialization
@@ -17,15 +19,29 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, FabricSerialization<T> {
+public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Serialization<T> {
 
 	private Map<String, T> caches = Maps.newConcurrentMap();
 	private FabricKeyValueStore keyValueStore;
 	private CacheKeyPrefix keyPrefix;
 	
+	public AbstractStoreCache(CacheKeyPrefix keyPrefix) {
+		this(keyPrefix, newDefaultKeyValueStore());
+	}
+
+	public AbstractStoreCache(CacheKeyPrefix keyPrefix, File keyValueStoreFile) {
+		this(keyPrefix, new FileSystemKeyValueStore(keyValueStoreFile));
+	}
+	
 	public AbstractStoreCache(CacheKeyPrefix keyPrefix, FabricKeyValueStore keyValueStore) {
 		this.keyValueStore = keyValueStore;
 		this.keyPrefix = keyPrefix;
+	}
+	
+	public static FabricKeyValueStore newDefaultKeyValueStore() {
+		FabricKeyValueStore store = new FileSystemKeyValueStore(new File("/HFCSampletest.properties"));
+		
+		return store;
 	}
 	
 	@Override
