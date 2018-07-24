@@ -1,5 +1,7 @@
 package io.github.hooj0.fabric.sdk.commons.cache.support;
 
+import java.io.File;
+
 import io.github.hooj0.fabric.sdk.commons.cache.AbstractStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.CacheKeyPrefix;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
@@ -17,6 +19,14 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
  */
 public class SimpleStoreCache extends AbstractStoreCache<String> {
 
+	public SimpleStoreCache(CacheKeyPrefix keyPrefix) {
+		super(keyPrefix);
+	}
+	
+	public SimpleStoreCache(CacheKeyPrefix keyPrefix, File keyValueStoreFile) {
+		super(keyPrefix, keyValueStoreFile);
+	}
+	
 	public SimpleStoreCache(CacheKeyPrefix keyPrefix, FabricKeyValueStore keyValueStore) {
 		super(keyPrefix, keyValueStore);
 	}

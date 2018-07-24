@@ -1,5 +1,6 @@
 package io.github.hooj0.fabric.sdk.commons.cache.support;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -27,12 +28,24 @@ public class ChannelStoreCache extends AbstractStoreCache<Channel> {
 
 	private HFClient client;
 	
+	public ChannelStoreCache(HFClient client) {
+		super(CacheKeyPrefix.CHANNEL_PREFIX);
+		
+		this.client = client;
+	}
+	
+	public ChannelStoreCache(File keyValueStoreFile, HFClient client) {
+		super(CacheKeyPrefix.CHANNEL_PREFIX, keyValueStoreFile);
+		
+		this.client = client;
+	}
+	
 	public ChannelStoreCache(FabricKeyValueStore keyValueStore, HFClient client) {
 		super(CacheKeyPrefix.CHANNEL_PREFIX, keyValueStore);
 		
 		this.client = client;
 	}
-
+	
 	@Override
 	public String serialize(Channel store) {
 		try {

@@ -1,5 +1,7 @@
 package io.github.hooj0.fabric.sdk.commons.cache.support;
 
+import java.io.File;
+
 import io.github.hooj0.fabric.sdk.commons.cache.CacheKeyPrefix;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
@@ -16,6 +18,14 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
  */
 public class PEMTLSCertStoreCache extends SimpleStoreCache {
 
+	public PEMTLSCertStoreCache() {
+		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX);
+	}
+	
+	public PEMTLSCertStoreCache(File keyValueStoreFile) {
+		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX, keyValueStoreFile);
+	}
+	
 	public PEMTLSCertStoreCache(FabricKeyValueStore keyValueStore) {
 		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX, keyValueStore);
 	}

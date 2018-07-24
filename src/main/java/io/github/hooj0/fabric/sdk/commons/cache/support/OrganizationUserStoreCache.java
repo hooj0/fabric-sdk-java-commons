@@ -2,6 +2,7 @@ package io.github.hooj0.fabric.sdk.commons.cache.support;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -30,6 +31,14 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 public class OrganizationUserStoreCache extends AbstractStoreCache<OrganizationUser> {
 	
 	private final static Logger logger = LoggerFactory.getLogger(OrganizationUserStoreCache.class);
+	
+	public OrganizationUserStoreCache() {
+		super(CacheKeyPrefix.ORGANIZATION_USER_PREFIX);
+	}
+	
+	public OrganizationUserStoreCache(File keyValueStoreFile) {
+		super(CacheKeyPrefix.ORGANIZATION_USER_PREFIX, keyValueStoreFile);
+	}
 	
 	public OrganizationUserStoreCache(FabricKeyValueStore keyValueStore) {
 		super(CacheKeyPrefix.ORGANIZATION_USER_PREFIX, keyValueStore);
