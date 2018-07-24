@@ -4,14 +4,14 @@ package io.github.hooj0.fabric.sdk.commons.cache;
  * 缓存对象与字符串之间的序列号和反序列化
  * @author hoojo
  * @createDate 2018年7月22日 下午1:49:19
- * @file FabricSerialization.java
+ * @file Serialization.java
  * @package io.github.hooj0.fabric.sdk.commons.cache
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface FabricSerialization<T> {
+public interface Serialization<T> {
 
 	/**
 	 * 将对象序列成字符串 
