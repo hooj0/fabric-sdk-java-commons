@@ -1,4 +1,4 @@
-package io.github.hooj0.fabric.sdk.commons.core.basic;
+package io.github.hooj0.fabric.sdk.commons.core.creator;
 
 import java.io.File;
 
@@ -9,7 +9,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
  * @author hoojo
  * @createDate 2018年7月22日 上午11:40:48
  * @file OrganizationUserCreator.java
- * @package io.github.hooj0.fabric.sdk.commons.core.basic
+ * @package io.github.hooj0.fabric.sdk.commons.core.creator
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
