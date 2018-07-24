@@ -1,4 +1,4 @@
-package io.github.hooj0.fabric.sdk.commons;
+package io.github.hooj0.fabric.sdk.commons.log;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -9,16 +9,19 @@ import org.slf4j.LoggerFactory;
  * 
  * @author hoojo
  * @createDate 2012-2-9 上午11:46:30
- * @file ApplicationLogging.java
+ * @file FabricLogging.java
  * @version 1.0
  */
 public abstract class FabricLogging {
 
 	protected final Logger logger;
 
-	public FabricLogging() {
-		super();
-		logger = LoggerFactory.getLogger(this.getClass());
+	public FabricLogging(Class<?> clazz) {
+		if (clazz == null) {
+			logger = LoggerFactory.getLogger(this.getClass());
+		} else {
+			logger = LoggerFactory.getLogger(clazz);
+		}
 	}
 
 	protected final void debug(Object o) {
