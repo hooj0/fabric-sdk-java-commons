@@ -22,6 +22,10 @@ public class MemoryKeyValueStore extends AbstractObject implements FabricKeyValu
 
 	private Map<String, String> stores = Maps.newConcurrentMap();
 	
+	public MemoryKeyValueStore() {
+		super(MemoryKeyValueStore.class);
+	}
+	
 	@Override
 	public String get(String key) {
 		return stores.get(key);
