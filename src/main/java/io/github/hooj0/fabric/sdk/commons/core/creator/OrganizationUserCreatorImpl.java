@@ -1,4 +1,4 @@
-package io.github.hooj0.fabric.sdk.commons.core.basic;
+package io.github.hooj0.fabric.sdk.commons.core.creator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +23,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
  * @author hoojo
  * @createDate 2018年7月22日 上午11:40:33
  * @file OrganizationUserCreatorImpl.java
- * @package io.github.hooj0.fabric.sdk.commons.core.basic
+ * @package io.github.hooj0.fabric.sdk.commons.core.creator
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
@@ -32,6 +32,10 @@ import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 public class OrganizationUserCreatorImpl implements OrganizationUserCreator {
 	
 	private FabricStoreCache<OrganizationUser> storeCache;
+	
+	public OrganizationUserCreatorImpl(FabricStoreCache<OrganizationUser> storeCache) {
+		this.storeCache = storeCache;
+	}
 	
 	@Override
 	public OrganizationUser create(String name, String org, String mspId, File privateKeyFile, File certificateFile) {
