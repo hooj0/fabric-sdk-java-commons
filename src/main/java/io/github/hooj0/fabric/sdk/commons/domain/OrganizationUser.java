@@ -41,6 +41,8 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	 * @param fileStore 文件缓存
 	 */
 	public OrganizationUser(String name, String org, FabricStoreCache<OrganizationUser> storeCache) {
+		super(OrganizationUser.class);
+		
 		this.name = name;
 		this.organization = org;
 		this.storeCache = storeCache;
