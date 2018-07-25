@@ -2,12 +2,12 @@ package io.github.hooj0.fabric.sdk.commons.core.execution.option;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Map;
 
 import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
+import org.hyperledger.fabric.sdk.User;
 
 /**
- * <b>function:</b>
+ * chaincode deploy operation instantiate options
  * @author hoojo
  * @createDate 2018年7月24日 下午4:04:09
  * @file InstantiateOptions.java
@@ -17,7 +17,7 @@ import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class InstantiateOptions extends InvokeOptions {
+public class InstantiateOptions extends TransactionsOptions {
 
 	/** 背书策略文件：yaml/yml/json/其他 */
 	private File endorsementPolicyFile;
@@ -25,19 +25,9 @@ public class InstantiateOptions extends InvokeOptions {
 	private InputStream endorsementPolicyInputStream;
 	/** 背书策略 */
 	private ChaincodeEndorsementPolicy endorsementPolicy;
+	/** 发起请求用户 */
+	private User requestUser;
 	
-	public InstantiateOptions(String func) {
-		super(func);
-	}
-	
-	public InstantiateOptions(String func, Object... values) {
-		super(func, values);
-	}
-
-	public InstantiateOptions(String func, Map<String, Object> values) {
-		super(func, values);
-	}
-
 	public File getEndorsementPolicyFile() {
 		return endorsementPolicyFile;
 	}
@@ -65,6 +55,15 @@ public class InstantiateOptions extends InvokeOptions {
 	public InstantiateOptions setEndorsementPolicy(ChaincodeEndorsementPolicy endorsementPolicy) {
 		this.endorsementPolicy = endorsementPolicy;
 		
+		return this;
+	}
+
+	public User getRequestUser() {
+		return requestUser;
+	}
+
+	public InstantiateOptions setRequestUser(User requestUser) {
+		this.requestUser = requestUser;
 		return this;
 	}
 }
