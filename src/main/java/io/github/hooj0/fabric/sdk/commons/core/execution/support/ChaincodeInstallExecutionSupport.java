@@ -22,7 +22,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeInstallExecuti
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
 
 /**
- * <b>function:</b>
+ * chaincode deploy operation install execution interface support
  * @author hoojo
  * @createDate 2018年7月24日 下午3:46:12
  * @file ChaincodeInstallExecutionSupport.java
@@ -60,6 +60,8 @@ public class ChaincodeInstallExecutionSupport extends AbstractChaincodeExecution
 	}
 	
 	private void checkArgs(InstallOptions options) {
+		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
+		
 		checkNotNull(options.getChaincodeId(), "ChaincodeId 是必填参数");
 		checkNotNull(options.getChaincodeType(), "ChaincodeType 是必填参数");
 	}
@@ -71,18 +73,22 @@ public class ChaincodeInstallExecutionSupport extends AbstractChaincodeExecution
 
 		Collection<ProposalResponse> successful = new LinkedList<>();
 		Collection<ProposalResponse> failed = new LinkedList<>();
-
-		// 构建安装chaincode请求
-		InstallProposalRequest installRequest = client.newInstallProposalRequest();
-		installRequest.setProposalWaitTime(options.getProposalWaitTime());
-		installRequest.setChaincodeLanguage(options.getChaincodeType());
-		installRequest.setChaincodeID(options.getChaincodeId());
-		
-		if (!StringUtils.isBlank(options.getChaincodeUpgradeVersion())) {
-			installRequest.setChaincodeVersion(options.getChaincodeUpgradeVersion());
-		}
 		
 		try {
+			client.setUserContext(options.getClientUserContext());
+			
+			// 构建安装chaincode请求
+			InstallProposalRequest installRequest = client.newInstallProposalRequest();
+			installRequest.setProposalWaitTime(options.getProposalWaitTime());
+			installRequest.setChaincodeLanguage(options.getChaincodeType());
+			installRequest.setChaincodeID(options.getChaincodeId());
+			
+			if (!StringUtils.isBlank(options.getChaincodeUpgradeVersion())) {
+				installRequest.setChaincodeVersion(options.getChaincodeUpgradeVersion());
+			}
+			if (options.getRequestUser() != null) {
+				installRequest.setUserContext(options.getRequestUser());
+			}
 			if (chaincodeSourceFile != null) { 
 				logger.debug("Chaincode source file path: {}", chaincodeSourceFile.getAbsolutePath());
 				installRequest.setChaincodeSourceLocation(chaincodeSourceFile);
