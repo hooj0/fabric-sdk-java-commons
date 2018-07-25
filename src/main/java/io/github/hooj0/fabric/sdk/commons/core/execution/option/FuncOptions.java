@@ -7,18 +7,17 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * <b>function:</b>
- * 
+ * chaincode transaction function (instantiate/invoke/query) options
  * @author hoojo
  * @createDate 2018年7月23日 下午4:32:02
- * @file SimpleOptions.java
- * @package io.github.hooj0.fabric.sdk.commons.core
+ * @file FuncOptions.java
+ * @package io.github.hooj0.fabric.sdk.commons.core.execution.option
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class SimpleOptions extends Options {
+public class FuncOptions {
 
 	/** 请求执行函数 */
 	private String func;
@@ -26,11 +25,11 @@ public class SimpleOptions extends Options {
 	/** 请求执行的参数 */
 	private String[] args;
 	
-	public SimpleOptions(String func) {
+	public FuncOptions(String func) {
 		this(func, new Object[0]);
 	}
 
-	public SimpleOptions(String func, Object... values) {
+	public FuncOptions(String func, Object... values) {
 		if (values != null && values.length > 50) {
 			throw new IllegalArgumentException("Too many values, the maximum allowed is 50");
 		}
@@ -39,7 +38,7 @@ public class SimpleOptions extends Options {
 		this.args = buildArgs(values);
 	}
 
-	public SimpleOptions(String func, Map<String, Object> values) {
+	public FuncOptions(String func, Map<String, Object> values) {
 		if (values.size() > 50) {
 			throw new IllegalArgumentException("Too many values, the maximum allowed is 50");
 		}
