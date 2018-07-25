@@ -21,12 +21,12 @@ import com.google.common.base.Optional;
 
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeUpgradeException;
 import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeUpgradeExecution;
-import io.github.hooj0.fabric.sdk.commons.core.execution.option.Options;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.FuncOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.UpgradeOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
- * <b>function:</b>
+ * chaincode deploy operation upgrade execution interface support
  * @author hoojo
  * @createDate 2018年7月24日 下午5:05:46
  * @file ChaincodeUpgradeExecutionSupport.java
@@ -36,37 +36,44 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecutionSupport<UpgradeOptions> implements ChaincodeUpgradeExecution {
+public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecutionSupport<UpgradeOptions, FuncOptions> implements ChaincodeUpgradeExecution {
 
 	public ChaincodeUpgradeExecutionSupport(HFClient client, Channel channel) {
 		super(client, channel, ChaincodeUpgradeExecutionSupport.class);
 	}
 	
 	@Override
-	public ResultSet execute(Options options, String func) {
-		return this.execute(bindOptions(options, new UpgradeOptions(func)));
+	public ResultSet execute(UpgradeOptions options, String func) {
+		return this.execute(options, new FuncOptions(func));
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func, Object... args) {
-		return this.execute(bindOptions(options, new UpgradeOptions(func, args)));
+	public ResultSet execute(UpgradeOptions options, String func, Object... args) {
+		return this.execute(options, new FuncOptions(func, args));
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func, LinkedHashMap<String, Object> args) {
-		return this.execute(bindOptions(options, new UpgradeOptions(func, args)));
+	public ResultSet execute(UpgradeOptions options, String func, LinkedHashMap<String, Object> args) {
+		return this.execute(options, new FuncOptions(func, args));
 	}
 
+	private void checkArgs(UpgradeOptions options, FuncOptions funcOptions) {
+		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
+		checkNotNull(options.getEndorsementPolicy(), "endorsementPolicy 背书策略文件为必填项");
+	}
+	
 	@Override
-	public ResultSet execute(UpgradeOptions options) {
+	public ResultSet execute(UpgradeOptions options, FuncOptions funcOptions) {
 		logger.info("通道：{} 升级安装 chaincode: {}", channel.getName(), options.getChaincodeId());
 
-		checkNotNull(options.getEndorsementPolicy(), "endorsementPolicy 背书策略文件为必填项");
-
-		String func = Optional.fromNullable(options.getFunc()).or("init");
-		String[] args = Optional.fromNullable(options.getArgs()).or(new String[] {});
+		checkArgs(options, funcOptions);
+		
+		String func = Optional.fromNullable(funcOptions.getFunc()).or("init");
+		String[] args = Optional.fromNullable(funcOptions.getArgs()).or(new String[] {});
 
 		try {
+			client.setUserContext(options.getClientUserContext());
+			
 			UpgradeProposalRequest upgradeProposalRequest = client.newUpgradeProposalRequest();
 			upgradeProposalRequest.setProposalWaitTime(options.getProposalWaitTime());
 			upgradeProposalRequest.setChaincodeLanguage(options.getChaincodeType());
@@ -77,8 +84,8 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 			upgradeProposalRequest.setTransientMap(options.getTransientData());
 			// 设置背书策略
 			upgradeProposalRequest.setChaincodeEndorsementPolicy(options.getEndorsementPolicy());
-			if (options.getContextUser() != null) {
-				upgradeProposalRequest.setUserContext(options.getContextUser());
+			if (options.getRequestUser() != null) {
+				upgradeProposalRequest.setUserContext(options.getRequestUser());
 			}
 
 			// 发送安装升级chaincode请求
@@ -123,17 +130,32 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func) {
-		return this.executeAsync(bindOptions(options, new UpgradeOptions(func)));
+	public CompletableFuture<TransactionEvent> executeAsync(UpgradeOptions options, String func) {
+		return this.executeAsync(options, new FuncOptions(func));
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func, Object... args) {
-		return this.executeAsync(bindOptions(options, new UpgradeOptions(func, args)));
+	public CompletableFuture<TransactionEvent> executeAsync(UpgradeOptions options, String func, Object... args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func, Map<String, Object> args) {
-		return this.executeAsync(bindOptions(options, new UpgradeOptions(func, args)));
+	public CompletableFuture<TransactionEvent> executeAsync(UpgradeOptions options, String func, Map<String, Object> args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(UpgradeOptions options, String func) {
+		return super.executeFor(options, new FuncOptions(func));
+	}
+
+	@Override
+	public TransactionEvent executeFor(UpgradeOptions options, String func, Object... args) {
+		return super.executeFor(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(UpgradeOptions options, String func, Map<String, Object> args) {
+		return super.executeFor(options, new FuncOptions(func, args));
 	}
 }
