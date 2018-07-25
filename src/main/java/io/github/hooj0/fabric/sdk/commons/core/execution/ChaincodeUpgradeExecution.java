@@ -4,12 +4,12 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 
-import io.github.hooj0.fabric.sdk.commons.core.execution.option.Options;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.FuncOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.UpgradeOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
- * <b>function:</b>
+ * chaincode deploy operation upgrade execution interface
  * @author hoojo
  * @createDate 2018年7月24日 下午4:56:58
  * @file ChaincodeUpgradeExecution.java
@@ -19,5 +19,5 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface ChaincodeUpgradeExecution extends ChaincodeExecution<ResultSet, Options, UpgradeOptions>, TransactionExecution<CompletableFuture<TransactionEvent>, Options, UpgradeOptions> {
+public interface ChaincodeUpgradeExecution extends ChaincodeExecution<ResultSet, UpgradeOptions, FuncOptions>, TransactionExecution<CompletableFuture<TransactionEvent>, UpgradeOptions, FuncOptions> {
 }
