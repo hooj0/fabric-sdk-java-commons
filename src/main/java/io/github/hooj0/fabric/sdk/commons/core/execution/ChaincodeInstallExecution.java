@@ -9,7 +9,7 @@ import org.hyperledger.fabric.sdk.ProposalResponse;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
 
 /**
- * <b>function:</b>
+ * chaincode deploy operation install execution interface
  * @author hoojo
  * @createDate 2018年7月24日 下午3:30:49
  * @file ChaincodeInstallExecution.java
