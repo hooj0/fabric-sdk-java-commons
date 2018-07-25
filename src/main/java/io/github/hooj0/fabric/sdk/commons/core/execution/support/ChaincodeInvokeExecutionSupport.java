@@ -29,12 +29,12 @@ import com.google.common.base.Strings;
 
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeInvokeException;
 import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeInvokeExecution;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.FuncOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InvokeOptions;
-import io.github.hooj0.fabric.sdk.commons.core.execution.option.Options;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
- * <b>function:</b>
+ * chaincode transaction invoke execution interface support
  * @author hoojo
  * @createDate 2018年7月24日 上午11:32:39
  * @file ChaincodeInvokeExecutionSupport.java
@@ -44,46 +44,50 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutionSupport<InvokeOptions> implements ChaincodeInvokeExecution {
+public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutionSupport<InvokeOptions, FuncOptions> implements ChaincodeInvokeExecution {
 
 	public ChaincodeInvokeExecutionSupport(HFClient client, Channel channel) {
 		super(client, channel, ChaincodeInvokeExecutionSupport.class);
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func) {
-		return this.execute(bindOptions(options, new InvokeOptions(func)));
+	public ResultSet execute(InvokeOptions options, String func) {
+		return this.execute(options, new FuncOptions(func));
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func, Object... args) {
-		return this.execute(bindOptions(options, new InvokeOptions(func, args)));
+	public ResultSet execute(InvokeOptions options, String func, Object... args) {
+		return this.execute(options, new FuncOptions(func, args));
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func, LinkedHashMap<String, Object> args) {
-		return this.execute(bindOptions(options, new InvokeOptions(func, args)));
+	public ResultSet execute(InvokeOptions options, String func, LinkedHashMap<String, Object> args) {
+		return this.execute(options, new FuncOptions(func, args));
 	}
 
-	private void checkArgs(InvokeOptions options) {
-		checkArgument(!Strings.isNullOrEmpty(options.getFunc()), "func 参数为必填项");
-		checkArgument(!Objects.isNull(options.getArgs()), "args 参数为必填项");		
+	private void checkArgs(InvokeOptions options, FuncOptions funcOptions) {
+		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
+
+		checkArgument(!Strings.isNullOrEmpty(funcOptions.getFunc()), "func 参数为必填项");
+		checkArgument(!Objects.isNull(funcOptions.getArgs()), "args 参数为必填项");		
 	}
 	
 	@Override
-	public ResultSet execute(InvokeOptions options) {
+	public ResultSet execute(InvokeOptions options, FuncOptions funcOptions) {
 		logger.info("在通道：{}，发起调用Chaincode 交易业务: {}", channel.getName(), options.getChaincodeId());
 
-		checkArgs(options);
+		checkArgs(options, funcOptions);
 		
 		try {
+			client.setUserContext(options.getClientUserContext());
+			
             // 构建——交易提议请求，向所有对等节点发送
             TransactionProposalRequest request = client.newTransactionProposalRequest();
             request.setProposalWaitTime(options.getProposalWaitTime());
             request.setChaincodeLanguage(options.getChaincodeType());
             request.setChaincodeID(options.getChaincodeId());
-            request.setFcn(options.getFunc());
-            request.setArgs(options.getArgs());
+            request.setFcn(funcOptions.getFunc());
+            request.setArgs(funcOptions.getArgs());
             
             // 添加——到分类账的提案中的瞬时数据
             Map<String, byte[]> transientMap = new HashMap<>();
@@ -95,9 +99,8 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
 				transientMap.putAll(options.getTransientData());
 			}
             request.setTransientMap(transientMap);
-            
-            if (options.getContextUser() != null) { // 使用特定用户
-				request.setUserContext(options.getContextUser());
+            if (options.getRequestUser() != null) { // 使用特定用户
+				request.setUserContext(options.getRequestUser());
 			}
             
             // 发送——交易请求
@@ -164,7 +167,9 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             	checkArgument(StringUtils.equals(options.getChaincodeId().getPath(), path), "chaincode Path不一致");
             }
 
-            return new ResultSet(successResponses).setTransactionId(response.getTransactionID());
+            result = response.getProposalResponse().getResponse().getPayload().toStringUtf8();
+            
+            return new ResultSet(successResponses).setTransactionId(response.getTransactionID()).setResult(result);
 		} catch (Exception e) {
             logger.error("调用chaincode时发生异常：", e);
             throw new FabricChaincodeInvokeException(e, "调用chaincode时发生异常： %s", e.getMessage());
@@ -172,17 +177,32 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func) {
-		return this.executeAsync(bindOptions(options, new InvokeOptions(func)));
+	public CompletableFuture<TransactionEvent> executeAsync(InvokeOptions options, String func) {
+		return this.executeAsync(options, new FuncOptions(func));
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func, Object... args) {
-		return this.executeAsync(bindOptions(options, new InvokeOptions(func, args)));
+	public CompletableFuture<TransactionEvent> executeAsync(InvokeOptions options, String func, Object... args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func, Map<String, Object> args) {
-		return this.executeAsync(bindOptions(options, new InvokeOptions(func, args)));
+	public CompletableFuture<TransactionEvent> executeAsync(InvokeOptions options, String func, Map<String, Object> args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(InvokeOptions options, String func) {
+		return super.executeFor(options, new FuncOptions(func));
+	}
+
+	@Override
+	public TransactionEvent executeFor(InvokeOptions options, String func, Object... args) {
+		return super.executeFor(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(InvokeOptions options, String func, Map<String, Object> args) {
+		return super.executeFor(options, new FuncOptions(func, args));
 	}
 }
