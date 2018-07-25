@@ -1,7 +1,17 @@
 package io.github.hooj0.fabric.sdk.commons.core;
 
+import java.util.LinkedHashMap;
+import java.util.concurrent.CompletableFuture;
+
+import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
+
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.FuncOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.InvokeOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.QueryOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
+
 /**
- * fabric Chaincode operations
+ * fabric chaincode transaction `invoke & query` operations
  * @author hoojo
  * @createDate 2018年7月23日 下午2:49:13
  * @file Session.java
@@ -13,25 +23,50 @@ package io.github.hooj0.fabric.sdk.commons.core;
  */
 public interface ChaincodeTransactionOperations {
 
-	/**
-     * Force the initialization of this Session instance if it hasn't been
-     * initialized yet.
-	 * @author hoojo
-	 * @createDate 2018年7月23日 下午3:10:28
-	 * @return
-	 */
-	ChaincodeTransactionOperations init();
+	// invoke
 	
-    void close();
+	ResultSet invoke(InvokeOptions options, FuncOptions funcOptions);
 
-    boolean isClosed();
+	ResultSet invoke(InvokeOptions options, String func);
+	
+	ResultSet invoke(InvokeOptions options, String func, Object... args);
 
-    State getState();
+	ResultSet invoke(InvokeOptions options, String func, LinkedHashMap<String, Object> args);
+	
+	// invoke async
+	
+	CompletableFuture<TransactionEvent> invokeAsync(InvokeOptions options, String func);
+	
+	CompletableFuture<TransactionEvent> invokeAsync(InvokeOptions options, String func, Object... args);
 
-    interface State {
-       
-        ChaincodeTransactionOperations getSession();
+	CompletableFuture<TransactionEvent> invokeAsync(InvokeOptions options, String func, LinkedHashMap<String, Object> args);
+	
+	// invoke async return event
+	
+	TransactionEvent invokeFor(InvokeOptions options, String func);
+	
+	TransactionEvent invokeFor(InvokeOptions options, String func, Object... args);
 
-        String getConnectedHosts();
-    }
+	TransactionEvent invokeFor(InvokeOptions options, String func, LinkedHashMap<String, Object> args);
+	
+	
+	
+	// query
+	
+	ResultSet query(QueryOptions options, FuncOptions funcOptions);
+
+	ResultSet query(QueryOptions options, String func);
+	
+	ResultSet query(QueryOptions options, String func, Object... args);
+
+	ResultSet query(QueryOptions options, String func, LinkedHashMap<String, Object> args);
+	
+	// query async return event
+	
+	TransactionEvent queryFor(QueryOptions options, String func);
+	
+	TransactionEvent queryFor(QueryOptions options, String func, Object... args);
+
+	TransactionEvent queryFor(QueryOptions options, String func, LinkedHashMap<String, Object> args);
+		
 }
