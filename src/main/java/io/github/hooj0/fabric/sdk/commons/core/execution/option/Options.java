@@ -6,6 +6,7 @@ import java.util.Map;
 import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.TransactionRequest.Type;
+import org.hyperledger.fabric.sdk.User;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -40,6 +41,9 @@ public class Options {
 	private int proposalWaitTime;
 	/** 账本瞬时数据 */
 	private Map<String, byte[]> transientData;
+	
+	/** 每次执行前重置的 UserContext */
+	private User clientUserContext;
 	
 	public Options setChancodeName(String chancodeName) {
 		this.chancodeName = chancodeName;
@@ -82,6 +86,12 @@ public class Options {
 		return this;
 	}
 
+	public Options setClientUserContext(User clientUserContext) {
+		this.clientUserContext = clientUserContext;
+		
+		return this;
+	}
+	
 	public int getProposalWaitTime() {
 		return proposalWaitTime;
 	}
@@ -116,5 +126,9 @@ public class Options {
 
 	public Collection<Peer> getSend2Peers() {
 		return send2Peers;
+	}
+
+	public User getClientUserContext() {
+		return clientUserContext;
 	}
 }
