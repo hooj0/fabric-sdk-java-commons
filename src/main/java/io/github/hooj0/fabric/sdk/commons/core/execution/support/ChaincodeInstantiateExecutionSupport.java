@@ -3,6 +3,7 @@ package io.github.hooj0.fabric.sdk.commons.core.execution.support;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -11,23 +12,23 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
+import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.InstantiateProposalRequest;
 import org.hyperledger.fabric.sdk.ProposalResponse;
-import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
-import org.hyperledger.fabric.sdk.exception.ProposalException;
 
 import com.google.common.base.Optional;
+import com.google.common.io.Files;
 
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeInstantiateException;
 import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeInstantiateExecution;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.FuncOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstantiateOptions;
-import io.github.hooj0.fabric.sdk.commons.core.execution.option.Options;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
- * <b>function:</b>
+ * chaincode transaction instantiate execution interface support
  * @author hoojo
  * @createDate 2018年7月24日 下午4:22:05
  * @file ChaincodeInstantiateExecutionSupport.java
@@ -37,50 +38,53 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExecutionSupport<InstantiateOptions> implements ChaincodeInstantiateExecution {
+public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExecutionSupport<InstantiateOptions, FuncOptions> implements ChaincodeInstantiateExecution {
 
 	public ChaincodeInstantiateExecutionSupport(HFClient client, Channel channel) {
 		super(client, channel, ChaincodeInstantiateExecutionSupport.class);
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func) {
-		return this.execute(bindOptions(options, new InstantiateOptions(func)));
+	public ResultSet execute(InstantiateOptions options, String func) {
+		return this.execute(options, new FuncOptions(func));
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func, Object... args) {
-		return this.execute(bindOptions(options, new InstantiateOptions(func, args)));
+	public ResultSet execute(InstantiateOptions options, String func, Object... args) {
+		return this.execute(options, new FuncOptions(func, args));
 	}
 
 	@Override
-	public ResultSet execute(Options options, String func, LinkedHashMap<String, Object> args) {
+	public ResultSet execute(InstantiateOptions options, String func, LinkedHashMap<String, Object> args) {
 		
-		return this.execute(bindOptions(options, new InstantiateOptions(func, args)));
+		return this.execute(options, new FuncOptions(func, args));
 	}
 
 	private void checkArgs(InstantiateOptions options) {
 		checkNotNull(options.getEndorsementPolicy(), "endorsementPolicy 背书策略文件为必填项");
+		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
 	}
 	
 	@Override
-	public ResultSet execute(InstantiateOptions options) {
+	public ResultSet execute(InstantiateOptions options, FuncOptions funcOptions) {
 		logger.info("在通道：{} 实例化Chaincode：{}", channel.getName(), options.getChaincodeId());
 
 		checkArgs(options);
 
-		String func = Optional.fromNullable(options.getFunc()).or("init");
-		String[] args = Optional.fromNullable(options.getArgs()).or(new String[] {});
-
-		// 注意安装chaincode不需要事务不需要发送给 Orderers
-		InstantiateProposalRequest instantiateRequest = client.newInstantiationProposalRequest();
-		instantiateRequest.setChaincodeLanguage(options.getChaincodeType());
-		instantiateRequest.setChaincodeID(options.getChaincodeId());
-		instantiateRequest.setFcn(func);
-		instantiateRequest.setArgs(args);
-		instantiateRequest.setProposalWaitTime(options.getProposalWaitTime());
+		String func = Optional.fromNullable(funcOptions.getFunc()).or("init");
+		String[] args = Optional.fromNullable(funcOptions.getArgs()).or(new String[] {});
 
 		try {
+			client.setUserContext(options.getClientUserContext());
+			
+			// 注意安装chaincode不需要事务不需要发送给 Orderers
+			InstantiateProposalRequest instantiateRequest = client.newInstantiationProposalRequest();
+			instantiateRequest.setChaincodeLanguage(options.getChaincodeType());
+			instantiateRequest.setChaincodeID(options.getChaincodeId());
+			instantiateRequest.setFcn(func);
+			instantiateRequest.setArgs(args);
+			instantiateRequest.setProposalWaitTime(options.getProposalWaitTime());
+			
 			Map<String, byte[]> transientMap = new HashMap<>();
 			transientMap.put("HyperLedgerFabric", "InstantiateProposalRequest:JavaSDK".getBytes(UTF_8));
 			transientMap.put("method", "InstantiateProposalRequest".getBytes(UTF_8));
@@ -90,11 +94,11 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 			}
 			instantiateRequest.setTransientMap(transientMap);
 
-			if (options.getContextUser() != null) {
-				instantiateRequest.setUserContext(options.getContextUser());
+			if (options.getRequestUser() != null) {
+				instantiateRequest.setUserContext(options.getRequestUser());
 			}
 			// 设置背书策略
-			instantiateRequest.setChaincodeEndorsementPolicy(options.getEndorsementPolicy());
+			instantiateRequest.setChaincodeEndorsementPolicy(getChaincodeEndorsementPolicy(options));
 			
 
 			// 通过指定对等节点和使用通道上的方式发送请求响应
@@ -134,25 +138,40 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 			}
 
 			return new ResultSet(successResponses);
-		} catch (InvalidArgumentException | ProposalException e) {
+		} catch (Exception e) {
 			logger.error("实例化chaincode时发生异常：", e);
             throw new FabricChaincodeInstantiateException(e, "实例化chaincode时发生异常： %s", e.getMessage());
 		}
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func) {
-		return this.executeAsync(bindOptions(options, new InstantiateOptions(func)));
+	public CompletableFuture<TransactionEvent> executeAsync(InstantiateOptions options, String func) {
+		return this.executeAsync(options, new FuncOptions(func));
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func, Object... args) {
-		return this.executeAsync(bindOptions(options, new InstantiateOptions(func, args)));
+	public CompletableFuture<TransactionEvent> executeAsync(InstantiateOptions options, String func, Object... args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
 	}
 
 	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(Options options, String func, Map<String, Object> args) {
-		return this.executeAsync(bindOptions(options, new InstantiateOptions(func, args)));
+	public CompletableFuture<TransactionEvent> executeAsync(InstantiateOptions options, String func, Map<String, Object> args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(InstantiateOptions options, String func) {
+		return super.executeFor(options, new FuncOptions(func));
+	}
+
+	@Override
+	public TransactionEvent executeFor(InstantiateOptions options, String func, Object... args) {
+		return super.executeFor(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(InstantiateOptions options, String func, Map<String, Object> args) {
+		return super.executeFor(options, new FuncOptions(func, args));
 	}
 	
 	/**
@@ -160,19 +179,32 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 	 * @author hoojo
 	 * @createDate 2018年6月25日 下午1:02:33
 	 */
-	/*public ChaincodeEndorsementPolicy getChaincodeEndorsementPolicy(String endorsementPolicyYamlFilePath) throws Exception {
+	private ChaincodeEndorsementPolicy getChaincodeEndorsementPolicy(InstantiateOptions options) throws Exception {
+		ChaincodeEndorsementPolicy endorsementPolicy = new ChaincodeEndorsementPolicy();
 		
 		File policyFile = null;
-		if (StringUtils.isEmpty(endorsementPolicyYamlFilePath)) {
-			policyFile = new File(config.getEndorsementPolicyFilePath());
+		if (options.getEndorsementPolicyFile() != null) {
+			policyFile = options.getEndorsementPolicyFile();
+			logger.info("背书策略文件：{}", policyFile.getAbsolutePath());
+			
+			String suffix = Files.getFileExtension(policyFile.getName());
+			if ("yaml".equalsIgnoreCase(suffix) || "yml".equalsIgnoreCase(suffix)) {
+				endorsementPolicy.fromYamlFile(policyFile);
+			} else  {
+				endorsementPolicy.fromFile(policyFile);
+			}
+		} else if (options.getEndorsementPolicyInputStream() != null) {
+			
+			endorsementPolicy.fromStream(options.getEndorsementPolicyInputStream());
+		} else if (options.getEndorsementPolicy() != null) {
+			
+			endorsementPolicy = options.getEndorsementPolicy();
 		} else {
-			policyFile = Paths.get(config.getCommonConfigRootPath(), endorsementPolicyYamlFilePath).toFile();
+			// policyFile = Paths.get(config.getCommonConfigRootPath(), endorsementPolicyYamlFilePath).toFile();
+			// logger.info("背书策略文件：{}", policyFile.getAbsolutePath());
+			// endorsementPolicy.fromYamlFile(policyFile);
 		}
-		logger.info("背书策略文件：{}", policyFile.getAbsolutePath());
-
-		ChaincodeEndorsementPolicy endorsementPolicy = new ChaincodeEndorsementPolicy();
-		endorsementPolicy.fromYamlFile(policyFile);
-
+		
 		return endorsementPolicy;
-	}*/
+	}
 }
