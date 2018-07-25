@@ -9,7 +9,7 @@ import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCacheFactory;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 
 /**
- * <b>function:</b>
+ * basic manager support
  * @author hoojo
  * @createDate 2018年7月23日 下午6:29:43
  * @file AbstractManager.java
@@ -30,9 +30,6 @@ public abstract class AbstractManager extends AbstractObject {
 		super(clazz);
 		
 		this.channelStoreCache = FabricStoreCacheFactory.createChannelStoreCache(client);
-		this.userStoreCache = FabricStoreCacheFactory.createOrganizationUserStoreCache();
-		this.certStoreCache = FabricStoreCacheFactory.createPEMTLSCertStoreCache();
-		this.keyStoreCache = FabricStoreCacheFactory.createPEMTLSKeyStoreCache();
 	}
 	
 	AbstractManager(Class<?> clazz) {
