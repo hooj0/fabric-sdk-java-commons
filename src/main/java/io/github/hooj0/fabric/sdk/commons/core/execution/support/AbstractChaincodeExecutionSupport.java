@@ -9,7 +9,6 @@ import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.Peer;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
-import io.github.hooj0.fabric.sdk.commons.core.execution.option.Options;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 
 /**
@@ -33,20 +32,6 @@ public abstract class AbstractChaincodeExecutionSupport extends AbstractObject {
 		
 		this.channel = channel;
 		this.client = client;
-	}
-	
-	protected <T extends Options> T bindOptions(Options src, T dest) {
-		dest.setChaincodePath(src.getChaincodePath());
-		dest.setChaincodeType(src.getChaincodeType());
-		dest.setChancodeName(src.getChancodeName());
-		dest.setChanicodeVersion(src.getChanicodeVersion());
-		
-		dest.setProposalWaitTime(src.getProposalWaitTime());
-		dest.setSend2Peers(src.getSend2Peers());
-		dest.setSpecificPeers(src.isSpecificPeers());
-		dest.setTransientData(src.getTransientData());
-		
-		return dest;
 	}
 	
 	/**
