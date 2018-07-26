@@ -53,20 +53,20 @@ public interface ChaincodeTransactionOperations {
 	
 	// query
 	
-	ResultSet query(QueryOptions options, FuncOptions funcOptions);
+	String query(QueryOptions options, FuncOptions funcOptions);
 
-	ResultSet query(QueryOptions options, String func);
+	String query(QueryOptions options, String func);
 	
-	ResultSet query(QueryOptions options, String func, Object... args);
+	String query(QueryOptions options, String func, Object... args);
 
-	ResultSet query(QueryOptions options, String func, LinkedHashMap<String, Object> args);
+	String query(QueryOptions options, String func, LinkedHashMap<String, Object> args);
 	
 	// query async return event
 	
-	TransactionEvent queryFor(QueryOptions options, String func);
+	ResultSet queryFor(QueryOptions options, String func);
 	
-	TransactionEvent queryFor(QueryOptions options, String func, Object... args);
+	ResultSet queryFor(QueryOptions options, String func, Object... args);
 
-	TransactionEvent queryFor(QueryOptions options, String func, LinkedHashMap<String, Object> args);
+	ResultSet queryFor(QueryOptions options, String func, LinkedHashMap<String, Object> args);
 		
 }
