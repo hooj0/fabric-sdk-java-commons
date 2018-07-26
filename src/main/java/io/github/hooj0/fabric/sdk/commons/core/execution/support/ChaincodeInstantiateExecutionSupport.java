@@ -61,8 +61,8 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 	}
 
 	private void checkArgs(InstantiateOptions options) {
-		checkNotNull(options.getEndorsementPolicy(), "endorsementPolicy 背书策略文件为必填项");
 		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
+		checkNotNull(options.getEndorsementPolicy(), "endorsementPolicy 背书策略文件为必填项");
 	}
 	
 	@Override
