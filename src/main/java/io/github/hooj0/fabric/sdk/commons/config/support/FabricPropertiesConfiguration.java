@@ -27,20 +27,18 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 public final class FabricPropertiesConfiguration extends AbstractConfiguration {
 
 	/** 系统变量 SDK配置 */
-	private static final String FABRIC_SDK_CONFIG = "hyperledger.fabric.sdk.commons.configuration";
+	private static final String ENV_FABRIC_SDK_CONFIG = "HYPERLEDGER_FABRIC_SDK_COMMONS_CONFIG";
 	/** 默认SDK配置 */
 	private static final String DEFAULT_SDK_CONFIG = "default-config.properties";
 
-	
-	
 	private FabricPropertiesConfiguration() {
 		super(FabricPropertiesConfiguration.class);
 		
 		InputStream stream = null;
 		try {
-			// 读取 sdk 配置文件，没有就读取默认配置 DEFAULT_CONFIG
-			String configPath = System.getProperty(FABRIC_SDK_CONFIG, DEFAULT_SDK_CONFIG);
-			File  configFile = new File(configPath).getAbsoluteFile();
+			// 读取 sdk 配置文件名称，没有就读取默认配置 DEFAULT_CONFIG
+			String configPath = StringUtils.defaultIfBlank(System.getenv(ENV_FABRIC_SDK_CONFIG), DEFAULT_SDK_CONFIG);
+			File configFile = new File(configPath).getAbsoluteFile();
 			logger.info("FileSystem加载SDK配置文件： {}， 配置文件是否存在: {}", configFile.toString(), configFile.exists());
 			
 			if (!configFile.exists()) {
@@ -54,39 +52,11 @@ public final class FabricPropertiesConfiguration extends AbstractConfiguration {
 		} catch (Exception e) {
 			logger.warn("加载SDK配置文件: {} 失败. 使用SDK默认配置", DEFAULT_SDK_CONFIG);
 		} finally {
-
+			
 			configurationDefaultValues();
 			
-			// TLS 
-			String tls = getSDKProperty(TLS_PATH, System.getenv("HYPERLEDGER_FABRIC_SDK_COMMONS_TLS"));
-			logger.debug("tls: {}", tls);
-			
-			runningTLS = StringUtils.equals(tls, "true");
-			runningFabricCATLS = runningTLS;
-			runningFabricTLS = runningTLS;
-			
-			// 找到组织配置 peerOrg1/peerOrg2
-			addOrganizationResources();
+			preparConfiguration();
 
-			// 设置组织 orderer、peer、eventhub、domain、cert等配置
-			for (Map.Entry<String, Organization> org : ORGANIZATION_RESOURCES.entrySet()) {
-				final Organization organization = org.getValue();
-				final String orgName = org.getKey();
-
-				final String domainName = getSDKProperty(FABRIC_NETWORK_KEY_PREFIX + orgName + ".domname");
-				organization.setDomainName(domainName);
-
-				addPeerLocation(organization, orgName);
-				addOrdererLocation(organization, orgName);
-				addEventHubLocation(organization, orgName);
-
-				setCAProperties(organization, orgName);
-				
-				logger.debug("最终organization配置：{}", organization);
-			}
-
-			logger.debug("最终ORGANIZATION_RESOURCES配置：{}", ORGANIZATION_RESOURCES);
-			
 			if (stream != null) {
 				try {
 					stream.close();
@@ -157,6 +127,30 @@ public final class FabricPropertiesConfiguration extends AbstractConfiguration {
 
 	@Override
 	public FabricKeyValueStore getKeyValueStore() {
+		return null;
+	}
+
+	@Override
+	public String getDefaultOrgName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getChannelName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AdminInfo getAdminInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] getUsers() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }
