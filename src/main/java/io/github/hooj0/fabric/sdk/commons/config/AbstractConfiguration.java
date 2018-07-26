@@ -23,7 +23,7 @@ import io.github.hooj0.fabric.sdk.commons.FabricConfigurationException;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 
 /**
- * <b>function:</b>
+ * abstract basic configuration support
  * @author hoojo
  * @createDate 2018年7月23日 上午9:28:04
  * @file AbstractConfiguration.java
@@ -42,9 +42,19 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	
 	/** 配置Key前缀 */
 	protected static final String PREFIX = "hyperledger.fabric.sdk.commons.";
-	
 	/** 区块链网络配置key的前缀 */
 	protected static final String FABRIC_NETWORK_KEY_PREFIX = PREFIX + "network.org.";
+	
+
+	/** 环境变量配置，是否启用tls */
+	protected static final String ENV_DEFAULT_TLS_ENABLED = "HYPERLEDGER_FABRIC_SDK_COMMONS_TLS_ENABLED";
+	
+	protected static final String ENV_FABRIC_NETWORK_HOST_KEY = "HYPERLEDGER_FABRIC_SDK_COMMONS_NETWORK_HOST";
+	/** 跳过 network-config */
+	protected static final String ENV_FABRIC_NETWORK_FILE_KEEP = ENV_FABRIC_NETWORK_HOST_KEY + "_KEEP";
+	/** fabric network host 区块链网络的主机IP地址 */
+	protected static final String FABRIC_NETWORK_HOST = StringUtils.defaultString(System.getenv(ENV_FABRIC_NETWORK_HOST_KEY), "192.168.8.8");
+	
 	
 	/** 调用合约等待时间 */
 	protected static final String INVOKE_WAIT_TIME = PREFIX + "invoke.wait.time";
@@ -52,17 +62,15 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	protected static final String DEPLOY_WAIT_TIME = PREFIX + "deploy.wait.time";
 	/** 发起proposal等待时间 */
 	protected static final String PROPOSAL_WAIT_TIME = PREFIX + "proposal.wait.time";
+	
+	
 	/** tls */
-	protected static final String TLS_PATH = PREFIX + "network.tls.enable";
+	protected static final String FABRIC_NETWORK_TLS_ENABLED = PREFIX + "network.tls.enable";
 	/** 匹配到 mspid 值*/
 	protected static final Pattern ORG_MSPID_PATTERN = Pattern.compile("^" + Pattern.quote(FABRIC_NETWORK_KEY_PREFIX) + "([^\\.]+)\\.mspid$");
-	
 	/** 不同版本通道、证书、交易配置 v1.0 and v1.1 src/test/fixture/sdkintegration/e2e-2Orgs */
-	protected static final String FABRIC_CONFIG_GENERATOR_VERSION = PREFIX + "tx.config.version"; //"v1.0" : "v1.1";
+	protected static final String FABRIC_CONFIG_GENERATOR_VERSION = PREFIX + "generator.version"; //"v1.0" : "v1.1";
 	
-	protected static final String FABRIC_NETWORK_HOST_KEY = PREFIX + "network.host";
-	/** fabric network host 区块链网络的主机IP地址 */
-	protected static final String FABRIC_NETWORK_HOST = StringUtils.defaultString(System.getenv(FABRIC_NETWORK_HOST_KEY), "192.168.8.8");
 	
 	/** chaincode 和 组织 、通道、区块配置的根目录 */
 	protected static final String COMMON_CONFIG_ROOT_PATH = PREFIX + "config.root.path";
@@ -77,6 +85,7 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	/** fabric network  config 配置文件路径 */
 	protected static final String NETWORK_CONFIG_DIR_FILE_PATH = PREFIX + "network.config.root.path";
 	
+	
 	/** 开启TLS证书，也就是https(grpcs)协议和http(grpc)协议之间的切换 */
 	protected boolean runningTLS;
 	protected boolean runningFabricCATLS;
@@ -84,6 +93,39 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	
 	public AbstractConfiguration(Class<?> clazz) {
 		super(clazz);
+	}
+	
+	protected void preparConfiguration() {
+		// TLS 
+		String tlsEnabled = getSDKProperty(FABRIC_NETWORK_TLS_ENABLED, System.getenv(ENV_DEFAULT_TLS_ENABLED));
+		logger.debug("tlsEnabled: {}", tlsEnabled);
+		
+		runningTLS = StringUtils.equals(tlsEnabled, "true");
+		runningFabricCATLS = runningTLS;
+		runningFabricTLS = runningTLS;
+		
+		// 找到组织配置 peerOrg1/peerOrg2
+		addOrganizationResources();
+
+		// 设置组织 orderer、peer、eventhub、domain、cert等配置
+		for (Map.Entry<String, Organization> org : ORGANIZATION_RESOURCES.entrySet()) {
+			final Organization organization = org.getValue();
+			final String orgName = org.getKey();
+
+			// XXX
+			final String domainName = getSDKProperty(FABRIC_NETWORK_KEY_PREFIX + orgName + ".domname");
+			organization.setDomainName(domainName);
+
+			addPeerLocation(organization, orgName);
+			addOrdererLocation(organization, orgName);
+			addEventHubLocation(organization, orgName);
+
+			setCAProperties(organization, orgName);
+			
+			logger.debug("最终organization配置：{}", organization);
+		}
+
+		logger.debug("最终ORGANIZATION_RESOURCES配置：{}", ORGANIZATION_RESOURCES);
 	}
 	
 	protected void configurationDefaultValues() {
@@ -110,7 +152,7 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 		defaultProperty(FABRIC_NETWORK_KEY_PREFIX + "peerOrg2.eventhub_locations", "peer0.org2.example.com@grpc://" + FABRIC_NETWORK_HOST + ":8053, peer1.org2.example.com@grpc://" + FABRIC_NETWORK_HOST + ":8058");
 
 		// Default tls values
-		defaultProperty(TLS_PATH, null);
+		defaultProperty(FABRIC_NETWORK_TLS_ENABLED, null);
 		
 		logger.debug("SDK Properties：{}", SDK_PROPERTIES);
 	}
@@ -380,7 +422,7 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 				// 写入替换后的内容
 				Files.write(Paths.get(transferNetworkConfig.getAbsolutePath()), sourceText.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 
-				if (!Objects.equals("true", System.getenv(FABRIC_NETWORK_HOST_KEY + "_KEEP"))) {
+				if (!Objects.equals("true", System.getenv(ENV_FABRIC_NETWORK_FILE_KEEP))) {
 					transferNetworkConfig.deleteOnExit();
 				} else {
 					logger.info("network-config.yaml replace Host after path: {}", transferNetworkConfig.getAbsolutePath());
@@ -401,5 +443,10 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	
 	public boolean isRunningFabricTLS() {
 		return runningFabricTLS;
+	}
+	
+	@Override
+	public String getFabricNetworkHost() {
+		return FABRIC_NETWORK_HOST;
 	}
 }
