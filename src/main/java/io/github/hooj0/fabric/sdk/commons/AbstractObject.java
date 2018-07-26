@@ -7,6 +7,7 @@ import io.github.hooj0.fabric.sdk.commons.log.FabricLogging;
 
 /**
  * 扩展类，提供基础方法
+ * @changelog Add empty parameter constructor
  * @author hoojo
  * @createDate 2018年6月12日 下午3:12:36
  * @file AbstractFabricObject.java
@@ -18,6 +19,10 @@ import io.github.hooj0.fabric.sdk.commons.log.FabricLogging;
  */
 public abstract class AbstractObject extends FabricLogging {
 
+	public AbstractObject() {
+		super(null);
+	}
+	
 	public AbstractObject(Class<?> clazz) {
 		super(clazz);
 	}
