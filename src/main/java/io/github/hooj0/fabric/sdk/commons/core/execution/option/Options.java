@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * Chaincode Operation execution Options
+ * @changlog updated `proposalWaitTime` type to long
  * @author hoojo
  * @createDate 2018年7月23日 下午3:00:27
  * @file Options.java
@@ -38,11 +39,11 @@ public class Options {
 	private Collection<Peer> send2Peers;
 	
 	/** 请求等待时间 */
-	private int proposalWaitTime;
+	private long proposalWaitTime;
 	/** 账本瞬时数据 */
 	private Map<String, byte[]> transientData;
 	
-	/** 每次执行前重置的 UserContext */
+	/** 客户端User上下文 */
 	private User clientUserContext;
 	
 	public Options setChancodeName(String chancodeName) {
@@ -70,7 +71,7 @@ public class Options {
 		return this;
 	}
 	
-	public Options setProposalWaitTime(int proposalWaitTime) {
+	public Options setProposalWaitTime(long proposalWaitTime) {
 		this.proposalWaitTime = proposalWaitTime;
 		return this;
 	}
@@ -86,13 +87,7 @@ public class Options {
 		return this;
 	}
 
-	public Options setClientUserContext(User clientUserContext) {
-		this.clientUserContext = clientUserContext;
-		
-		return this;
-	}
-	
-	public int getProposalWaitTime() {
+	public long getProposalWaitTime() {
 		return proposalWaitTime;
 	}
 
@@ -130,5 +125,10 @@ public class Options {
 
 	public User getClientUserContext() {
 		return clientUserContext;
+	}
+
+	public Options setClientUserContext(User clientUserContext) {
+		this.clientUserContext = clientUserContext;
+		return this;
 	}
 }
