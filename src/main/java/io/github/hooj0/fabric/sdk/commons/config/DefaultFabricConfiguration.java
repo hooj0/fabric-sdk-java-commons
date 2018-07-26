@@ -8,7 +8,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
- * <b>function:</b>
+ * default fabric configuration support
  * @author hoojo
  * @createDate 2018年7月23日 上午9:22:48
  * @file DefaultFabricConfiguration.java
@@ -150,7 +150,42 @@ public enum DefaultFabricConfiguration implements FabricConfiguration {
 
 	@Override
 	public boolean isRunningAgainstFabric10() {
-		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public String getDefaultOrgName() {
+		return "peerOrg1";
+	}
+
+	@Override
+	public String getChannelName() {
+		return "mychannel";
+	}
+
+	@Override
+	public AdminInfo getAdminInfo() {
+		return new AdminInfo() {
+			
+			@Override
+			public String getPassword() {
+				return "adminpw";
+			}
+			
+			@Override
+			public String getName() {
+				return "admin";
+			}
+		};
+	}
+
+	@Override
+	public String[] getUsers() {
+		return new String[] { "user1" };
+	}
+
+	@Override
+	public String getFabricNetworkHost() {
+		return "192.168.8.8";
 	}
 }
