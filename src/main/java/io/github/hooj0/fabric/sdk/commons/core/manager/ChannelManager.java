@@ -1,4 +1,4 @@
-package io.github.hooj0.fabric.sdk.commons.core.support;
+package io.github.hooj0.fabric.sdk.commons.core.manager;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
@@ -25,11 +25,11 @@ import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 
 /**
- * 通道管理服务
+ * fabric channel manager service support
  * @author hoojo
  * @createDate 2018年6月22日 下午5:24:46
  * @file ChannelManager.java
- * @package com.cnblogs.hoojo.fabric.sdk.core
+ * @package io.github.hooj0.fabric.sdk.commons.core.manager
  * @project fabric-sdk-examples
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
@@ -60,7 +60,7 @@ public class ChannelManager extends AbstractManager {
 		//client.setUserContext(org.getUser("user1"));
 
 		/** 恢复或创建通道 */
-		Channel channel = channelStoreCache.getStore(channelName);
+		Channel channel = channelStoreCache.getStore(org.getName(), channelName);
 		if (channel == null) {
 			try {
 				/** 创建 Orderer 共识服务 */
@@ -98,18 +98,20 @@ public class ChannelManager extends AbstractManager {
 		/** 添加事件总线 */
 		logger.info("Add EventHub: {}", channelName);
 		createEventHub(channel, org);
-
-		/** 初始化 */
-		logger.info("initialize channel: {}", channelName);
-		channel.initialize();
-
-		channel = checkChannelSerialize(channel);
-
-		checkChannel(channelName, channel);
 		
+		/** 初始化 */
+		if (!channel.isInitialized()) {
+			logger.info("initialize channel: {}.{}", org.getName(), channelName);
+			channel.initialize();
+		}
+		
+		channel = checkChannelSerialize(channel);
+		
+		checkChannel(channelName, channel);
 		logger.info("Organization: {} , Finished initialization channel： {}", org.getName(), channelName);
-
-		channelStoreCache.setStore(channelName, channel);
+		
+		channelStoreCache.setStore(new String[] { org.getName(), channelName }, channel);
+		
 		return channel;
 	}
 
@@ -138,7 +140,6 @@ public class ChannelManager extends AbstractManager {
 	public Channel restoreChannel(String channelName, Organization org) throws Exception {
 
 		// client.setUserContext(org.getUser(USER_NAME));
-
 		/** 恢复或创建通道 */
 		Channel channel = channelStoreCache.getStore(channelName);
 		if (channel == null) {

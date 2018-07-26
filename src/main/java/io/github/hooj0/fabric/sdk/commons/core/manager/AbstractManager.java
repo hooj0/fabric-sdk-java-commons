@@ -1,4 +1,4 @@
-package io.github.hooj0.fabric.sdk.commons.core.support;
+package io.github.hooj0.fabric.sdk.commons.core.manager;
 
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
@@ -13,7 +13,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
  * @author hoojo
  * @createDate 2018年7月23日 下午6:29:43
  * @file AbstractManager.java
- * @package io.github.hooj0.fabric.sdk.commons.core.support
+ * @package io.github.hooj0.fabric.sdk.commons.core.manager
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com

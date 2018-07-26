@@ -1,4 +1,4 @@
-package io.github.hooj0.fabric.sdk.commons.core.support;
+package io.github.hooj0.fabric.sdk.commons.core.manager;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,11 +31,11 @@ import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 import io.github.hooj0.fabric.sdk.commons.util.GzipUtils;
 
 /**
- * User 管理服务
+ * fabric user manager support
  * @author hoojo
  * @createDate 2018年6月22日 下午5:23:50
  * @file UserManager.java
- * @package com.cnblogs.hoojo.fabric.sdk.core
+ * @package io.github.hooj0.fabric.sdk.commons.core.manager
  * @project fabric-sdk-examples
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
@@ -56,11 +56,11 @@ public class UserManager extends AbstractManager {
 		this.organizations = config.getOrganizations();
 	}
 
-	public void initialize(String adminName, String adminSecret, String userName) throws Exception {
+	public void initialize(String adminName, String adminSecret, String... userNames) throws Exception {
 		logger.info("init organization user");
 
 		initializeCaClient();
-		enrollOrganizationUsers(adminName, adminSecret, userName);
+		enrollOrganizationUsers(adminName, adminSecret, userNames);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class UserManager extends AbstractManager {
 	 * @createDate 2018年6月13日 上午11:01:15
 	 * @throws Exception
 	 */
-	private void enrollOrganizationUsers(String adminName, String adminSecret, String userName) throws Exception {
+	private void enrollOrganizationUsers(String adminName, String adminSecret, String... userNames) throws Exception {
 		logger.info("Start -> Enroll Organization: CA Admin、User、Peer Admin、TLS ");
 
 		for (Organization org : organizations) {
@@ -126,11 +126,13 @@ public class UserManager extends AbstractManager {
 			// 设置当前组织 admin
 			org.setAdmin(admin);
 
-			// user register/enroll
-			OrganizationUser user = registerAndEnrollUser(org, userName);
-
-			// 设置当前组织 user
-			org.addUser(user);
+			for (String userName : userNames) {
+				// user register/enroll
+				OrganizationUser user = registerAndEnrollUser(org, userName);
+				
+				// 设置当前组织 user
+				org.addUser(user);
+			}
 
 			// peer admin
 			OrganizationUser peerAdmin = wrapperPeerAdmin(org);
