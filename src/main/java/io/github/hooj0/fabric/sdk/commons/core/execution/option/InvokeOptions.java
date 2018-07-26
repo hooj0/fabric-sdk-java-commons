@@ -15,6 +15,7 @@ import org.hyperledger.fabric.sdk.User;
  */
 public class InvokeOptions extends TransactionsOptions {
 
+	/** 发起查询用户 */
 	private User requestUser;
 
 	public User getRequestUser() {
