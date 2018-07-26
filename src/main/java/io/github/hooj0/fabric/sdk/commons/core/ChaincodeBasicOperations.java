@@ -1,5 +1,7 @@
 package io.github.hooj0.fabric.sdk.commons.core;
 
+import org.hyperledger.fabric.sdk.Channel;
+
 /**
  * basic chaincode operations init interface
  * @author hoojo
@@ -14,13 +16,13 @@ package io.github.hooj0.fabric.sdk.commons.core;
 public interface ChaincodeBasicOperations {
 
 	/**
-     * Force the initialization of this Session instance if it hasn't been
+     * Force the initialization of this instance if it hasn't been
      * initialized yet.
 	 * @author hoojo
 	 * @createDate 2018年7月23日 下午3:10:28
-	 * @return
+	 * @return Channel initialization channel
 	 */
-	ChaincodeTransactionOperations init();
+	Channel init(String channelName, String orgName);
 	
     void close();
 
