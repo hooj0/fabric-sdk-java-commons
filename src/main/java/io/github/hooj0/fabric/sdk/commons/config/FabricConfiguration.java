@@ -8,7 +8,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
- * fabric config
+ * fabric config interface
  * @author hoojo
  * @createDate 2018年7月21日 下午11:17:03
  * @file FabricConfiguration.java
@@ -20,7 +20,29 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
  */
 public interface FabricConfiguration {
 	
+	/** 键值存储系统 */
 	public FabricKeyValueStore getKeyValueStore();
+	
+	/** 系统使用默认的组织名称 */
+	public String getDefaultOrgName();
+	
+	/** 通道名称 */
+	public String getChannelName();
+	
+	/** 区块链网络 管理员用户名和密码  */
+	public AdminInfo getAdminInfo();
+	
+	/** 区块链网络 普通用户 */
+	public String[] getUsers();
+	
+	/** 区块链网络主机host */
+	public String getFabricNetworkHost();
+	
+	/** 区块链网络是否是 1.0的版本 */
+	public boolean isRunningAgainstFabric10();
+	
+	/** 是否启用TLS */
+	public boolean isRunningFabricTLS();
 	
 	/**  获取全部组织 */
 	public Collection<Organization> getOrganizations();
@@ -38,11 +60,6 @@ public interface FabricConfiguration {
 	public Properties getEventHubProperties(String name);
 	
 	public Properties getTLSCertProperties(final String type, final String name);
-	
-	//public String getFabricNetworkHost();
-	
-	public boolean isRunningAgainstFabric10();
-	public boolean isRunningFabricTLS();
 	
 	/** network-config.yaml 配置文件 */
 	public File getNetworkConfigFile();
@@ -81,4 +98,9 @@ public interface FabricConfiguration {
 	
 	/** configtxlator 配置转换工具URL配置 */
 	public String getFabricConfigTxLaterURL();
+	
+	interface AdminInfo {
+		String getName();
+		String getPassword();
+	}
 }
