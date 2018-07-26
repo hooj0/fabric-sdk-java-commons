@@ -8,7 +8,6 @@ import org.hyperledger.fabric.sdk.Channel.TransactionOptions;
 
 /**
  * chaincode transaction (instantiate/invoke/query) options
- * 
  * @author hoojo
  * @createDate 2018年7月25日 上午9:48:36
  * @file TransactionsOptions.java
@@ -20,7 +19,7 @@ import org.hyperledger.fabric.sdk.Channel.TransactionOptions;
  */
 public class TransactionsOptions extends Options {
 	/** 交易等待时间 */
-	private int transactionWaitTime;
+	private long transactionWaitTime;
 	/** 发起交易的用户 */
 	private User transactionsUser;
 	/** 向指定 Orderer发送交易进行排序共识 */
@@ -37,11 +36,11 @@ public class TransactionsOptions extends Options {
 		return this;
 	}
 	
-	public int getTransactionWaitTime() {
+	public long getTransactionWaitTime() {
 		return transactionWaitTime;
 	}
 
-	public TransactionsOptions setTransactionWaitTime(int transactionWaitTime) {
+	public TransactionsOptions setTransactionWaitTime(long transactionWaitTime) {
 		this.transactionWaitTime = transactionWaitTime;
 
 		return this;
