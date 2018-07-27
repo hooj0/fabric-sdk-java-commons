@@ -28,10 +28,12 @@ import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreator;
 import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 import io.github.hooj0.fabric.sdk.commons.util.GzipUtils;
 
 /**
  * fabric user manager support
+ * @changelog Add key value store & file constructor super support
  * @author hoojo
  * @createDate 2018年6月22日 下午5:23:50
  * @file UserManager.java
@@ -43,19 +45,29 @@ import io.github.hooj0.fabric.sdk.commons.util.GzipUtils;
  */
 public class UserManager extends AbstractManager {
 
-	private FabricConfiguration config;
 	private Collection<Organization> organizations;
 	private OrganizationUserCreator userCreator;
 
 	public UserManager(FabricConfiguration config) {
-		super(UserManager.class);
-		
-		this.config = config;
-		
-		this.userCreator = new OrganizationUserCreatorImpl(userStoreCache);
-		this.organizations = config.getOrganizations();
+		super(config, UserManager.class);
+		this.init();
+	}
+	
+	public UserManager(FabricConfiguration config, File keyValueStoreFile) {
+		super(config, keyValueStoreFile, UserManager.class);
+		this.init();
+	}
+	
+	public UserManager(FabricConfiguration config, FabricKeyValueStore keyValueStore) {
+		super(config, keyValueStore, UserManager.class);
+		this.init();
 	}
 
+	private void init() {
+		this.organizations = config.getOrganizations();
+		this.userCreator = new OrganizationUserCreatorImpl(userStoreCache);
+	}
+	
 	public void initialize(String adminName, String adminSecret, String... userNames) throws Exception {
 		logger.info("init organization user");
 
@@ -106,10 +118,10 @@ public class UserManager extends AbstractManager {
 			ca.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
 
 			/** TLS 证书模式：如何从Fabric CA获取客户端TLS证书，为orderer、peer 使用一个客户端TLS证书 */
-			if (config.isRunningFabricTLS()) {
+			if (config.isEnabledFabricTLS()) {
 				enrollAdminTLS(org, adminName, adminSecret);
 			} else {
-				logger.debug("TLS 证书模式：{}", config.isRunningFabricTLS());
+				logger.debug("TLS 证书模式：{}", config.isEnabledFabricTLS());
 			}
 
 			HFCAInfo info = ca.info();
@@ -252,9 +264,9 @@ public class UserManager extends AbstractManager {
 		final String domain = org.getDomainName();
 
 		// src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
-		File keydir = Paths.get(config.getCryptoTxConfigRootPath(), "crypto-config/peerOrganizations/", domain, format("/users/Admin@%s/msp/keystore", domain)).toFile();
+		File keydir = Paths.get(config.getCryptoChannelConfigRootPath(), "crypto-config/peerOrganizations/", domain, format("/users/Admin@%s/msp/keystore", domain)).toFile();
 		File privateKeyFile = GzipUtils.findFileSk(keydir);
-		File certificateFile = Paths.get(config.getCryptoTxConfigRootPath(), "crypto-config/peerOrganizations/", domain, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", domain, domain)).toFile();
+		File certificateFile = Paths.get(config.getCryptoChannelConfigRootPath(), "crypto-config/peerOrganizations/", domain, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", domain, domain)).toFile();
 
 		logger.trace("privateKeyDir: {}", keydir.getAbsolutePath());
 		logger.trace("privateKeyFile: {}", privateKeyFile.getAbsolutePath());
