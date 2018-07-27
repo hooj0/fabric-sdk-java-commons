@@ -287,19 +287,25 @@ function setup() {
 	log "red" "================ Start 'Add & Commit' code to local repository ================"
 	findCommitFiles
 	
-	log "red" "================   Start 'pushing' code to remote repository   ================"
-	#pushGit
+	if [ $push == "true" ]; then
+		log "red" "================   Start 'pushing' code to remote repository   ================"
+		pushGit
+	fi
 	
 	echo
-	log "green" "          Done!"
 	echo
+	log "green" " Done!!!"
 }
 	
-debug_mode="false"	
+debug_mode="false"
+push="false"	
 for param in "$@"; do
     log "green" "====> 参数: $param"
     if [ $param == "-d" -o $param == "--debug" ]; then
     	debug_mode="true"
+    fi
+    if [ $param == "-p" -o $param == "--push" ]; then
+    	push="true"
     fi
 done
 	
