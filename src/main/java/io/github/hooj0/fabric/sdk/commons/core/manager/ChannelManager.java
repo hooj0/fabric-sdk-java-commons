@@ -23,9 +23,11 @@ import com.google.common.collect.Lists;
 
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
  * fabric channel manager service support
+ * @changelog Add key value store & file constructor super support
  * @author hoojo
  * @createDate 2018年6月22日 下午5:24:46
  * @file ChannelManager.java
@@ -37,14 +39,16 @@ import io.github.hooj0.fabric.sdk.commons.domain.Organization;
  */
 public class ChannelManager extends AbstractManager {
 
-	private FabricConfiguration config;
-	private HFClient client;
-
 	public ChannelManager(FabricConfiguration config, HFClient client) {
-		super(client, ChannelManager.class);
-		
-		this.config = config;
-		this.client = client;
+		super(config, client, ChannelManager.class);
+	}
+	
+	public ChannelManager(FabricConfiguration config, HFClient client, File keyValueStoreFile) {
+		super(config, keyValueStoreFile, client, ChannelManager.class);
+	}
+	
+	public ChannelManager(FabricConfiguration config, HFClient client, FabricKeyValueStore keyValueStore) {
+		super(config, keyValueStore, client, ChannelManager.class);
 	}
 
 	/**
@@ -280,7 +284,7 @@ public class ChannelManager extends AbstractManager {
 		logger.info("开始创建通道：{}", channelName);
 
 		// 通道配置文件
-		File channelFile = new File(config.getChannelPath(), channelName + ".tx");
+		File channelFile = new File(config.getChannelArtifactsPath(), channelName + ".tx");
 		logger.debug("通道配置文件：{}", channelFile.getAbsolutePath());
 		ChannelConfiguration channelConfiguration = new ChannelConfiguration(channelFile);
 
@@ -318,7 +322,7 @@ public class ChannelManager extends AbstractManager {
 			Peer peer = client.newPeer(peerName, grpcURL, peerProps);
 
 			PeerOptions options = PeerOptions.createPeerOptions();
-			if (!config.isRunningAgainstFabric10()) {
+			if (!config.isFabricConfigtxV10()) {
 				// 默认 所有角色
 				options.registerEventsForBlocks();
 			} else {
