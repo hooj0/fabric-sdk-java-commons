@@ -32,11 +32,6 @@ public class ChaincodeTransactionTemplate extends AbstractOperationSupport imple
 	private ChaincodeInvokeExecution invokeExecution;
 	private ChaincodeQueryExecution queryExecution;
 	
-	public ChaincodeTransactionTemplate(FabricConfiguration config) {
-		super(config.getChannelName(), config.getDefaultOrgName(), config, ChaincodeDeployTemplate.class);
-		this.init();
-	}
-	
 	public ChaincodeTransactionTemplate(String channelName, String orgName) {
 		super(channelName, orgName, ChaincodeDeployTemplate.class);
 		this.init();
