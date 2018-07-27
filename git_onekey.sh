@@ -288,6 +288,7 @@ function setup() {
 	findCommitFiles
 	
 	if [ $push == "true" ]; then
+		printf "\n"
 		log "red" "================   Start 'pushing' code to remote repository   ================"
 		pushGit
 	fi
