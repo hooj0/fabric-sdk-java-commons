@@ -9,9 +9,10 @@ import io.github.hooj0.fabric.sdk.commons.cache.support.PEMTLSCertStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.support.PEMTLSKeyStoreCache;
 import io.github.hooj0.fabric.sdk.commons.config.DefaultFabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
- * <b>function:</b>
+ * fabric store cache static facotry
  * @author hoojo
  * @createDate 2018年7月23日 下午6:08:04
  * @file FabricStoreCacheFactory.java
@@ -22,20 +23,22 @@ import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
  * @version 1.0
  */
 public abstract class FabricStoreCacheFactory {
-
+	
+	private final static FabricKeyValueStore KEY_VALUE_STORE = DefaultFabricConfiguration.INSTANCE.getDefaultConfiguration().getDefaultKeyValueStore();
+	
 	public static FabricStoreCache<Channel> createChannelStoreCache(HFClient client) {
-		return new ChannelStoreCache(DefaultFabricConfiguration.INSTANCE.getKeyValueStore(), client);
+		return new ChannelStoreCache(KEY_VALUE_STORE, client);
 	}
 	
 	public static FabricStoreCache<OrganizationUser> createOrganizationUserStoreCache() {
-		return new OrganizationUserStoreCache(DefaultFabricConfiguration.INSTANCE.getKeyValueStore());
+		return new OrganizationUserStoreCache(KEY_VALUE_STORE);
 	}
 	
 	public static FabricStoreCache<String> createPEMTLSCertStoreCache() {
-		return new PEMTLSCertStoreCache(DefaultFabricConfiguration.INSTANCE.getKeyValueStore());
+		return new PEMTLSCertStoreCache(KEY_VALUE_STORE);
 	}
 	
 	public static FabricStoreCache<String> createPEMTLSKeyStoreCache() {
-		return new PEMTLSKeyStoreCache(DefaultFabricConfiguration.INSTANCE.getKeyValueStore());
+		return new PEMTLSKeyStoreCache(KEY_VALUE_STORE);
 	}
 }
