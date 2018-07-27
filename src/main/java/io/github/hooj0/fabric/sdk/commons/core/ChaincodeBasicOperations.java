@@ -16,24 +16,18 @@ import org.hyperledger.fabric.sdk.Channel;
 public interface ChaincodeBasicOperations {
 
 	/**
-     * Force the initialization of this instance if it hasn't been
-     * initialized yet.
+     * 在指定的orgName节点上初始化通道 channelName
 	 * @author hoojo
 	 * @createDate 2018年7月23日 下午3:10:28
 	 * @return Channel initialization channel
 	 */
-	Channel init(String channelName, String orgName);
+	public Channel init(String channelName, String orgName);
 	
-    void close();
-
-    boolean isClosed();
-
-    State getState();
-
-    interface State {
-       
-        ChaincodeTransactionOperations getSession();
-
-        String getConnectedHosts();
-    }
+	/**
+	 * 初始化系统会员用户
+	 * @author hoojo
+	 * @createDate 2018年7月27日 下午4:40:43
+	 * @param users
+	 */
+	public void init(String... users);
 }
