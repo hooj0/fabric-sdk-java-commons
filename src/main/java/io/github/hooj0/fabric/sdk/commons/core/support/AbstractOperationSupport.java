@@ -19,6 +19,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 
 /**
  * common basic operation support
+ * @changelog Add Object getter method support, refactoring init method support
  * @changelog Add empty `constructor & init method` support & afterOptionSet method support
  * @author hoojo
  * @createDate 2018年7月25日 下午6:28:10
@@ -37,9 +38,11 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 	protected final FabricConfiguration config;
 	
 	protected final Channel channel;
+	protected final String channelName;
+	protected final String orgName;
 	
 	public AbstractOperationSupport(String channelName, String orgName, Class<?> clazz) {
-		this(channelName, orgName, DefaultFabricConfiguration.INSTANCE, clazz);
+		this(channelName, orgName, DefaultFabricConfiguration.INSTANCE.getDefaultConfiguration(), clazz);
 	}
 	
 	public AbstractOperationSupport(String channelName, String orgName, FabricConfiguration config, Class<?> clazz) {
@@ -56,15 +59,18 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 		this.userManager = new UserManager(config);
 		this.channelManager = new ChannelManager(config, client);
 		
-		this.init();
+		this.init(config.getUsers());
 		
+		this.orgName = orgName;
+		this.channelName = channelName;
 		this.channel = init(channelName, orgName);
 	}
 	
-	private void init() {
+	@Override
+	public void init(String... users) {
 		try {
-			userManager.initialize(config.getAdminInfo().getName(), config.getAdminInfo().getPassword(), config.getUsers());
-			logger.debug("Successfully initialize admin: {} & users: {}", config.getAdminInfo().getName(), config.getUsers());
+			userManager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), users);
+			logger.debug("Successfully initialize admin: {} & users: {}", config.getCaAdminName(), users);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw new FabricChaincodeOperationException("Instantiate administrator, user, authentication, registration failed.");
@@ -86,14 +92,12 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 			return channel;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			throw new FabricChaincodeOperationException("Instantiate preparing the channel '%s' failed.", config.getChannelName());
+			throw new FabricChaincodeOperationException("Instantiate preparing the channel '%s' failed.", channelName);
 		}
 	}
 	
 	public void afterOptionSet(Options options) {
 		checkNotNull(options, "options params not null!");
-		
-		options.setClientUserContext(DefaultFabricConfiguration.INSTANCE.getOrganization("").getPeerAdmin());
 		
 		if (options.getProposalWaitTime() <= 0) {
 			options.setProposalWaitTime(config.getProposalWaitTime());
@@ -105,21 +109,38 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 			if (transactionsOptions.getTransactionWaitTime() <= 0) {
 				transactionsOptions.setTransactionWaitTime(config.getTransactionWaitTime());
 			}
+			
+			if (transactionsOptions.getClientUserContext() != null) {
+				transactionsOptions.setClientUserContext(config.getOrganization(orgName).getPeerAdmin());
+			}
 		}
 	}
 
-	@Override
-	public void close() {
-
+	public HFClient getClient() {
+		return client;
 	}
 
-	@Override
-	public boolean isClosed() {
-		return false;
+	public UserManager getUserManager() {
+		return userManager;
 	}
 
-	@Override
-	public State getState() {
-		return null;
+	public ChannelManager getChannelManager() {
+		return channelManager;
+	}
+
+	public FabricConfiguration getConfig() {
+		return config;
+	}
+
+	public Channel getChannel() {
+		return channel;
+	}
+
+	public String getChannelName() {
+		return channelName;
+	}
+
+	public String getOrgName() {
+		return orgName;
 	}
 }
