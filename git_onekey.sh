@@ -1,4 +1,5 @@
 #!/bin/bash
+# @changlog Add remote push action, update git status, add log print
 
 #set -e
 #set -o pipefail
@@ -96,42 +97,60 @@ function commitCode() {
 	comment="$3"
 	
 	log "_black" "git add $file"
-	git add "$file"
+	if [ $debug_mode == "true" ]; then
+		git add "$file"
+	fi
 	
 	if [ -z $comment ]; then
 		log "red" "commit file ==> $file"
+		
 		git diff $file
+		echo
 		read -p "input commit comment message: " comment
 	fi
 	
 	case $code_status in
-	    "M")  
+	    "M"|"MM")  
 			log "_blue" "Changed file ==> $file"
-	    	git commit -m ":sparkles: :bento: :recycle: $emoji Changed ${comment}"
+			if [ $debug_mode == "true" ]; then
+	    		git commit -m ":sparkles: :bento: :recycle: $emoji Changed ${comment}"
+	    	fi
 	    ;;
-	    "R"|"RMD")  
+	    "R"|"RM")  
 			log "_yellow" "Renamed file ==> $file"
-	    	git commit -m ":sparkles: :bento: :truck: $emoji Renamed ${comment}"
+			if [ $debug_mode == "true" ]; then
+	    		git commit -m ":sparkles: :bento: :truck: $emoji Renamed ${comment}"
+	    	fi
 	    ;;
 	    "A")  
 			log "_green" "Added file ==> $file"
-	    	git commit -m ":sparkles: :bento: $emoji Added ${comment}"
+			if [ $debug_mode == "true" ]; then
+	    		git commit -m ":sparkles: :bento: $emoji Added ${comment}"
+	    	fi
 	    ;;
 	    "D")  
 			log "_red" "Removed file ==> $file"
-	    	git commit -m ":sparkles: :bento: :fire: $emoji Removed ${comment}"
+			if [ $debug_mode == "true" ]; then
+	    		git commit -m ":sparkles: :bento: :fire: $emoji Removed ${comment}"
+	    	fi
 	    ;;
 	    "C")  
 			log "_sky_blue" "Added copy file ==> $file"
-	    	git commit -m ":sparkles: :bento: $emoji Added ${comment}"
+			if [ $debug_mode == "true" ]; then
+	    		git commit -m ":sparkles: :bento: $emoji Added ${comment}"
+	    	fi
 	    ;;
 	    "U")  
 			log "_white" "Added copy file ==> $file"
-	    	git commit -m ":sparkles: :bento: :recycle: $emoji Updated ${comment}"
+			if [ $debug_mode == "true" ]; then
+	    		git commit -m ":sparkles: :bento: :recycle: $emoji Updated ${comment}"
+	    	fi
 	    ;;
 	    "??")  
 			log "_purple" "First init add ==> $file"
-	    	git commit -m ":sparkles: :tada: :bento: $emoji Init add ${comment}"
+			if [ $debug_mode == "true" ]; then
+	    		git commit -m ":sparkles: :bento: :tada: $emoji Init add ${comment}"
+	    	fi
 	    ;;
 	    *)  
 	    	log "rrr" "===================================> NOT FOUND Match Status：$code_status"
@@ -140,12 +159,11 @@ function commitCode() {
 }
 
 function findCommitFiles() {
-	echo
-	# git status -s | awk -F ' ' '{print $1}'
+	# git status -su | awk -F ' ' '{print $1}'
 	
 	IFS_OLD=$IFS
 	IFS=$'\n'
-	file_status=$(git status -s)
+	file_status=`git status -su`
 	
 	for status in $file_status; do
 		log "_line" "                                                                                                                                "
@@ -161,7 +179,6 @@ function findCommitFiles() {
 		#echo "status --> ${state}"
 		#echo "file --> ${file}"
 		fetchComment $file
-		
 		fetchCommentStatus $comment
 		commitCode $state $file $comment
 	done
@@ -195,7 +212,7 @@ function fetchComment() {
 }
 
 function generatorComment() {
-	log "red" "----------------------> ${file##*.}"
+	log "red" " generator comment =========> ${file##*.}"
 	
 	suffix=${file##*.}
 	case $suffix in
@@ -206,6 +223,11 @@ function generatorComment() {
 		"properties"|"xml")
 			emoji=":wrench:"
 		;;
+		*)
+			unset emoji
+			unset comment
+			#comment=""
+		;;
 	esac	
 }
 
@@ -215,7 +237,6 @@ function fetchCommentStatus() {
 	comment="$1"
 	comment_state=`echo $comment | awk -F ' ' '{print $1}'`
 	
-	unset fetch_status
 	if [ -n $comment_state ]; then
 		case $comment_state in
 			add|Add|added|Added)
@@ -236,6 +257,9 @@ function fetchCommentStatus() {
 			delete|Delete|deleted|Deleted)
 				fetch_status="D"
 			;;
+			*)
+				unset fetch_status
+			;;
 		esac
 		
 		# 截掉首单词
@@ -250,14 +274,34 @@ function fetchCommentStatus() {
 	# echo "comment==========> $comment"
 }
 
+function pushGit() {
+	git status
+	
+	git push origin master
+}
+
 # setup shell
 function setup() {
-	
+	log "_red" "================ Start 'Add & Commit' code to local repository ==============="
 	findCommitFiles
 	
+	log "_red" "================   Start 'pushing' code to remote repository   ==============="
+	#pushGit
+	
 	echo
-	log "_green" "Done!"
+	log "_green" "          Done!"
+	echo
 }
 	
-
+debug_mode="false"	
+for param in "$@"; do
+    echo "====> 参数: $param"
+    if [ $param == "-d" -o $param == "--debug" ]; then
+    	debug_mode="true"
+    fi
+done
+	
 setup
+
+
+

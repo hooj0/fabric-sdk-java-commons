@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 	
 	<name>Hyperledger fabric java sdk commons</name>
-	<description> Hyperledger fabric java sdk assembly of public, core functional methods, providing further calls to other frameworks.</description>
+	<description>Hyperledger fabric java sdk assembly of public, core functional methods, providing further calls to other frameworks.</description>
 	<url>https://github.com/hooj0/fabric-sdk-java-commons</url>
 
 	<licenses>
