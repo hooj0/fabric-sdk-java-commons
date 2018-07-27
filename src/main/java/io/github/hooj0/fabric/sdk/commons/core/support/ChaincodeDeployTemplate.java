@@ -40,11 +40,6 @@ public class ChaincodeDeployTemplate extends AbstractOperationSupport implements
 	private ChaincodeInstantiateExecution instantiateExecution;
 	private ChaincodeUpgradeExecution upgradeExecution;
 	
-	public ChaincodeDeployTemplate(FabricConfiguration config) {
-		super(config.getChannelName(), config.getDefaultOrgName(), config, ChaincodeDeployTemplate.class);
-		this.init();
-	}
-	
 	public ChaincodeDeployTemplate(String channelName, String orgName) {
 		super(channelName, orgName, ChaincodeDeployTemplate.class);
 		this.init();
