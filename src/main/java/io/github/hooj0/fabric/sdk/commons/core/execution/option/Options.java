@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * Chaincode Operation execution Options
- * @changlog updated `proposalWaitTime` type to long
+ * @changlog updated chaincode getter & setter method, add chaincodeID setter getter method
  * @author hoojo
  * @createDate 2018年7月23日 下午3:00:27
  * @file Options.java
@@ -25,11 +25,11 @@ import com.google.common.collect.ImmutableMap;
 public class Options {
 
 	/** Chaincode 名称 */
-	private String chancodeName;
+	private String chaincodeName;
 	/** Chaincode 路径 */
 	private String chaincodePath;
 	/** Chaincode 版本 */
-	private String chanicodeVersion;
+	private String chaincodeVersion;
 	/** Chaincode 类型 */
 	private Type chaincodeType;
 	
@@ -46,8 +46,8 @@ public class Options {
 	/** 客户端User上下文 */
 	private User clientUserContext;
 	
-	public Options setChancodeName(String chancodeName) {
-		this.chancodeName = chancodeName;
+	public Options setChaincodeName(String chaincodeName) {
+		this.chaincodeName = chaincodeName;
 		return this;
 	}
 	
@@ -56,8 +56,8 @@ public class Options {
 		return this;
 	}
 	
-	public Options setChanicodeVersion(String chanicodeVersion) {
-		this.chanicodeVersion = chanicodeVersion;
+	public Options setChaincodeVersion(String chaincodeVersion) {
+		this.chaincodeVersion = chaincodeVersion;
 		return this;
 	}
 	
@@ -95,16 +95,16 @@ public class Options {
 		return transientData;
 	}
 
-	public String getChancodeName() {
-		return chancodeName;
+	public String getChaincodeName() {
+		return chaincodeName;
 	}
 
 	public String getChaincodePath() {
 		return chaincodePath;
 	}
 
-	public String getChanicodeVersion() {
-		return chanicodeVersion;
+	public String getChaincodeVersion() {
+		return chaincodeVersion;
 	}
 
 	public Type getChaincodeType() {
@@ -116,7 +116,15 @@ public class Options {
 	}
 	
 	public ChaincodeID getChaincodeId() {
-		return ChaincodeID.newBuilder().setName(chancodeName).setPath(chaincodePath).setVersion(chanicodeVersion).build();
+		return ChaincodeID.newBuilder().setName(chaincodeName).setPath(chaincodePath).setVersion(chaincodeVersion).build();
+	}
+	
+	public Options setChaincodeId(ChaincodeID chaincodeId) {
+		this.chaincodeName = chaincodeId.getName();
+		this.chaincodePath = chaincodeId.getPath();
+		this.chaincodeVersion = chaincodeId.getVersion();
+
+		return this;
 	}
 
 	public Collection<Peer> getSend2Peers() {
