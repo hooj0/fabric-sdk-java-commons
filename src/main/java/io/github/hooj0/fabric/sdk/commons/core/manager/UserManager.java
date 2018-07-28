@@ -147,7 +147,7 @@ public class UserManager extends AbstractManager {
 			}
 
 			// peer admin
-			OrganizationUser peerAdmin = wrapperPeerAdmin(org);
+			OrganizationUser peerAdmin = createPeerAdmin(org);
 
 			// 设置当前组织 peerAdmin
 			org.setPeerAdmin(peerAdmin);
@@ -250,13 +250,13 @@ public class UserManager extends AbstractManager {
 	}
 
 	/**
-	 * peer节点管理员证书私钥封装
+	 * peer节点管理员 注册和认证
 	 * 
 	 * @author hoojo
 	 * @createDate 2018年6月13日 上午10:53:35
 	 * @throws IOException
 	 */
-	public OrganizationUser wrapperPeerAdmin(Organization org) throws Exception {
+	public OrganizationUser createPeerAdmin(Organization org) throws Exception {
 		logger.info("节点管理员——认证……");
 
 		final String orgName = org.getName();
