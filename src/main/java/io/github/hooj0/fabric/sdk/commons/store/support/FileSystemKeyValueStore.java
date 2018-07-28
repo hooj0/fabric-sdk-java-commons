@@ -39,7 +39,11 @@ public class FileSystemKeyValueStore extends AbstractObject implements FabricKey
 
 	public FileSystemKeyValueStore(File storeFile) {
 		super(FileSystemKeyValueStore.class);
+		
 		logger.debug("KeyValue store file location：{}", storeFile.getAbsolutePath());
+		if (!storeFile.exists()) {
+			throw new FabricStoreException("KeyValueStore file not found, Please create a file：%s", storeFile.getName());
+		}
 		
 		this.storeFile = storeFile;
 	}
