@@ -78,7 +78,7 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	 * crypto-config & channel-artifacts 加密配置和通道文件的 根目录，
 	 * 如：/e2e-2Orgs <br/>
 	 * 返回完整路径：src/test/fixture/integration/e2e-2Orgs/v1.0/
-	 **/
+	 */
 	public String getCryptoChannelConfigRootPath() {
 		return Paths.get(getCommonRootPath(), getProperty(CRYPTO_CHANNEL_CONFIG_ROOT_PATH, "/e2e-2Orgs/"), getFabricConfigtxVersion()).toString();
 	}
@@ -86,7 +86,7 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	/** 
 	 * 通道文件的配置目录，如: /channel-artifacts <br/>
 	 * 返回完整路径： src/test/fixture/integration/e2e-2Orgs/v1.0/channel-artifacts 
-	 **/
+	 */
 	public String getChannelArtifactsPath() {
 		return Paths.get(getCryptoChannelConfigRootPath(), getProperty(CHANNEL_ARTIFACTS_ROOT_PATH, "/channel-artifacts")).toString();
 	}
@@ -94,7 +94,7 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	/** 
 	 * chaincode 源码文件路径，如：/gocc/sample11 <br/> 
 	 * 返回完整路径：src/test/fixture/integration/gocc/sample_11 
-	 **/
+	 */
 	public String getChaincodeRootPath() {
 		return Paths.get(getCommonRootPath(), getProperty(CHAINCODE_SOURCE_ROOT_PATH)).toString();
 	}
@@ -102,7 +102,7 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	/** 
 	 * 背书文件配置路径，如：chaincodeendorsementpolicy.yaml <br/> 
 	 * 返回完整路径：src/test/fixture/integration/chaincodeendorsementpolicy.yaml 
-	 **/
+	 */
 	public String getEndorsementPolicyFilePath() {
 		return Paths.get(getCommonRootPath(), getProperty(ENDORSEMENT_POLICY_FILE_PATH)).toString();
 	}
@@ -110,7 +110,7 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	/** 
 	 * network config 配置路径父目录，如：network_configs <br/>
 	 * 返回完整路径：src/test/fixture/sdkintegration/network_configs 
-	 **/
+	 */
 	public String getNetworkConfigRootPath() {
 		return Paths.get(getCommonRootPath(), getProperty(NETWORK_CONFIG_ROOT_PATH)).toString();
 	}
@@ -123,15 +123,15 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	
 	/** fabric网络 Ca 节点 管理员 密码  */
 	public String getCaAdminPassword() {
-		return getProperty(NETWORK_CA_ADMIN_NAME);
+		return getProperty(NETWORK_CA_ADMIN_PASSWD);
 	}
 	
 	/** fabric网络 Ca 节点 管理员 用户名*/
 	public String getCaAdminName() {
-		return getProperty(NETWORK_CA_ADMIN_PASSWD);
+		return getProperty(NETWORK_CA_ADMIN_NAME);
 	}
 	
-	/** organization中的member user */
+	/** organization中的member user，fabric network 即将准备初始化注册&认证的普通用户 */
 	public String[] getUsers() {
 		return StringUtils.split(StringUtils.strip(getProperty(NETWORK_ORGS_MEMBER_USERS)), ",");
 	}
