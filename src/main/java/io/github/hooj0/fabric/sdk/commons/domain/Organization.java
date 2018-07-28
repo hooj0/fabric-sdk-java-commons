@@ -10,8 +10,11 @@ import java.util.Set;
 import org.hyperledger.fabric.sdk.User;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
 
+import lombok.ToString;
+
 /**
  * Organization Resources 组织资源配置
+ * @changelog Add toString overwrite method implements
  * @author hoojo
  * @createDate 2018年6月12日 下午3:26:54
  * @file Organization.java
@@ -21,6 +24,7 @@ import org.hyperledger.fabric_ca.sdk.HFCAClient;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@ToString
 public class Organization {
 	
 	/** org name */
