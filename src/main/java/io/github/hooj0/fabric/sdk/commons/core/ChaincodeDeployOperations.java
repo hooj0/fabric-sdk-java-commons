@@ -17,6 +17,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
  * chaincode deploy operation `install & instantiate & upgrade` interface
+ * @changelog Add extends ChaincodeBasicOperations interface
  * @author hoojo
  * @createDate 2018年7月24日 下午5:46:02
  * @file ChaincodeDeployOperations.java
@@ -26,7 +27,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface ChaincodeDeployOperations {
+public interface ChaincodeDeployOperations extends ChaincodeBasicOperations {
 
 	// install
 	
