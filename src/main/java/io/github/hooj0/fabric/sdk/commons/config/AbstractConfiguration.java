@@ -57,6 +57,7 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	
 	/** 默认的组织配置信息配置设置 */
 	protected void defaultValueSettings() {
+
 		// Default network domain
 		defaultProperty(NETWORK_DOMAIN, "example.com");
 		
@@ -114,11 +115,7 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 			addEventHubLocation(organization, orgName);
 
 			setCAProperties(organization, orgName);
-			
-			logger.debug("最终organization配置：{}", organization);
 		}
-
-		logger.debug("最终ORGANIZATION_RESOURCES配置：{}", ORGANIZATIONS);
 	}
 	
 	/** 默认配置优先读取 系统级别 配置，如果系统环境配置为空，则读取运行变量中的配置 */
@@ -135,6 +132,8 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 				if (null == getProperty(key) && value != null) {
 					data = value;
 					logger.trace("使用默认配置：{} => {}", key, data);
+				} else {
+					logger.trace("读取SDK配置: {} => {}", key, getProperty(key));
 				}
 			}
 		}
