@@ -23,7 +23,7 @@
 	<logger name="io.netty" level="ERROR" />
 	<logger name="io.grpc.netty" level="ERROR" />
 	
-	<logger name="com.cnblogs.hoojo.fabric" level="TRACE" />
+	<logger name="io.github.hooj0.fabric.sdk.commons" level="TRACE" />
 	<logger name="org.hyperledger" level="TRACE" />
 
 	<root level="TRACE">
