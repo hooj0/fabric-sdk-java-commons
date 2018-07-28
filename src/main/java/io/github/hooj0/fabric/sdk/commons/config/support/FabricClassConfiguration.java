@@ -1,10 +1,17 @@
 package io.github.hooj0.fabric.sdk.commons.config.support;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import io.github.hooj0.fabric.sdk.commons.FabricConfigurationException;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 import io.github.hooj0.fabric.sdk.commons.store.support.MemoryKeyValueStore;
 
 /**
  * Class System configuration support
+ * @changelog Add default fabric key value store const variable, generator properties file method support
  * @changelog Add singleton instance support, provide default key value store and property setter method
  * @author hoojo
  * @createDate 2018年7月23日 上午9:23:25
@@ -17,6 +24,8 @@ import io.github.hooj0.fabric.sdk.commons.store.support.MemoryKeyValueStore;
  */
 public final class FabricClassConfiguration extends AbstractConfigurationSupport {
 
+	private static final FabricKeyValueStore KEY_VALUE_STORE = new MemoryKeyValueStore();
+	
 	private final static class SingletonHolder {
 		public static final FabricClassConfiguration instance = new FabricClassConfiguration();
 	}
@@ -34,7 +43,7 @@ public final class FabricClassConfiguration extends AbstractConfigurationSupport
 
 	@Override
 	public FabricKeyValueStore getDefaultKeyValueStore() {
-		return new MemoryKeyValueStore();
+		return KEY_VALUE_STORE;
 	}
 	
 	public FabricClassConfiguration settingPropertyValue(String key, String value) {
@@ -92,5 +101,26 @@ public final class FabricClassConfiguration extends AbstractConfigurationSupport
 		settingPropertyValue(NETWORK_KEY_PREFIX + orgName +  ".domname", domain); // "org2.example.com"
 		
 		return this;
+	}
+	
+	/**
+	 * 将Class配置中的数据，生成 Properties 配置文件 
+	 * @author hoojo
+	 * @createDate 2018年7月28日 下午6:08:53
+	 * @param file
+	 */
+	public void generatorPropertiesFile(File file) {
+		try {
+			logger.debug("generator properties config file: {}", file.getAbsolutePath());
+			OutputStream out = new FileOutputStream(file);
+			
+			SDK_COMMONS_PROPERTIES.store(out, "class file fabric configuration support");
+			
+			out.flush();
+			out.close();
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			throw new FabricConfigurationException(e, "generator properties config file '%s' exception：", file.getAbsolutePath());
+		}
 	}
 }
