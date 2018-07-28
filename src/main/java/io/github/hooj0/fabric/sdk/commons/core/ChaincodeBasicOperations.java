@@ -1,9 +1,15 @@
 package io.github.hooj0.fabric.sdk.commons.core;
 
 import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.sdk.HFClient;
+
+import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
+import io.github.hooj0.fabric.sdk.commons.core.manager.ChannelManager;
+import io.github.hooj0.fabric.sdk.commons.core.manager.UserManager;
 
 /**
  * basic chaincode operations init interface
+ * @changelog Add getter method defined
  * @author hoojo
  * @createDate 2018年7月25日 下午6:21:55
  * @file ChaincodeBasicOperations.java
@@ -30,4 +36,18 @@ public interface ChaincodeBasicOperations {
 	 * @param users
 	 */
 	public void init(String... users);
+	
+	public HFClient getClient();
+
+	public UserManager getUserManager();
+
+	public ChannelManager getChannelManager();
+
+	public FabricConfiguration getConfig();
+
+	public Channel getChannel();
+
+	public String getChannelName();
+
+	public String getOrgName();
 }
