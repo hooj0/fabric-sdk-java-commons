@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import io.github.hooj0.fabric.sdk.commons.config.FabricConfigurationPropertyKey;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
 
@@ -39,7 +40,7 @@ public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Seri
 	}
 	
 	public static FabricKeyValueStore newDefaultKeyValueStore() {
-		FabricKeyValueStore store = new FileSystemKeyValueStore(new File("/HFCSampletest.properties"));
+		FabricKeyValueStore store = new FileSystemKeyValueStore(new File(FabricConfigurationPropertyKey.DEFAULT_KEY_VALUE_STORE_FILE_NAME));
 		
 		return store;
 	}
