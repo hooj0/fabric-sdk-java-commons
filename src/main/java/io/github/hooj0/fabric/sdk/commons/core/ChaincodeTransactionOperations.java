@@ -12,7 +12,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
  * fabric chaincode transaction `invoke & query` operations
- * @changelog Add extends ChaincodeBasicOperations interface
+ * @changelog Add extends `ChaincodeBasicOperations` interface
  * @author hoojo
  * @createDate 2018年7月23日 下午2:49:13
  * @file Session.java
