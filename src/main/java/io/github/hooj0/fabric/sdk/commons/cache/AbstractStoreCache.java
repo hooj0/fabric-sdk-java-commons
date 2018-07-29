@@ -10,7 +10,7 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
 
 /**
- * Baisc store cache，implements cache prefix key wrapper and cache object Serialization
+ * baisc store cache, implements cache prefix key wrapper and cache object Serialization
  * @author hoojo
  * @createDate 2018年7月22日 上午11:51:13
  * @file AbstractStoreCache.java
