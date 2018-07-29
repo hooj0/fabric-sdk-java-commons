@@ -1,5 +1,6 @@
 package io.github.hooj0.fabric.sdk.commons.core.support;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -8,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.hyperledger.fabric.sdk.TransactionRequest.Type;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -19,9 +20,10 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstantiateOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.UpgradeOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
+import io.github.hooj0.fabric.sdk.commons.store.support.MemoryKeyValueStore;
 
 /**
- * chaincode deploy template test units
+ * chaincode deploy template 'Install & Instantiate & Upgrade' test units
  * @author hoojo
  * @createDate 2018年7月28日 下午9:58:03
  * @file ChaincodeDeployTemplateTest.java
@@ -32,24 +34,17 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @version 1.0
  */
 @SuppressWarnings("unused")
-public class ChaincodeDeployTemplateTest {
-
-	private final static String foo = "mychannel";
-	private final static String bar = "mychannel2";
-	private final static String org1 = "peerOrg1";
-	private final static String org2 = "peerOrg2";
-	
-	private static String CHAIN_CODE_NAME = "example_cc_go";
-	private static String CHAIN_CODE_PATH = "github.com/example_cc";
-	private static final String CHAIN_CODE_VERSION = "1";
-	private static final String CHAIN_CODE_VERSION_11 = "11";
-	private static Type CHAIN_CODE_LANG = Type.GO_LANG;
+public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 
 	private ChaincodeDeployOperations operations;
 	
-	@BeforeClass
+	@Before
 	public void setup() {
-		operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance()); 
+		//operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance()); 
+		
+		//operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new File("my-kv-store.properties")); 
+		
+		operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new MemoryKeyValueStore()); 
 	}
 	
 	@Test
