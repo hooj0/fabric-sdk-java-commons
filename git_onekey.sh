@@ -112,31 +112,31 @@ function commitCode() {
 	
 	case $code_status in
 	    "M"|"MM")  
-			log "_blue" "Changed file ==> $file"
+			log "blue" "Changed file ==> $file"
 			if [ $debug_mode == "false" ]; then
 	    		git commit -m ":sparkles: :bento: :recycle: $emoji Changed ${comment}"
 	    	fi
 	    ;;
 	    "R"|"RM")  
-			log "_yellow" "Renamed file ==> $file"
+			log "yellow" "Renamed file ==> $file"
 			if [ $debug_mode == "false" ]; then
 	    		git commit -m ":sparkles: :bento: :truck: $emoji Renamed ${comment}"
 	    	fi
 	    ;;
 	    "A")  
-			log "_green" "Added file ==> $file"
+			log "green" "Added file ==> $file"
 			if [ $debug_mode == "false" ]; then
 	    		git commit -m ":sparkles: :bento: $emoji Added ${comment}"
 	    	fi
 	    ;;
 	    "D")  
-			log "_red" "Removed file ==> $file"
+			log "red" "Removed file ==> $file"
 			if [ $debug_mode == "false" ]; then
 	    		git commit -m ":sparkles: :bento: :fire: $emoji Removed ${comment}"
 	    	fi
 	    ;;
 	    "C")  
-			log "_sky_blue" "Added copy file ==> $file"
+			log "sky_blue" "Added copy file ==> $file"
 			if [ $debug_mode == "false" ]; then
 	    		git commit -m ":sparkles: :bento: $emoji Added ${comment}"
 	    	fi
@@ -148,7 +148,7 @@ function commitCode() {
 	    	fi
 	    ;;
 	    "??")  
-			log "_purple" "First init add ==> $file"
+			log "purple" "First init add ==> $file"
 			if [ $debug_mode == "false" ]; then
 	    		git commit -m ":sparkles: :bento: :tada: $emoji Init add ${comment}"
 	    	fi
