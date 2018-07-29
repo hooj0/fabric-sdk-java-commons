@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableMap;
 
 /**
  * Chaincode Operation execution Options
- * @changlog updated chaincode getter & setter method, add chaincodeID setter getter method
+ * @changelog updated chaincode getter & setter method, add chaincodeID setter getter method
  * @author hoojo
  * @createDate 2018年7月23日 下午3:00:27
  * @file Options.java
@@ -120,6 +120,7 @@ public class Options {
 	}
 	
 	public Options setChaincodeId(ChaincodeID chaincodeId) {
+		
 		this.chaincodeName = chaincodeId.getName();
 		this.chaincodePath = chaincodeId.getPath();
 		this.chaincodeVersion = chaincodeId.getVersion();
