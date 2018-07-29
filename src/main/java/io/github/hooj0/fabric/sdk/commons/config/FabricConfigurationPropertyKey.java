@@ -2,6 +2,8 @@ package io.github.hooj0.fabric.sdk.commons.config;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.github.hooj0.fabric.sdk.commons.AbstractObject;
+
 /**
  * fabric configuration properties key
  * @changelog Add fabric config property key comment desc
@@ -14,10 +16,14 @@ import org.apache.commons.lang3.StringUtils;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface FabricConfigurationPropertyKey  {
+public abstract class FabricConfigurationPropertyKey extends AbstractObject {
 
+	/** 默认的Key前缀，当 COMMONS_PREFIX 为空就使用 DEFAULT_PREFIX 前缀  */
+	public static final String DEFAULT_PREFIX = "hyperledger.fabric.sdk.commons.";
+	/** 公共前缀，提供外部修改 */
+	public static String COMMONS_PREFIX = DEFAULT_PREFIX;
 	/** 配置Key前缀 */
-	public static final String PREFIX = "hyperledger.fabric.sdk.commons.";
+	public static final String PREFIX = StringUtils.defaultIfBlank(COMMONS_PREFIX, DEFAULT_PREFIX);
 	
 	
 	
@@ -114,8 +120,13 @@ public interface FabricConfigurationPropertyKey  {
 	/** 系统变量 SDK配置 */
 	public static final String ENV_FABRIC_SDK_CONFIG = "HYPERLEDGER_FABRIC_SDK_COMMONS_CONFIG";
 	/** 默认SDK配置 */
-	public static final String DEFAULT_SDK_CONFIG_NAME = "default-config.properties";
+	public static final String DEFAULT_SDK_CONFIG_NAME = "fabric-chaincode.properties";
+	/** SDK 配置文件名称 */
+	public static String SDK_CONFIG_NAME = DEFAULT_SDK_CONFIG_NAME;
 	/** 默认的file keyvalue store 配置文件名称 */
 	public static final String DEFAULT_KEY_VALUE_STORE_FILE_NAME = "fabric-kv-store.properties";
 	
+	public FabricConfigurationPropertyKey(Class<?> clazz) {
+		super(clazz);
+	}
 }
