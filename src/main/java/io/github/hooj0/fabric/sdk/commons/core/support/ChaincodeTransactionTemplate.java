@@ -1,5 +1,6 @@
 package io.github.hooj0.fabric.sdk.commons.core.support;
 
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,9 +16,11 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.option.QueryOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 import io.github.hooj0.fabric.sdk.commons.core.execution.support.ChaincodeInvokeExecutionSupport;
 import io.github.hooj0.fabric.sdk.commons.core.execution.support.ChaincodeQueryExecutionSupport;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
  * fabric chaincode transaction `invoke & query` operations interface support
+ * @changelog Add `file & key value store` constructor method support
  * @author hoojo
  * @createDate 2018年7月26日 下午4:19:55
  * @file ChaincodeTransactionTemplate.java
@@ -33,12 +36,22 @@ public class ChaincodeTransactionTemplate extends AbstractOperationSupport imple
 	private ChaincodeQueryExecution queryExecution;
 	
 	public ChaincodeTransactionTemplate(String channelName, String orgName) {
-		super(channelName, orgName, ChaincodeDeployTemplate.class);
+		super(channelName, orgName, ChaincodeTransactionTemplate.class);
 		this.init();
 	}
 
 	public ChaincodeTransactionTemplate(String channelName, String orgName, FabricConfiguration config) {
-		super(channelName, orgName, config, ChaincodeDeployTemplate.class);
+		super(channelName, orgName, config, ChaincodeTransactionTemplate.class);
+		this.init();
+	}
+	
+	public ChaincodeTransactionTemplate(String channelName, String orgName, FabricConfiguration config, File storeFile) {
+		super(channelName, orgName, config, storeFile, ChaincodeTransactionTemplate.class);
+		this.init();
+	}
+
+	public ChaincodeTransactionTemplate(String channelName, String orgName, FabricConfiguration config, FabricKeyValueStore store) {
+		super(channelName, orgName, config, store, ChaincodeTransactionTemplate.class);
 		this.init();
 	}
 	
