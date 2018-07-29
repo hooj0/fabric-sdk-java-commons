@@ -18,7 +18,7 @@ import lombok.ToString;
  * @author hoojo
  * @createDate 2018年6月12日 下午3:26:54
  * @file Organization.java
- * @package com.cnblogs.hoojo.fabric.sdk.config
+ * @package io.github.hooj0.fabric.sdk.commons.domain
  * @project fabric-sdk-examples
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
