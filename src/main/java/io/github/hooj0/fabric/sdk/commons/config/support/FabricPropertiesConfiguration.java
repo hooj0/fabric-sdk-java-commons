@@ -44,19 +44,19 @@ public final class FabricPropertiesConfiguration extends AbstractConfigurationSu
 		InputStream stream = null;
 		try {
 			// 读取 sdk 配置文件名称，没有就读取默认配置 DEFAULT_CONFIG
-			File config = new File(getConfigPath()).getAbsoluteFile();
-			logger.info("FileSystem加载SDK配置文件： {}， 配置文件存在: {}", config.getAbsolutePath(), config.exists());
+			File config = new File(getConfigPath());
+			logger.info("FileSystem loads the SDK configuration file: {}, if the configuration file exists: {}", config.getAbsolutePath(), config.exists());
 			
 			if (!config.exists()) {
 				stream = FabricPropertiesConfiguration.class.getResourceAsStream("/" + config.getName());
-				logger.info("ClassPath加载SDK配置文件： {}， 配置文件存在: {}", config.getName(), stream != null);
+				logger.info("ClassPath loads the SDK configuration file: {}, the configuration file exists: {}", config.getName(), stream != null);
 			} else {
 				stream = new FileInputStream(config);
 			}
 			
 			SDK_COMMONS_PROPERTIES.load(stream);
 		} catch (Exception e) {
-			logger.warn("使用SDK默认配置失败，没有找到SDK配置文件: {} ", DEFAULT_SDK_CONFIG_NAME);
+			logger.warn("Failed to use the SDK default configuration, SDK configuration file not found: {} ", DEFAULT_SDK_CONFIG_NAME);
 		} finally {
 
 			defaultValueSettings();
@@ -78,7 +78,7 @@ public final class FabricPropertiesConfiguration extends AbstractConfigurationSu
 	}
 	
 	private String getConfigPath() {
-		return StringUtils.defaultIfBlank(System.getenv(ENV_FABRIC_SDK_CONFIG), DEFAULT_SDK_CONFIG_NAME);
+		return StringUtils.defaultIfBlank(System.getenv(ENV_FABRIC_SDK_CONFIG), StringUtils.defaultIfEmpty(SDK_CONFIG_NAME, DEFAULT_SDK_CONFIG_NAME));
 	}
 	
 	/**
