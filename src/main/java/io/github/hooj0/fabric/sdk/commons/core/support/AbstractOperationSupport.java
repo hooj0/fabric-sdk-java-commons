@@ -2,6 +2,8 @@ package io.github.hooj0.fabric.sdk.commons.core.support;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.File;
+
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
@@ -16,11 +18,12 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.option.TransactionsOpti
 import io.github.hooj0.fabric.sdk.commons.core.manager.ChannelManager;
 import io.github.hooj0.fabric.sdk.commons.core.manager.UserManager;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
+import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
 
 /**
  * common basic operation support
- * @changelog Add Object getter method support, refactoring init method support
- * @changelog Add empty `constructor & init method` support & afterOptionSet method support
+ * @changelog Add `File & FabricKeyValueStore` constructor method support & add common initialize method
  * @author hoojo
  * @createDate 2018年7月25日 下午6:28:10
  * @file AbstractOperationSupport.java
@@ -32,14 +35,14 @@ import io.github.hooj0.fabric.sdk.commons.domain.Organization;
  */
 public class AbstractOperationSupport extends AbstractObject implements ChaincodeBasicOperations {
 
-	protected final HFClient client;
-	protected final UserManager userManager;
-	protected final ChannelManager channelManager;
-	protected final FabricConfiguration config;
+	protected HFClient client;
+	protected UserManager userManager;
+	protected ChannelManager channelManager;
+	protected FabricConfiguration config;
 	
-	protected final Channel channel;
-	protected final String channelName;
-	protected final String orgName;
+	protected Channel channel;
+	protected String channelName;
+	protected String orgName;
 	
 	public AbstractOperationSupport(String channelName, String orgName, Class<?> clazz) {
 		this(channelName, orgName, DefaultFabricConfiguration.INSTANCE.getDefaultConfiguration(), clazz);
@@ -47,7 +50,19 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 	
 	public AbstractOperationSupport(String channelName, String orgName, FabricConfiguration config, Class<?> clazz) {
 		super(clazz);
-		
+		this.initialize(channelName, orgName, config, null);
+	}
+	
+	public AbstractOperationSupport(String channelName, String orgName, FabricConfiguration config, File storeFile, Class<?> clazz) {
+		this(channelName, orgName, config, new FileSystemKeyValueStore(storeFile), clazz);
+	}
+	
+	public AbstractOperationSupport(String channelName, String orgName, FabricConfiguration config, FabricKeyValueStore store, Class<?> clazz) {
+		super(clazz);
+		this.initialize(channelName, orgName, config, store);
+	}
+	
+	private void initialize(String channelName, String orgName, FabricConfiguration config, FabricKeyValueStore store) {
 		this.client = HFClient.createNewInstance();
 		try {
 			client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
@@ -56,14 +71,19 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 		}
 		
 		this.config = config;
-		this.userManager = new UserManager(config);
-		this.channelManager = new ChannelManager(config, client);
+		if (store != null) {
+			this.userManager = new UserManager(config, store);
+			this.channelManager = new ChannelManager(config, client, store);
+		} else {
+			this.userManager = new UserManager(config);
+			this.channelManager = new ChannelManager(config, client);
+		}
 		
 		this.init(config.getUsers());
+		this.channel = init(channelName, orgName);
 		
 		this.orgName = orgName;
 		this.channelName = channelName;
-		this.channel = init(channelName, orgName);
 	}
 	
 	@Override
@@ -104,8 +124,8 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 		}
 		
 		if (options instanceof TransactionsOptions) {
-			
 			TransactionsOptions transactionsOptions = (TransactionsOptions) options;
+			
 			if (transactionsOptions.getTransactionWaitTime() <= 0) {
 				transactionsOptions.setTransactionWaitTime(config.getTransactionWaitTime());
 			}
@@ -142,5 +162,15 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 
 	public String getOrgName() {
 		return orgName;
+	}
+	
+	/**
+	 * 获取当前的组织信息
+	 * @author hoojo
+	 * @createDate 2018年7月29日 上午11:25:24
+	 * @return Organization
+	 */
+	public Organization getOrganization() {
+		return this.config.getOrganization(this.orgName);
 	}
 }
