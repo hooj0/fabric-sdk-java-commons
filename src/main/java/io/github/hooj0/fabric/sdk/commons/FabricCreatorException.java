@@ -1,7 +1,7 @@
 package io.github.hooj0.fabric.sdk.commons;
 
 /**
- * fabric store 异常
+ * fabric store custom exception
  * @author hoojo
  * @createDate 2018年7月21日 下午10:27:53
  * @file FabricCreatorException.java
