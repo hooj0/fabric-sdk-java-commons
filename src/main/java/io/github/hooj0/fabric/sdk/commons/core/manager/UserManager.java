@@ -218,7 +218,7 @@ public class UserManager extends AbstractManager {
 	 * @author hoojo
 	 * @createDate 2018年6月13日 上午10:48:39
 	 */
-	public OrganizationUser registerAndEnrollUser(Organization org, String userName) throws Exception {
+	public OrganizationUser registerAndEnrollUser(Organization org, String userName, String affiliation) throws Exception {
 		logger.info("普通用户——注册和认证……");
 
 		HFCAClient ca = org.getCAClient();
@@ -227,7 +227,7 @@ public class UserManager extends AbstractManager {
 		OrganizationUser user = userStoreCache.getStore(userName, org.getName());
 		if (!user.isRegistered()) { // 未注册
 			// 用户注册
-			final RegistrationRequest request = new RegistrationRequest(user.getName(), "org1.department1");
+			final RegistrationRequest request = new RegistrationRequest(user.getName(), affiliation);
 
 			// 利用管理员权限进行普通user注册
 			String secret = ca.register(request, org.getAdmin());
@@ -248,6 +248,11 @@ public class UserManager extends AbstractManager {
 
 		return user;
 	}
+	
+	/** {@link #registerAndEnrollUser(Organization, String, String) } */
+	public OrganizationUser registerAndEnrollUser(Organization org, String userName) throws Exception {
+		return this.registerAndEnrollUser(org, userName, "org1.department1");
+	}
 
 	/**
 	 * peer节点管理员 注册和认证
@@ -264,9 +269,10 @@ public class UserManager extends AbstractManager {
 		final String domain = org.getDomainName();
 
 		// src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
-		File keydir = Paths.get(config.getCryptoChannelConfigRootPath(), "crypto-config/peerOrganizations/", domain, format("/users/Admin@%s/msp/keystore", domain)).toFile();
+		String peerOrgs = "crypto-config/peerOrganizations/";
+		File keydir = Paths.get(config.getCryptoChannelConfigRootPath(), peerOrgs, domain, format("/users/Admin@%s/msp/keystore", domain)).toFile();
 		File privateKeyFile = GzipUtils.findFileSk(keydir);
-		File certificateFile = Paths.get(config.getCryptoChannelConfigRootPath(), "crypto-config/peerOrganizations/", domain, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", domain, domain)).toFile();
+		File certificateFile = Paths.get(config.getCryptoChannelConfigRootPath(), peerOrgs, domain, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", domain, domain)).toFile();
 
 		logger.trace("privateKeyDir: {}", keydir.getAbsolutePath());
 		logger.trace("privateKeyFile: {}", privateKeyFile.getAbsolutePath());
