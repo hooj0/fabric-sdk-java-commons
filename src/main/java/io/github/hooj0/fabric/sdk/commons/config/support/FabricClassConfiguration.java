@@ -48,6 +48,7 @@ public final class FabricClassConfiguration extends AbstractConfigurationSupport
 	
 	public FabricClassConfiguration settingPropertyValue(String key, String value) {
 		SDK_COMMONS_PROPERTIES.setProperty(key, value);
+		
 		return this;
 	}
 	
