@@ -6,10 +6,11 @@ import org.hyperledger.fabric.sdk.HFClient;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.core.manager.ChannelManager;
 import io.github.hooj0.fabric.sdk.commons.core.manager.UserManager;
+import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 
 /**
  * basic chaincode operations init interface
- * @changelog Add getter method defined
+ * @changelog Add getter `Organization` method defined
  * @author hoojo
  * @createDate 2018年7月25日 下午6:21:55
  * @file ChaincodeBasicOperations.java
@@ -39,10 +40,6 @@ public interface ChaincodeBasicOperations {
 	
 	public HFClient getClient();
 
-	public UserManager getUserManager();
-
-	public ChannelManager getChannelManager();
-
 	public FabricConfiguration getConfig();
 
 	public Channel getChannel();
@@ -50,4 +47,16 @@ public interface ChaincodeBasicOperations {
 	public String getChannelName();
 
 	public String getOrgName();
+	
+	public UserManager getUserManager();
+
+	public ChannelManager getChannelManager();
+	
+	/**
+	 * 获取当前的组织信息
+	 * @author hoojo
+	 * @createDate 2018年7月29日 上午11:25:24
+	 * @return Organization
+	 */
+	public Organization getOrganization();
 }
