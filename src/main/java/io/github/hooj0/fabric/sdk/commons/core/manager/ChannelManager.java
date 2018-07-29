@@ -111,6 +111,7 @@ public class ChannelManager extends AbstractManager {
 		
 		if (channel.isShutdown() || !channel.isInitialized()) {
 			System.out.println("=============> 通道关闭或为初始化，需要重新开启");
+			
 		}
 		channel = checkChannelSerialize(channel);
 		
