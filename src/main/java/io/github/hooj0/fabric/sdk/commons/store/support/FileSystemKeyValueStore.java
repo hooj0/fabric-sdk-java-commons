@@ -19,6 +19,7 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
  * 文件系统KeyValue持久化存储
+ * @changelog Add file system keyvalue store file exists exception fail
  * @author hoojo
  * @createDate 2018年7月21日 下午9:46:14
  * @file FileSystemKeyValueStore.java
