@@ -66,7 +66,6 @@ public enum DefaultFabricConfiguration {
 		
 		config.settingPropertyValue(FabricConfigurationPropertyKey.FABRIC_CONFIGTX_VERSION, "v1.0");
 		
-		
 		config.settingPropertyValue(FabricConfigurationPropertyKey.CONFIG_TXLATER_URL, "http://127.0.0.1:70599");
 
 		config.settingPropertyValue(FabricConfigurationPropertyKey.INVOKE_WAIT_TIME, "10");
