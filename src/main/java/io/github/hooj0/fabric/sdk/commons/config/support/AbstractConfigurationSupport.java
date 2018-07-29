@@ -9,7 +9,7 @@ import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 
 /**
  * basic abstract config support
- * @changelog Add config basic property getter method support
+ * @changelog update 'isEnabledFabricTLS' property getter method support
  * @author hoojo
  * @createDate 2018年7月27日 上午11:27:21
  * @file AbstractConfigurationSupport.java
@@ -32,7 +32,13 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	
 	/** 是否启用TLS 安全证书 */ 
 	public boolean isEnabledFabricTLS() {
-		return enableFabricTLS;
+		String enabledTLS = getProperty(NETWORK_TLS_ENABLED, System.getenv(ENV_DEFAULT_TLS_ENABLED));
+		
+		enableTLS = StringUtils.equals(enabledTLS, "true");
+		enableFabricCATLS = enableTLS;
+		enableFabricTLS = enableTLS;
+		
+		return enableTLS;
 	}
 	
 	/** 区块链网络主机IP地址 */
