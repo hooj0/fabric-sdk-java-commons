@@ -132,7 +132,7 @@ function commitCode() {
 	    "D")  
 			log "red" "Removed file ==> $file"
 			if [ $debug_mode == "false" ]; then
-	    		git commit -m ":sparkles: :bento: :fire: $emoji Removed ${comment}"
+	    		git commit -m ":sparkles: :fire: $emoji Removed ${comment} & redundant files"
 	    	fi
 	    ;;
 	    "C")  
@@ -179,8 +179,12 @@ function findCommitFiles() {
 		
 		#echo "status --> ${state}"
 		#echo "file --> ${file}"
-		fetchComment $file
-		fetchCommentStatus $comment
+		unset comment
+		if [ -e $file]; then
+			fetchComment $file
+			fetchCommentStatus $comment
+		fi
+		
 		commitCode $state $file $comment
 	done
 	
