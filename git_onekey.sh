@@ -206,6 +206,7 @@ function fetchComment() {
 	# replace space
 	comment=`echo $comment | sed "s/$defaultKeyword//g" | sed 's/^ //g'`
 	
+	unset emoji
 	if [ -z $comment ]; then
 		generatorComment
 	fi
