@@ -22,9 +22,11 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 import io.github.hooj0.fabric.sdk.commons.core.execution.support.ChaincodeInstallExecutionSupport;
 import io.github.hooj0.fabric.sdk.commons.core.execution.support.ChaincodeInstantiateExecutionSupport;
 import io.github.hooj0.fabric.sdk.commons.core.execution.support.ChaincodeUpgradeExecutionSupport;
+import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
  * chaincode deploy operation `install & instantiate & upgrade` interface support
+ * @changelog Add `File & FabricKeyValueStore` constructor method support
  * @author hoojo
  * @createDate 2018年7月25日 下午6:26:01
  * @file ChaincodeDeployTemplate.java
@@ -47,6 +49,16 @@ public class ChaincodeDeployTemplate extends AbstractOperationSupport implements
 
 	public ChaincodeDeployTemplate(String channelName, String orgName, FabricConfiguration config) {
 		super(channelName, orgName, config, ChaincodeDeployTemplate.class);
+		this.init();
+	}
+
+	public ChaincodeDeployTemplate(String channelName, String orgName, FabricConfiguration config, File storeFile) {
+		super(channelName, orgName, config, storeFile, ChaincodeDeployTemplate.class);
+		this.init();
+	}
+
+	public ChaincodeDeployTemplate(String channelName, String orgName, FabricConfiguration config, FabricKeyValueStore store) {
+		super(channelName, orgName, config, store, ChaincodeDeployTemplate.class);
 		this.init();
 	}
 	
