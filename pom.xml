@@ -33,12 +33,17 @@
 	</scm>
 	
 	<properties>
+		<!--
+		@changelog Add jar `dependencies` version properties  
+		-->
+
 		<!-- compiler -->
 		<java.version>1.8</java.version>
-		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
+		<!-- test -->
 		<junit.version>4.12</junit.version>
+		<httpclient.version>4.5.5</httpclient.version>
 		
 		<!-- Logging -->
 		<logback.version>1.0.13</logback.version>
@@ -46,7 +51,15 @@
 		<log4j.version>1.2.17</log4j.version>
 		<slf4j.version>1.7.19</slf4j.version>
 		
-		<httpclient.version>4.5.5</httpclient.version>
+		<!-- runtime -->
+		<commons-lang3.version>3.7</commons-lang3.version>
+		<guava.version>25.1-jre</guava.version>
+
+		<!-- fabric sdk -->		
+		<fabric-sdk-java.version>1.1.0</fabric-sdk-java.version>
+
+		<!-- lombok -->
+		<lombok.version>1.18.0</lombok.version>
 	</properties>
 
 	<dependencies>
@@ -63,14 +76,12 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
-			<scope>runtime</scope>
 		</dependency>		
 
 		<dependency>
@@ -84,28 +95,28 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.7</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>25.1-jre</version>
+			<version>${guava.version}</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.hyperledger.fabric-sdk-java/fabric-sdk-java -->
 		<dependency>
 			<groupId>org.hyperledger.fabric-sdk-java</groupId>
 			<artifactId>fabric-sdk-java</artifactId>
-			<version>1.1.0</version>
+			<version>${fabric-sdk-java.version}</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 		    <groupId>org.projectlombok</groupId>
 		    <artifactId>lombok</artifactId>
-		    <version>1.18.0</version>
+		    <version>${lombok.version}</version>
 		    <scope>provided</scope>
 		</dependency>
 		
