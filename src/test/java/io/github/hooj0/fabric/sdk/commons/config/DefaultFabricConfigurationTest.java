@@ -3,6 +3,8 @@ package io.github.hooj0.fabric.sdk.commons.config;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+
 import org.junit.Test;
 
 import io.github.hooj0.fabric.sdk.commons.config.support.FabricClassConfiguration;
@@ -77,6 +79,13 @@ public class DefaultFabricConfigurationTest {
 	}
 	
 	@Test
+	public void testGeneratorFilePropertiesForClass() {
+		this.testSettings();
+		
+		DefaultFabricConfiguration.INSTANCE.getClassConfiguration().generatorPropertiesFile(new File("myconfig2.properties"));
+	}
+	
+	@Test
 	public void testClassProperties() {
 		this.testSettings();
 		
@@ -86,7 +95,7 @@ public class DefaultFabricConfigurationTest {
 		FabricConfiguration classConf = DefaultFabricConfiguration.INSTANCE.getClassConfiguration();
 		
 		assertEquals(classConf.getFabricConfigtxVersion(), "v1.0");
-		assertEquals(classConf.isEnabledFabricTLS(), false);
+		assertEquals(classConf.isEnabledFabricTLS(), true);
 		assertEquals(classConf.isFabricConfigtxV10(), true);
 
 		assertEquals(classConf.getFabricNetworkHost(), "192.168.8.8");
@@ -128,6 +137,7 @@ public class DefaultFabricConfigurationTest {
 	@Test
 	public void testGeneratorFileProperties() {
 		
+		// FabricConfigurationPropertyKey.SDK_CONFIG_NAME = "myconfig.properties";
 		DefaultFabricConfiguration.INSTANCE.getPropertiesConfiguration().generatorPropertiesFile();
 	}
 	
