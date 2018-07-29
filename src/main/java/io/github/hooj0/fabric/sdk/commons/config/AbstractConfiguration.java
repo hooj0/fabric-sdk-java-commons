@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.hyperledger.fabric.sdk.helper.Utils;
 
-import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.FabricConfigurationException;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 
@@ -33,7 +32,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.Organization;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public abstract class AbstractConfiguration extends AbstractObject implements FabricConfiguration, FabricConfigurationPropertyKey {
+public abstract class AbstractConfiguration extends FabricConfigurationPropertyKey implements FabricConfiguration  {
 
 	/** SDK 配置 */
 	protected static final Properties SDK_COMMONS_PROPERTIES = new Properties();
@@ -42,7 +41,6 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	
 	/** 区块链网络配置key的前缀 */
 	protected static final String NETWORK_KEY_PREFIX = PREFIX + "network.org.";
-	
 	/** 匹配到 mspid 值*/
 	private static final Pattern ORG_MSPID_PATTERN = Pattern.compile("^" + Pattern.quote(NETWORK_KEY_PREFIX) + "([^\\.]+)\\.mspid$");
 	
@@ -93,7 +91,7 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 	protected void instantiateConfiguration() {
 		// TLS 
 		String enabledTLS = getProperty(NETWORK_TLS_ENABLED, System.getenv(ENV_DEFAULT_TLS_ENABLED));
-		logger.debug("tlsEnabled: {}", enabledTLS);
+		logger.debug("enabledTLS: {}", enabledTLS);
 		
 		enableTLS = StringUtils.equals(enabledTLS, "true");
 		enableFabricCATLS = enableTLS;
@@ -222,7 +220,7 @@ public abstract class AbstractConfiguration extends AbstractObject implements Fa
 			File certFile = new File(cert);
 			if (!certFile.exists() || !certFile.isFile()) {
 				logger.debug("certFile path: {}", certFile.getAbsolutePath());
-				throw new FabricConfigurationException("证书文件不存在： " + certFile.getAbsolutePath());
+				throw new FabricConfigurationException("cert file not found： " + certFile.getAbsolutePath());
 			}
 			
 			Properties properties = new Properties();
