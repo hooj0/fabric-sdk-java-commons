@@ -1,5 +1,6 @@
 package io.github.hooj0.fabric.sdk.commons.core.support;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
@@ -8,13 +9,20 @@ import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 
+import com.google.common.base.Strings;
+
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeOperationException;
 import io.github.hooj0.fabric.sdk.commons.config.DefaultFabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.core.ChaincodeBasicOperations;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstantiateOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.InvokeOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.Options;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.QueryOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.TransactionsOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.option.UpgradeOptions;
 import io.github.hooj0.fabric.sdk.commons.core.manager.ChannelManager;
 import io.github.hooj0.fabric.sdk.commons.core.manager.UserManager;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
@@ -63,6 +71,8 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 	}
 	
 	private void initialize(String channelName, String orgName, FabricConfiguration config, FabricKeyValueStore store) {
+		checkNotNull(config, "FabricConfiguration is not null!");
+		
 		this.client = HFClient.createNewInstance();
 		try {
 			client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
@@ -88,6 +98,9 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 	
 	@Override
 	public void init(String... users) {
+		checkNotNull(users, "FabricConfiguration is not null!");
+		checkArgument(users.length > 0, "FabricConfiguration.getUsers() result is not null!");
+		
 		try {
 			userManager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), users);
 			logger.debug("Successfully initialize admin: {} & users: {}", config.getCaAdminName(), users);
@@ -99,8 +112,10 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 	
 	@Override
 	public Channel init(String channelName, String orgName) {
-		Organization org = config.getOrganization(orgName);
+		checkArgument(!Strings.isNullOrEmpty(channelName), "channelName is not null!");
+		checkArgument(!Strings.isNullOrEmpty(orgName), "orgName is not null!");
 		
+		Organization org = config.getOrganization(orgName);
 		if (org == null) {
 			throw new FabricChaincodeOperationException("Organization that did not find the name '%s'", orgName);
 		}
@@ -129,9 +144,37 @@ public class AbstractOperationSupport extends AbstractObject implements Chaincod
 			if (transactionsOptions.getTransactionWaitTime() <= 0) {
 				transactionsOptions.setTransactionWaitTime(config.getTransactionWaitTime());
 			}
-			
-			if (transactionsOptions.getClientUserContext() != null) {
-				transactionsOptions.setClientUserContext(config.getOrganization(orgName).getPeerAdmin());
+		}
+		
+		if (options instanceof QueryOptions) {
+			QueryOptions queryOptions = (QueryOptions) options;
+			if (queryOptions.getClientUserContext() == null) {
+				queryOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
+			}
+		}
+		if (options instanceof InvokeOptions) {
+			InvokeOptions invokeOptions = (InvokeOptions) options;
+			if (invokeOptions.getClientUserContext() == null) {
+				invokeOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
+			}
+		}
+		
+		if (options instanceof InstantiateOptions) {
+			InstantiateOptions instantiateOptions = (InstantiateOptions) options;
+			if (instantiateOptions.getClientUserContext() == null) {
+				instantiateOptions.setClientUserContext(getOrganization().getPeerAdmin());
+			}
+		}
+		if (options instanceof InstallOptions) {
+			InstallOptions installOptions = (InstallOptions) options;
+			if (installOptions.getClientUserContext() == null) {
+				installOptions.setClientUserContext(getOrganization().getPeerAdmin());
+			}
+		}
+		if (options instanceof UpgradeOptions) {
+			UpgradeOptions upgradeOptions = (UpgradeOptions) options;
+			if (upgradeOptions.getClientUserContext() == null) {
+				upgradeOptions.setClientUserContext(getOrganization().getPeerAdmin());
 			}
 		}
 	}
