@@ -180,7 +180,7 @@ function findCommitFiles() {
 		#echo "status --> ${state}"
 		#echo "file --> ${file}"
 		unset comment
-		if [ -e $file]; then
+		if [ -e $file ]; then
 			fetchComment $file
 			fetchCommentStatus $comment
 		fi
