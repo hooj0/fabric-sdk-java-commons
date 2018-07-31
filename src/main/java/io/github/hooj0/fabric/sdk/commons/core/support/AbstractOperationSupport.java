@@ -41,7 +41,7 @@ import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class AbstractOperationSupport extends AbstractObject implements ChaincodeBasicOperations {
+public abstract class AbstractOperationSupport extends AbstractObject implements ChaincodeBasicOperations {
 
 	protected HFClient client;
 	protected UserManager userManager;
