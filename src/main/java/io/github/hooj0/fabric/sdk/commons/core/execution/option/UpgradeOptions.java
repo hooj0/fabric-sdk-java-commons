@@ -1,7 +1,5 @@
 package io.github.hooj0.fabric.sdk.commons.core.execution.option;
 
-import lombok.NoArgsConstructor;
-
 /**
  * chaincode deploy operation upgrade options
  * @author hoojo
@@ -13,6 +11,5 @@ import lombok.NoArgsConstructor;
  * @email hoojo_@126.com
  * @version 1.0
  */
-@NoArgsConstructor
 public class UpgradeOptions extends InstantiateOptions {
 }
