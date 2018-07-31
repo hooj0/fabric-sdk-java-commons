@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 
 import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
-import org.hyperledger.fabric.sdk.User;
 
 /**
  * chaincode deploy operation instantiate options
@@ -25,8 +24,6 @@ public class InstantiateOptions extends TransactionsOptions {
 	private InputStream endorsementPolicyInputStream;
 	/** 背书策略 */
 	private ChaincodeEndorsementPolicy endorsementPolicy;
-	/** 发起请求用户 */
-	private User requestUser;
 	
 	public File getEndorsementPolicyFile() {
 		return endorsementPolicyFile;
@@ -55,15 +52,6 @@ public class InstantiateOptions extends TransactionsOptions {
 	public InstantiateOptions setEndorsementPolicy(ChaincodeEndorsementPolicy endorsementPolicy) {
 		this.endorsementPolicy = endorsementPolicy;
 		
-		return this;
-	}
-
-	public User getRequestUser() {
-		return requestUser;
-	}
-
-	public InstantiateOptions setRequestUser(User requestUser) {
-		this.requestUser = requestUser;
 		return this;
 	}
 }
