@@ -45,6 +45,8 @@ public class Options {
 	
 	/** 客户端User上下文 */
 	private User clientUserContext;
+	/** 发送proposal请求的User */
+	private User requestUser;
 	
 	public Options setChaincodeName(String chaincodeName) {
 		this.chaincodeName = chaincodeName;
@@ -138,6 +140,15 @@ public class Options {
 
 	public Options setClientUserContext(User clientUserContext) {
 		this.clientUserContext = clientUserContext;
+		return this;
+	}
+
+	public User getRequestUser() {
+		return requestUser;
+	}
+
+	public Options setRequestUser(User requestUser) {
+		this.requestUser = requestUser;
 		return this;
 	}
 }
