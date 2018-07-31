@@ -1,7 +1,5 @@
 package io.github.hooj0.fabric.sdk.commons.core.execution.option;
 
-import org.hyperledger.fabric.sdk.User;
-
 /**
  * chaincode deploy operation install options
  * @author hoojo
@@ -16,7 +14,6 @@ import org.hyperledger.fabric.sdk.User;
 public class InstallOptions extends Options {
 
 	private String chaincodeUpgradeVersion;
-	private User requestUser;
 
 	public String getChaincodeUpgradeVersion() {
 		return chaincodeUpgradeVersion;
@@ -25,15 +22,6 @@ public class InstallOptions extends Options {
 	public InstallOptions setChaincodeUpgradeVersion(String chaincodeUpgradeVersion) {
 		this.chaincodeUpgradeVersion = chaincodeUpgradeVersion;
 		
-		return this;
-	}
-
-	public User getRequestUser() {
-		return requestUser;
-	}
-
-	public InstallOptions setRequestUser(User installUser) {
-		this.requestUser = installUser;
 		return this;
 	}
 }
