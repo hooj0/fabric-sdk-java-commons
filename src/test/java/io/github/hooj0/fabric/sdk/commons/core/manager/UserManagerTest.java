@@ -25,7 +25,7 @@ public class UserManagerTest {
 	@Test
 	public void testInstance() {
 		
-		FabricConfiguration config = DefaultFabricConfiguration.INSTANCE.getClassConfiguration();
+		FabricConfiguration config = DefaultFabricConfiguration.INSTANCE.getDefaultConfiguration();
 		FabricKeyValueStore store = config.getDefaultKeyValueStore();
 
 		UserManager manager = new UserManager(config, store);
@@ -76,8 +76,9 @@ public class UserManagerTest {
 		try {
 			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
 
-			// HFCAClient client = config.getOrganization("peerOrg1").getCAClient();
-			//client.register(arg0, arg1)
+			//HFCAClient client = config.getOrganization("peerOrg1").getCAClient();
+			
+			System.out.println(manager.registerAndEnrollUser(config.getOrganization("peerOrg1"), "hoojo", "org1.department1"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
