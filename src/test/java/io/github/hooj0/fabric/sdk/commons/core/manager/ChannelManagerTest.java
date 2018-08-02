@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import io.github.hooj0.fabric.sdk.commons.config.DefaultFabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
+import io.github.hooj0.fabric.sdk.commons.config.support.FabricClassConfiguration;
+import io.github.hooj0.fabric.sdk.commons.config.support.FabricPropertiesConfiguration;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
@@ -28,7 +30,16 @@ public class ChannelManagerTest {
 	@Test
 	public void testInstance() {
 		
-		FabricConfiguration config = DefaultFabricConfiguration.INSTANCE.getClassConfiguration();
+		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
+		FabricKeyValueStore store = config.getDefaultKeyValueStore();
+
+		UserManager manager = new UserManager(config, store);
+		
+		try {
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		HFClient client = HFClient.createNewInstance();
 		try {
@@ -37,10 +48,17 @@ public class ChannelManagerTest {
 			e.printStackTrace();
 		}
 		
-		ChannelManager manager = new ChannelManager(config, client);
-		
+		ChannelManager channelManager = new ChannelManager(config, client);
 		try {
-			manager.initialize("mychannel", config.getOrganization("peerOrg1"));
+			System.out.println("peerOrg1----->>>>>" + config.getOrganization("peerOrg1"));
+			System.out.println("PeerAdmin----->>>>>" + config.getOrganization("peerOrg1").getPeerAdmin());
+			System.out.println("user1----->>>>>" + config.getOrganization("peerOrg1").getUser("user1"));
+
+			System.out.println("peerOrg1----->>>>>" + config.getOrganization("peerOrg2"));
+			System.out.println("PeerAdmin----->>>>>" + config.getOrganization("peerOrg2").getPeerAdmin());
+			System.out.println("user1----->>>>>" + config.getOrganization("peerOrg2").getUser("user1"));
+			
+			channelManager.initialize("mychannel", config.getOrganization("peerOrg1"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -49,7 +67,7 @@ public class ChannelManagerTest {
 	@Test
 	public void testInstance2() {
 		
-		FabricConfiguration config = DefaultFabricConfiguration.INSTANCE.getClassConfiguration();
+		FabricConfiguration config = FabricClassConfiguration.getInstance();
 		FabricKeyValueStore store = config.getDefaultKeyValueStore();
 		
 		HFClient client = HFClient.createNewInstance();
@@ -71,7 +89,7 @@ public class ChannelManagerTest {
 	@Test
 	public void testInstance3() {
 		
-		FabricConfiguration config = DefaultFabricConfiguration.INSTANCE.getPropertiesConfiguration();
+		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
 		FabricKeyValueStore store = config.getDefaultKeyValueStore();
 		
 		HFClient client = HFClient.createNewInstance();
@@ -93,7 +111,7 @@ public class ChannelManagerTest {
 	@Test
 	public void testInstance4() {
 		
-		FabricConfiguration config = DefaultFabricConfiguration.INSTANCE.getPropertiesConfiguration();
+		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
 		
 		HFClient client = HFClient.createNewInstance();
 		try {
