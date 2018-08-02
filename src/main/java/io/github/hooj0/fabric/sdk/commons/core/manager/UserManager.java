@@ -23,6 +23,7 @@ import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.hyperledger.fabric_ca.sdk.exception.EnrollmentException;
 import org.hyperledger.fabric_ca.sdk.exception.InvalidArgumentException;
 
+import io.github.hooj0.fabric.sdk.commons.FabricRootException;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreator;
 import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl;
@@ -198,7 +199,7 @@ public class UserManager extends AbstractManager {
 		HFCAClient ca = org.getCAClient();
 
 		// 从缓存或store中获取用户
-		OrganizationUser admin = userStoreCache.getStore(adminName, org.getName());
+		OrganizationUser admin = userCreator.create(adminName, org.getName());
 		if (!admin.isEnrolled()) { // 未认证，只需用用ca client进行认证
 
 			// 认证：获取用户的签名证书和私钥。
@@ -224,7 +225,7 @@ public class UserManager extends AbstractManager {
 		HFCAClient ca = org.getCAClient();
 
 		// 从缓存或store中获取用户
-		OrganizationUser user = userStoreCache.getStore(userName, org.getName());
+		OrganizationUser user = userCreator.create(userName, org.getName());
 		if (!user.isRegistered()) { // 未注册
 			// 用户注册
 			final RegistrationRequest request = new RegistrationRequest(user.getName(), affiliation);
@@ -277,6 +278,10 @@ public class UserManager extends AbstractManager {
 		logger.trace("privateKeyDir: {}", keydir.getAbsolutePath());
 		logger.trace("privateKeyFile: {}", privateKeyFile.getAbsolutePath());
 		logger.trace("certificateFile: {}", certificateFile.getAbsolutePath());
+		
+		if (!privateKeyFile.exists()) {
+			throw new FabricRootException("sk file not found: %s", privateKeyFile.getAbsolutePath());
+		}
 
 		// 从缓存或store中获取用户
 		OrganizationUser peerAdmin = userCreator.create(orgName + "Admin", orgName, mspid, privateKeyFile, certificateFile);
