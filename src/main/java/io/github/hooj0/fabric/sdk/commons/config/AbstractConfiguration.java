@@ -55,7 +55,8 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 	
 	/** 默认的组织配置信息配置设置 */
 	protected void defaultValueSettings() {
-
+		logger.info("开始进行系统默认配置");
+		
 		// Default network domain
 		defaultProperty(NETWORK_DOMAIN, "example.com");
 		
@@ -89,6 +90,8 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 	
 	/** 创建配置对象信息 */
 	protected void instantiateConfiguration() {
+		logger.info("创建配置对象信息");
+		
 		// TLS 
 		String enabledTLS = getProperty(NETWORK_TLS_ENABLED, System.getenv(ENV_DEFAULT_TLS_ENABLED));
 		logger.debug("enabledTLS: {}", enabledTLS);
