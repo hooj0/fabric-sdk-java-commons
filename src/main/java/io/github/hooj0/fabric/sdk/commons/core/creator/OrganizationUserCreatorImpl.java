@@ -57,7 +57,7 @@ public class OrganizationUserCreatorImpl implements OrganizationUserCreator {
 			
 			return user;
 		} catch (Exception e) {
-			throw new FabricCreatorException(e, "Get %s.%s OrganizationUser Member from cache exception:", org, name);
+			throw new FabricCreatorException(e, "Get '%s.%s' OrganizationUser Member from cache exception:", org, name);
 		}	
 	}
 	
