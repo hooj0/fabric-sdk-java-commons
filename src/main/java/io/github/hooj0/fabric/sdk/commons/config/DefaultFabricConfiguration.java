@@ -21,8 +21,8 @@ public enum DefaultFabricConfiguration {
 	INSTANCE;
 
 	public FabricConfiguration getDefaultConfiguration() {
-		//return this.getClassConfiguration();
-		return this.getPropertiesConfiguration();
+		return FabricClassConfiguration.getInstance();
+		//return FabricPropertiesConfiguration.getInstance();
 	}
 	
 	public FabricPropertiesConfiguration getPropertiesConfiguration() {
@@ -34,7 +34,7 @@ public enum DefaultFabricConfiguration {
 	}
 
 	private DefaultFabricConfiguration() {
-		// this.setLocalSettings();
+		this.setLocalSettings();
 	}
 	
 	@SuppressWarnings("unused")
@@ -43,8 +43,7 @@ public enum DefaultFabricConfiguration {
 
 		String orgName = "peerOrg1";
 		
-		// config.setNetworkDomain("example.com");
-		config.setNetworkDomain("hoojo.cnblogs.com");
+		config.setNetworkDomain("example.com");
 		
 		config.setMspId(orgName, "Org1MSP");
 		config.setOrgDomain(orgName, "org1." + config.getNetworkDomain());
@@ -64,9 +63,9 @@ public enum DefaultFabricConfiguration {
 		config.setEventHubLocation(orgName, "peer0.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8053, peer1.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8058");
 		
 		
-		config.settingPropertyValue(FabricConfigurationPropertyKey.FABRIC_CONFIGTX_VERSION, "v1.0");
+		config.settingPropertyValue(FabricConfigurationPropertyKey.FABRIC_CONFIGTX_VERSION, "v1.1");
 		
-		config.settingPropertyValue(FabricConfigurationPropertyKey.CONFIG_TXLATER_URL, "http://127.0.0.1:70599");
+		config.settingPropertyValue(FabricConfigurationPropertyKey.CONFIG_TXLATER_URL, "http://" + config.getFabricNetworkHost() + ":7059");
 
 		config.settingPropertyValue(FabricConfigurationPropertyKey.INVOKE_WAIT_TIME, "10");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.DEPLOY_WAIT_TIME, "100");
@@ -74,7 +73,7 @@ public enum DefaultFabricConfiguration {
 
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_TLS_ENABLED, "true");
 
-		config.settingPropertyValue(FabricConfigurationPropertyKey.COMMON_CONFIG_ROOT_PATH, "src/test/fixture/sdkintegration");
+		config.settingPropertyValue(FabricConfigurationPropertyKey.COMMON_CONFIG_ROOT_PATH, "src/test/fixture/integration");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.CRYPTO_CHANNEL_CONFIG_ROOT_PATH, "/e2e-2Orgs");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.CHAINCODE_SOURCE_ROOT_PATH, "/gocc/sample11");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.CHANNEL_ARTIFACTS_ROOT_PATH, "/channel-artifacts");
