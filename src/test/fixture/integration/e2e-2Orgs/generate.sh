@@ -56,21 +56,21 @@ function replacePrivateKey () {
 	echo "OPTS: $OPTS"
 
     echo
-    echo "==> cp script/check-files.tpl.sh script/check-files.sh"
-	cp script/check-files.tpl.sh script/check-files.sh
+    echo "==> cp script/check-files.tpl.sh script/$VERSION_DIR/check-files.sh"
+	cp script/check-files.tpl.sh script/$VERSION_DIR/check-files.sh
 
     CURRENT_DIR=$PWD
     cd ./$CRYPTO_CONFIG_OUTPUT_ROOT/peerOrganizations/org1.example.com/ca/
     PRIV_KEY=$(ls *_sk)
     cd $CURRENT_DIR
 	
-    sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" script/check-files.sh #> script/check-files.sh
+    sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" script/$VERSION_DIR/check-files.sh 
 
     cd ./$CRYPTO_CONFIG_OUTPUT_ROOT/peerOrganizations/org2.example.com/ca/
     PRIV_KEY=$(ls *_sk)
     cd $CURRENT_DIR
 
-    sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" script/check-files.sh #> script/check-files.sh
+    sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" script/$VERSION_DIR/check-files.sh 
     echo
 }
 
@@ -124,6 +124,13 @@ function generateChannelArtifacts() {
 	echo "#################################################################"
 	echo "==> cryptogen -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME"
 	$CONFIGTXGEN -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME
+
+	echo
+	echo "#################################################################"
+	echo "### Generating channel configuration transaction 'channel.tx' ###"
+	echo "#################################################################"
+	echo "==> cryptogen -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/${CHANNEL_NAME}2.tx -channelID ${CHANNEL_NAME}2"
+	$CONFIGTXGEN -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/${CHANNEL_NAME}2.tx -channelID ${CHANNEL_NAME}2
 }
 
 function skip() {
@@ -154,8 +161,8 @@ function cleanChannelArtifacts() {
 	echo "==> rm -rf ./$VERSION_DIR/"
     [ -n $VERSION_DIR ] && [ -d "./$VERSION_DIR" ] && rm -rf ./$VERSION_DIR/*
 
-	echo "==> rm -rf ./channel-artifacts/* ./crypto-config/* ./script/check-file.sh"
-    rm -rf ./channel-artifacts/* ./crypto-config/* ./script/check-file.sh
+	echo "==> rm -rf ./channel-artifacts/* ./crypto-config/* ./script/v1.*"
+    rm -rfv ./channel-artifacts/* ./crypto-config/* ./script/v1.*
     
     echo
 }
@@ -187,7 +194,7 @@ function mergeArtifactsCryptoDir() {
 
 	echo "==> mv ./crypto-config ./$VERSION_DIR/"
     mv -v ./crypto-config ./$VERSION_DIR/
-    
+
     echo
 }
 
