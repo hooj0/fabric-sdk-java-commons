@@ -3,6 +3,8 @@ package io.github.hooj0.fabric.sdk.commons.cache;
 import java.io.File;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Maps;
 
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfigurationPropertyKey;
@@ -47,6 +49,10 @@ public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Seri
 	
 	@Override
 	public void setStore(String[] storeKey, T store) {
+		if (store == null) {
+			return;
+		}
+		
 		String key = keyPrefix.getKeyPrefix(storeKey);
 		caches.put(key, store);
 
@@ -55,6 +61,10 @@ public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Seri
 	
 	@Override
 	public void setStore(String storeKey, T store) {
+		if (store == null) {
+			return;
+		}
+		
 		String key = keyPrefix.getKeyPrefix(storeKey);
 		caches.put(key, store);
 
@@ -70,7 +80,13 @@ public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Seri
 		}
 		
 		String value = keyValueStore.get(key);
-		return this.deserialize(value);
+		if (StringUtils.isNotBlank(value)) {
+			T store = this.deserialize(value);
+			caches.put(key, store);
+			return store;
+		}
+		
+		return null;
 	}
 
 	@Override
