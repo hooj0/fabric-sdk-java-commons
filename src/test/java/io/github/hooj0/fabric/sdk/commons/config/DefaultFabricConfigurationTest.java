@@ -28,7 +28,7 @@ public class DefaultFabricConfigurationTest {
 	@Test
 	public void testSettings() {
 		
-		FabricClassConfiguration config = DefaultFabricConfiguration.INSTANCE.getClassConfiguration();
+		FabricClassConfiguration config = FabricClassConfiguration.getInstance();
 
 		String orgName = "peerOrg1";
 		
