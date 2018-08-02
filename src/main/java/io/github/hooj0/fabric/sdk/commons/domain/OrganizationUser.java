@@ -70,7 +70,7 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	}
 	
 	private void setStoreCache() {
-		storeCache.setStore(new String[] { this.name, affiliation }, this);
+		storeCache.setStore(new String[] { this.name, this.organization }, this);
 	}
 	
 	/**
