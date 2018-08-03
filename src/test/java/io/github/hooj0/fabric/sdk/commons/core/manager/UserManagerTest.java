@@ -78,7 +78,7 @@ public class UserManagerTest {
 
 			//HFCAClient client = config.getOrganization("peerOrg1").getCAClient();
 			
-			System.out.println(manager.registerAndEnrollUser(config.getOrganization("peerOrg1"), "hoojo", "org1.department1"));
+			System.out.println(manager.registerAndEnrollUser(config.getOrganization("peerOrg1"), "hoojo1"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
