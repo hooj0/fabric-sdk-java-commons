@@ -69,7 +69,11 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
 		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
 
 		checkArgument(!Strings.isNullOrEmpty(funcOptions.getFunc()), "func 参数为必填项");
-		checkArgument(!Objects.isNull(funcOptions.getArgs()), "args 参数为必填项");		
+		checkArgument(!Objects.isNull(funcOptions.getArgs()), "args 参数为必填项");	
+		
+		logger.debug("options: {}", options);
+		logger.debug("func: {}", funcOptions.getFunc());
+		logger.debug("args: {}", new Object[] { funcOptions.getArgs() });
 	}
 	
 	@Override
@@ -117,10 +121,12 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             Collection<ProposalResponse> successResponses = new LinkedList<>();
             Collection<ProposalResponse> failedResponses = new LinkedList<>();
             
+            String payload = null;
 			for (ProposalResponse response : responses) {
 				if (response.getStatus() == ProposalResponse.Status.SUCCESS) {
 					logger.debug("交易成功 Txid: {} from peer {}", response.getTransactionID(), response.getPeer().getName());
 					successResponses.add(response);
+					payload = response.getProposalResponse().getResponse().getPayload().toStringUtf8();
 				} else {
 					logger.debug("交易失败 Txid: {} from peer {}", response.getTransactionID(), response.getPeer().getName());
 					failedResponses.add(response);
@@ -166,10 +172,8 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             } else {
             	checkArgument(StringUtils.equals(options.getChaincodeId().getPath(), path), "chaincode Path不一致");
             }
-
-            result = response.getProposalResponse().getResponse().getPayload().toStringUtf8();
             
-            return new ResultSet(successResponses).setTransactionId(response.getTransactionID()).setResult(result);
+            return new ResultSet(successResponses).setTransactionId(response.getTransactionID()).setResult(payload);
 		} catch (Exception e) {
             logger.error("调用chaincode时发生异常：", e);
             throw new FabricChaincodeInvokeException(e, "调用chaincode时发生异常： %s", e.getMessage());
