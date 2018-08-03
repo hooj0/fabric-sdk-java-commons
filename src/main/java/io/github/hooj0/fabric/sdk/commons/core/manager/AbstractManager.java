@@ -7,7 +7,6 @@ import org.hyperledger.fabric.sdk.HFClient;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCache;
-import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCacheFactory;
 import io.github.hooj0.fabric.sdk.commons.cache.support.ChannelStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.support.OrganizationUserStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.support.PEMTLSCertStoreCache;
@@ -15,6 +14,7 @@ import io.github.hooj0.fabric.sdk.commons.cache.support.PEMTLSKeyStoreCache;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
+import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
 
 /**
  * basic manager support
@@ -39,57 +39,39 @@ public abstract class AbstractManager extends AbstractObject {
 	protected HFClient client;
 	
 	AbstractManager(FabricConfiguration config, HFClient client, Class<?> clazz) {
-		super(clazz);
-		
-		this.client = client;
-		this.config = config;
-		this.channelStoreCache = FabricStoreCacheFactory.createChannelStoreCache(client);
+		this(config, config.getDefaultKeyValueStore(), client, clazz);
+	}
+	
+	AbstractManager(FabricConfiguration config, File keyValueStoreFile, HFClient client, Class<?> clazz) {
+		this(config, new FileSystemKeyValueStore(keyValueStoreFile), client, clazz);
 	}
 	
 	AbstractManager(FabricConfiguration config, FabricKeyValueStore keyValueStore, HFClient client, Class<?> clazz) {
 		super(clazz);
 		
+		logger.info("fabric key value store support is '{}'", keyValueStore.getClass());
+		
 		this.client = client;
 		this.config = config;
 		this.channelStoreCache = new ChannelStoreCache(keyValueStore, client);
 	}
-
-	AbstractManager(FabricConfiguration config, File keyValueStoreFile, HFClient client, Class<?> clazz) {
-		super(clazz);
-		
-		this.client = client;
-		this.config = config;
-		this.channelStoreCache = new ChannelStoreCache(keyValueStoreFile, client);
-	}
-	
 	
 	AbstractManager(FabricConfiguration config, Class<?> clazz) {
-		super(clazz);
-		
-		this.config = config;
-		
-		this.userStoreCache = FabricStoreCacheFactory.createOrganizationUserStoreCache();
-		this.certStoreCache = FabricStoreCacheFactory.createPEMTLSCertStoreCache();
-		this.keyStoreCache = FabricStoreCacheFactory.createPEMTLSKeyStoreCache();
+		this(config, config.getDefaultKeyValueStore(), clazz);
+	}
+	
+	AbstractManager(FabricConfiguration config, File keyValueStoreFile, Class<?> clazz) {
+		this(config, new FileSystemKeyValueStore(keyValueStoreFile), clazz);
 	}
 	
 	AbstractManager(FabricConfiguration config, FabricKeyValueStore keyValueStore, Class<?> clazz) {
 		super(clazz);
+		logger.info("fabric key value store support is '{}'", keyValueStore.getClass());
 		
 		this.config = config;
 		
 		this.userStoreCache = new OrganizationUserStoreCache(keyValueStore);
 		this.certStoreCache = new PEMTLSCertStoreCache(keyValueStore);
 		this.keyStoreCache = new PEMTLSKeyStoreCache(keyValueStore);
-	}
-	
-	AbstractManager(FabricConfiguration config, File keyValueStoreFile, Class<?> clazz) {
-		super(clazz);
-		
-		this.config = config;
-		
-		this.userStoreCache = new OrganizationUserStoreCache(keyValueStoreFile);
-		this.certStoreCache = new PEMTLSCertStoreCache(keyValueStoreFile);
-		this.keyStoreCache = new PEMTLSKeyStoreCache(keyValueStoreFile);
 	}
 }
