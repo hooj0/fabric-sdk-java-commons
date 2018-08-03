@@ -81,6 +81,10 @@ public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSu
 		checkArgument(!Strings.isNullOrEmpty(funcOptions.getFunc()), "func 参数为必填项");
 		checkArgument(!Objects.isNull(funcOptions.getArgs()), "args 参数为必填项");
 		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
+		
+		logger.debug("options: {}", options);
+		logger.debug("func: {}", funcOptions.getFunc());
+		logger.debug("args: {}", new Object[] { funcOptions.getArgs() });
 	}
 	
 	@Override
