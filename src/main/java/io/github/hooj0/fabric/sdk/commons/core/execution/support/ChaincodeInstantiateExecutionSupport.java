@@ -3,7 +3,6 @@ package io.github.hooj0.fabric.sdk.commons.core.execution.support;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,14 +11,12 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
-import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.InstantiateProposalRequest;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 
 import com.google.common.base.Optional;
-import com.google.common.io.Files;
 
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeInstantiateException;
 import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeInstantiateExecution;
@@ -71,6 +68,10 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 
 		checkArgs(options);
 
+		logger.debug("options: {}", options);
+		logger.debug("func: {}", funcOptions.getFunc());
+		logger.debug("args: {}", new Object[] { funcOptions.getArgs() });
+		
 		String func = Optional.fromNullable(funcOptions.getFunc()).or("init");
 		String[] args = Optional.fromNullable(funcOptions.getArgs()).or(new String[] {});
 
@@ -98,7 +99,7 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 				instantiateRequest.setUserContext(options.getRequestUser());
 			}
 			// 设置背书策略
-			instantiateRequest.setChaincodeEndorsementPolicy(getChaincodeEndorsementPolicy(options));
+			instantiateRequest.setChaincodeEndorsementPolicy(options.getEndorsementPolicy());
 			
 
 			// 通过指定对等节点和使用通道上的方式发送请求响应
@@ -117,9 +118,12 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 			Collection<ProposalResponse> successResponses = new LinkedList<>();
 			Collection<ProposalResponse> failedResponses = new LinkedList<>();
 			
+			String payload = null;
 			for (ProposalResponse response : responses) {
 				if (response.isVerified() && response.getStatus() == ProposalResponse.Status.SUCCESS) {
 					successResponses.add(response);
+					payload = response.getProposalResponse().getResponse().getPayload().toStringUtf8();
+					
 					logger.debug("成功实例化 Txid: {} , peer: {}", response.getTransactionID(), response.getPeer().getName());
 				} else {
 					failedResponses.add(response);
@@ -137,7 +141,7 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 				throw new FabricChaincodeInstantiateException("没有足够的 endorsers 实例化: %s，endorser failed：%s , verified：%s.", successResponses.size(), first.getMessage(), first.isVerified());
 			}
 
-			return new ResultSet(successResponses);
+			return new ResultSet(successResponses).setResult(payload);
 		} catch (Exception e) {
 			logger.error("实例化chaincode时发生异常：", e);
             throw new FabricChaincodeInstantiateException(e, "实例化chaincode时发生异常： %s", e.getMessage());
@@ -172,39 +176,5 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 	@Override
 	public TransactionEvent executeFor(InstantiateOptions options, String func, Map<String, Object> args) {
 		return super.executeFor(options, new FuncOptions(func, args));
-	}
-	
-	/**
-	 * 设置背书策略配置
-	 * @author hoojo
-	 * @createDate 2018年6月25日 下午1:02:33
-	 */
-	private ChaincodeEndorsementPolicy getChaincodeEndorsementPolicy(InstantiateOptions options) throws Exception {
-		ChaincodeEndorsementPolicy endorsementPolicy = new ChaincodeEndorsementPolicy();
-		
-		File policyFile = null;
-		if (options.getEndorsementPolicyFile() != null) {
-			policyFile = options.getEndorsementPolicyFile();
-			logger.info("背书策略文件：{}", policyFile.getAbsolutePath());
-			
-			String suffix = Files.getFileExtension(policyFile.getName());
-			if ("yaml".equalsIgnoreCase(suffix) || "yml".equalsIgnoreCase(suffix)) {
-				endorsementPolicy.fromYamlFile(policyFile);
-			} else  {
-				endorsementPolicy.fromFile(policyFile);
-			}
-		} else if (options.getEndorsementPolicyInputStream() != null) {
-			
-			endorsementPolicy.fromStream(options.getEndorsementPolicyInputStream());
-		} else if (options.getEndorsementPolicy() != null) {
-			
-			endorsementPolicy = options.getEndorsementPolicy();
-		} else {
-			// policyFile = Paths.get(config.getCommonConfigRootPath(), endorsementPolicyYamlFilePath).toFile();
-			// logger.info("背书策略文件：{}", policyFile.getAbsolutePath());
-			// endorsementPolicy.fromYamlFile(policyFile);
-		}
-		
-		return endorsementPolicy;
 	}
 }
