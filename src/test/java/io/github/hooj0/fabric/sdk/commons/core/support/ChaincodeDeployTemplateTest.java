@@ -1,6 +1,5 @@
 package io.github.hooj0.fabric.sdk.commons.core.support;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -8,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.ProposalResponse;
-import org.hyperledger.fabric.sdk.TransactionRequest.Type;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,11 +38,11 @@ public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 	
 	@Before
 	public void setup() {
-		//operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance()); 
+		operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance()); 
 		
 		//operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new File("my-kv-store.properties")); 
 		
-		operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new MemoryKeyValueStore()); 
+		//operations = new ChaincodeDeployTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new MemoryKeyValueStore()); 
 	}
 	
 	@Test
@@ -67,6 +65,7 @@ public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 		options.setEndorsementPolicyFile(Paths.get(operations.getConfig().getEndorsementPolicyFilePath()).toFile());
 		
 		ResultSet rs = operations.instantiate(options, "init", "a", 200, "b", 300);
+		System.out.println("-------->>>>>>>" + rs);
 	}
 
 	@Test
@@ -112,6 +111,7 @@ public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 		args.put("b", 500);
 		
 		TransactionEvent event = operations.instantiateFor(options, "init", args);
+		System.out.println("-------------->>>>>>>" + event);
 	}
 	
 	@Test
