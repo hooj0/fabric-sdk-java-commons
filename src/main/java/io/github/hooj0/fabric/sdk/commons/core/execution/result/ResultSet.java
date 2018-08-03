@@ -1,8 +1,12 @@
 package io.github.hooj0.fabric.sdk.commons.core.execution.result;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 import org.hyperledger.fabric.sdk.ProposalResponse;
+import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
+
+import lombok.ToString;
 
 /**
  * <b>function:</b>
@@ -15,6 +19,7 @@ import org.hyperledger.fabric.sdk.ProposalResponse;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@ToString
 public class ResultSet {
 
 	private String result;
@@ -22,6 +27,10 @@ public class ResultSet {
 	private String transactionId;
 	
 	private Collection<ProposalResponse> responses;
+	
+	private CompletableFuture<TransactionEvent> future;
+	
+	private TransactionEvent transactionEvent;
 	
 	public ResultSet(String result) {
 		this.result = result;
@@ -57,6 +66,24 @@ public class ResultSet {
 
 	public ResultSet setTransactionId(String transactionId) {
 		this.transactionId = transactionId;
+		return this;
+	}
+
+	public CompletableFuture<TransactionEvent> getFuture() {
+		return future;
+	}
+
+	public ResultSet setFuture(CompletableFuture<TransactionEvent> future) {
+		this.future = future;
+		return this;
+	}
+
+	public TransactionEvent getTransactionEvent() {
+		return transactionEvent;
+	}
+
+	public ResultSet setTransactionEvent(TransactionEvent transactionEvent) {
+		this.transactionEvent = transactionEvent;
 		return this;
 	}
 }
