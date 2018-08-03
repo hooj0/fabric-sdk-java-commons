@@ -57,4 +57,22 @@ public interface FabricStoreCache<T> {
 	 * @return true | false
 	 */
 	public boolean removeStore(String... storeKey);
+
+	/**
+	 * 在缓存中是否存在
+	 * @author hoojo
+	 * @createDate 2018年7月22日 下午2:19:08
+	 * @param storeKey store Key
+	 * @return true | false
+	 */
+	public boolean hasCache(String... storeKey);
+	
+	/**
+	 * 获取内存缓存的store对象
+	 * @author hoojo
+	 * @createDate 2018年7月22日 上午11:56:14
+	 * @param key store Key
+	 * @return
+	 */
+	public T getCache(String... storeKey);
 }
