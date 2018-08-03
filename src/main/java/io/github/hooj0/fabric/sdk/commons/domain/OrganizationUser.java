@@ -10,6 +10,17 @@ import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCache;
 import io.netty.util.internal.StringUtil;
 
+/**
+ * fabric user organization domain
+ * @author hoojo
+ * @createDate 2018年8月2日 上午8:51:57
+ * @file OrganizationUser.java
+ * @package io.github.hooj0.fabric.sdk.commons.domain
+ * @project fabric-sdk-commons
+ * @blog http://hoojo.cnblogs.com
+ * @email hoojo_@126.com
+ * @version 1.0
+ */
 public class OrganizationUser extends AbstractObject implements User, Serializable {
 
 	private static final long serialVersionUID = -383568751809394444L;
@@ -47,10 +58,10 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 		this.organization = org;
 		this.storeCache = storeCache;
 		
-		if (storeCache.hasStore(this.name, org)) {
-			setStoreCache();
+		if (storeCache.hasStore(org, name)) {
+			bind(storeCache.getStore(org, name));
 		} else {
-			bind(storeCache.getStore(this.name, org));
+			setStoreCache();
 		}
 	}
 	
@@ -65,12 +76,12 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 			this.enrollment = user.enrollment;
 			this.mspId = user.mspId;
 			
-			logger.debug("从 store 缓存恢复User：{}", this);
+			logger.debug("Restore User from store cache: {}", this);
 		}
 	}
 	
 	private void setStoreCache() {
-		storeCache.setStore(new String[] { this.name, this.organization }, this);
+		storeCache.setStore(new String[] { this.organization, this.name }, this);
 	}
 	
 	/**
