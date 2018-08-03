@@ -40,7 +40,6 @@ public final class FabricPropertiesConfiguration extends AbstractConfigurationSu
 	
 	private FabricPropertiesConfiguration() {
 		super(FabricPropertiesConfiguration.class);
-		System.out.println("---------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		
 		InputStream stream = null;
 		try {
