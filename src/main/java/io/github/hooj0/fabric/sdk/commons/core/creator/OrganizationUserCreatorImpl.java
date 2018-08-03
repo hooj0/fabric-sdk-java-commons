@@ -14,6 +14,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.hyperledger.fabric.sdk.Enrollment;
 
+import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.FabricCreatorException;
 import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCache;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
@@ -29,7 +30,7 @@ import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class OrganizationUserCreatorImpl implements OrganizationUserCreator {
+public class OrganizationUserCreatorImpl extends AbstractObject implements OrganizationUserCreator {
 	
 	private FabricStoreCache<OrganizationUser> storeCache;
 	
@@ -39,10 +40,11 @@ public class OrganizationUserCreatorImpl implements OrganizationUserCreator {
 	
 	@Override
 	public OrganizationUser create(String name, String org, String mspId, File privateKeyFile, File certificateFile) {
+		logger.debug("create organization User '{}' by Org '{}'", name, org);
 		
 		try {
-			OrganizationUser user = storeCache.getStore(name, org);
-			if (null != user) {
+			OrganizationUser user = storeCache.getCache(org, name);
+			if (user != null) {
 				return user;
 			}
 
@@ -62,9 +64,9 @@ public class OrganizationUserCreatorImpl implements OrganizationUserCreator {
 	}
 	
 	public OrganizationUser create(String name, String org) {
-
-		OrganizationUser user = storeCache.getStore(name, org);
+		logger.debug("create organization User '{}' by Org '{}'", name, org);
 		
+		OrganizationUser user = storeCache.getCache(org, name);
 		if (null != user) {
 			return user;
 		}
