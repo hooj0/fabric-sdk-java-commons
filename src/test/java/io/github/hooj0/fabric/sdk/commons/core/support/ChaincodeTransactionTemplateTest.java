@@ -1,6 +1,7 @@
 package io.github.hooj0.fabric.sdk.commons.core.support;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.junit.Before;
@@ -11,7 +12,6 @@ import io.github.hooj0.fabric.sdk.commons.core.ChaincodeTransactionOperations;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InvokeOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.QueryOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
-import io.github.hooj0.fabric.sdk.commons.store.support.MemoryKeyValueStore;
 
 /**
  * chaincode transaction template 'query & invoke' test unit
@@ -30,11 +30,11 @@ public class ChaincodeTransactionTemplateTest extends BasedTemplateTest {
 	
 	@Before
 	public void setup() {
-		//operations = new ChaincodeTransactionTemplate(foo, org1, FabricPropertiesConfiguration.getInstance()); 
+		operations = new ChaincodeTransactionTemplate(foo, org1, FabricPropertiesConfiguration.getInstance()); 
 		
 		//operations = new ChaincodeTransactionTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new File("my-kv-store.properties")); 
 		
-		operations = new ChaincodeTransactionTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new MemoryKeyValueStore()); 
+		//operations = new ChaincodeTransactionTemplate(foo, org1, FabricPropertiesConfiguration.getInstance(), new MemoryKeyValueStore()); 
 	}
 	
 	@Test
@@ -45,7 +45,16 @@ public class ChaincodeTransactionTemplateTest extends BasedTemplateTest {
 		
 		options.setClientUserContext(operations.getOrganization().getUser("user1"));
 		
-		ResultSet rs = operations.invoke(options, "move", "a", "b", 30);
+		ResultSet rs = operations.invoke(options, "move", "a", "b", 20);
+		System.out.println(rs);
+		
+		try {
+			TransactionEvent event = operations.getChannel().sendTransaction(rs.getResponses()).get();
+			System.out.println(event.isValid());
+			System.out.println(event.getBlockEvent());
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Test
@@ -56,7 +65,7 @@ public class ChaincodeTransactionTemplateTest extends BasedTemplateTest {
 		
 		options.setClientUserContext(operations.getOrganization().getUser("user1"));
 		
-		CompletableFuture<TransactionEvent> futrue = operations.invokeAsync(options, "move", "a", "b", 30);
+		CompletableFuture<TransactionEvent> futrue = operations.invokeAsync(options, "move", "a", "b", 5);
 	}
 	
 	@Test
@@ -67,7 +76,8 @@ public class ChaincodeTransactionTemplateTest extends BasedTemplateTest {
 		
 		options.setClientUserContext(operations.getOrganization().getUser("user1"));
 		
-		TransactionEvent event = operations.invokeFor(options, "move", "a", "b", 30);
+		TransactionEvent event = operations.invokeFor(options, "move", "a", "b", 5);
+		System.out.println(event.getTransactionID());
 	}
 	
 	@Test
@@ -76,10 +86,18 @@ public class ChaincodeTransactionTemplateTest extends BasedTemplateTest {
 		QueryOptions options = new QueryOptions();
 		options.setChaincodePath(CHAIN_CODE_PATH).setChaincodeType(CHAIN_CODE_LANG).setChaincodeVersion(CHAIN_CODE_VERSION_11).setChaincodeName(CHAIN_CODE_NAME);
 		
-		options.setClientUserContext(operations.getOrganization().getUser("user1"));
+		options.setProposalWaitTime(100000);
+		options.setSpecificPeers(false);
+		
+		operations.init("hoojo3");
+		
+		options.setClientUserContext(operations.getOrganization().getUser("hoojo3"));
 		// options.setRequestUser(requestUser);
 		
-		String rs = operations.query(options, "a");
+		String rs = operations.query(options, "query", "a");
+		System.out.println(rs);
+		rs = operations.query(options, "query", "b");
+		System.out.println(rs);
 	}
 	
 	@Test
@@ -91,6 +109,7 @@ public class ChaincodeTransactionTemplateTest extends BasedTemplateTest {
 		options.setClientUserContext(operations.getOrganization().getUser("user1"));
 		// options.setRequestUser(requestUser);
 		
-		ResultSet rs = operations.queryFor(options, "a");
+		ResultSet rs = operations.queryFor(options, "query", "a");
+		System.out.println(rs);
 	}
 }
