@@ -8,14 +8,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.github.hooj0.fabric.sdk.commons.FabricCacheException;
 import io.github.hooj0.fabric.sdk.commons.cache.AbstractStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.CacheKeyPrefix;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Organization User store cache support
@@ -28,9 +27,8 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@Slf4j
 public class OrganizationUserStoreCache extends AbstractStoreCache<OrganizationUser> {
-	
-	private final static Logger logger = LoggerFactory.getLogger(OrganizationUserStoreCache.class);
 	
 	public OrganizationUserStoreCache() {
 		super(CacheKeyPrefix.ORGANIZATION_USER_PREFIX);
@@ -65,7 +63,7 @@ public class OrganizationUserStoreCache extends AbstractStoreCache<OrganizationU
 				if (oos != null) oos.close();
 				if (bos != null) bos.close();
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		
@@ -93,7 +91,7 @@ public class OrganizationUserStoreCache extends AbstractStoreCache<OrganizationU
 				if (bis != null) bis.close();
 				if (bis != null) bis.close();
 			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 	}
