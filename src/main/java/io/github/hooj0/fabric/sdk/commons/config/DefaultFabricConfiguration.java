@@ -21,8 +21,8 @@ public enum DefaultFabricConfiguration {
 	INSTANCE;
 
 	public FabricConfiguration getDefaultConfiguration() {
-		return FabricClassConfiguration.getInstance();
-		//return FabricPropertiesConfiguration.getInstance();
+		//return FabricClassConfiguration.getInstance();
+		return FabricPropertiesConfiguration.getInstance();
 	}
 	
 	public FabricPropertiesConfiguration getPropertiesConfiguration() {
@@ -83,8 +83,6 @@ public enum DefaultFabricConfiguration {
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_CA_ADMIN_NAME, "admin");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_CA_ADMIN_PASSWD, "adminpw");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_ORGS_MEMBER_USERS, "user1");
-
-		config.printConfig("custom class properties");
 	}
 	
 	public static void main(String[] args) {
