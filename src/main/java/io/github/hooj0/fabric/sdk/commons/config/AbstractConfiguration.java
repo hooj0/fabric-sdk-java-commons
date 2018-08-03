@@ -84,8 +84,6 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 
 		// Default tls values
 		defaultProperty(NETWORK_TLS_ENABLED, null);
-
-		printConfig("sdk properties");
 	}
 	
 	/** 创建配置对象信息 */
@@ -169,7 +167,7 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 					Organization org = new Organization(orgName, val.trim());
 					ORGANIZATIONS.put(orgName, org);
 					
-					logger.debug("添加组织: {} => {}", orgName, org);
+					logger.debug("Add Organization: {} => {}", orgName, org);
 				}
 			}
 		}
@@ -315,10 +313,11 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 		if (!isFabricConfigtxV10()) {
 			File clientCert;
 			File clientKey;
+			
 			String topDomain = this.getNetworkDomain();
 			if ("orderer".equals(type)) {
-				clientCert = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", topDomain, "/users/Admin@", topDomain, "/tls/client.crt").toFile();
-				clientKey = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", topDomain, "/users/Admin@", topDomain, "/tls/client.key").toFile();
+				clientCert = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", topDomain, "/users/Admin@" + topDomain, "/tls/client.crt").toFile();
+				clientKey = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", topDomain, "/users/Admin@" + topDomain, "/tls/client.key").toFile();
 			} else {
 				clientCert = Paths.get(txconfigRootPath, "crypto-config/peerOrganizations/", domainName, "users/User1@" + domainName, "tls/client.crt").toFile();
 				clientKey = Paths.get(txconfigRootPath, "crypto-config/peerOrganizations/", domainName, "users/User1@" + domainName, "tls/client.key").toFile();
@@ -393,19 +392,15 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 		return networkConfig;
 	}
 	
-	protected void printConfig(String tag) {
-		printConfig(null, tag);
-	}
-	
 	protected void printConfig(Properties properties, String tag) {
 		Properties props = properties == null ? SDK_COMMONS_PROPERTIES : properties;
-		System.out.println("---------------------------" + tag + "------------------------------");
+		logger.trace("---------------------------" + tag + "------------------------------");
 		for (Map.Entry<Object, Object> item : props.entrySet()) {
 			final String key = item.getKey() + "";
 			final String val = item.getValue() + "";
 			
-			System.out.println(key + "->" + val);
+			logger.trace(key + "->" + val);
 		}
-		System.out.println("-----------------------------" + tag + "----------------------------");
+		logger.trace("-----------------------------" + tag + "----------------------------");
 	} 
 }
