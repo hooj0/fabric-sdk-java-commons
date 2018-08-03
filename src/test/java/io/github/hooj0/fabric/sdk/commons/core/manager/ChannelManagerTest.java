@@ -2,9 +2,7 @@ package io.github.hooj0.fabric.sdk.commons.core.manager;
 
 import java.io.File;
 
-import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
-import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.junit.Test;
 
@@ -33,14 +31,6 @@ public class ChannelManagerTest {
 		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
 		FabricKeyValueStore store = config.getDefaultKeyValueStore();
 
-		UserManager manager = new UserManager(config, store);
-		
-		try {
-			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 		HFClient client = HFClient.createNewInstance();
 		try {
 			client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
@@ -48,17 +38,18 @@ public class ChannelManagerTest {
 			e.printStackTrace();
 		}
 		
-		ChannelManager channelManager = new ChannelManager(config, client);
+		UserManager manager = new UserManager(config, store);
+		ChannelManager channelManager = new ChannelManager(config, client, store);
+		
 		try {
-			System.out.println("peerOrg1----->>>>>" + config.getOrganization("peerOrg1"));
-			System.out.println("PeerAdmin----->>>>>" + config.getOrganization("peerOrg1").getPeerAdmin());
-			System.out.println("user1----->>>>>" + config.getOrganization("peerOrg1").getUser("user1"));
-
-			System.out.println("peerOrg1----->>>>>" + config.getOrganization("peerOrg2"));
-			System.out.println("PeerAdmin----->>>>>" + config.getOrganization("peerOrg2").getPeerAdmin());
-			System.out.println("user1----->>>>>" + config.getOrganization("peerOrg2").getUser("user1"));
-			
-			channelManager.initialize("mychannel", config.getOrganization("peerOrg1"));
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			//channelManager.initialize("mychannel2", config.getOrganization("peerOrg1"));
+			channelManager.initialize("mychannel2", config.getOrganization("peerOrg1"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,10 +68,17 @@ public class ChannelManagerTest {
 			e.printStackTrace();
 		}
 		
-		ChannelManager manager = new ChannelManager(config, client, store);
+		UserManager manager = new UserManager(config, store);
+		ChannelManager channelManager = new ChannelManager(config, client, store);
 		
 		try {
-			manager.initialize("mychannel", config.getOrganization("peerOrg1"));
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			channelManager.initialize("mychannel2", config.getOrganization("peerOrg1"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -89,7 +87,7 @@ public class ChannelManagerTest {
 	@Test
 	public void testInstance3() {
 		
-		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
+		FabricConfiguration config = DefaultFabricConfiguration.INSTANCE.getDefaultConfiguration();
 		FabricKeyValueStore store = config.getDefaultKeyValueStore();
 		
 		HFClient client = HFClient.createNewInstance();
@@ -99,10 +97,17 @@ public class ChannelManagerTest {
 			e.printStackTrace();
 		}
 		
-		ChannelManager manager = new ChannelManager(config, client, store);
+		UserManager manager = new UserManager(config, store);
+		ChannelManager channelManager = new ChannelManager(config, client, store);
 		
 		try {
-			manager.initialize("mychannel", config.getOrganization("peerOrg1"));
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			channelManager.initialize("mychannel2", config.getOrganization("peerOrg1"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -120,13 +125,108 @@ public class ChannelManagerTest {
 			e.printStackTrace();
 		}
 		
-		ChannelManager manager = new ChannelManager(config, client, new File("src/test/resources/fabric-kv-store.properties"));
+		File storeFile = new File("src/test/resources/fabric-kv-store.properties");
+		
+		UserManager manager = new UserManager(config, storeFile);
+		ChannelManager channelManager = new ChannelManager(config, client, storeFile);
 		
 		try {
-			Channel channel = manager.initialize("mychannel", config.getOrganization("peerOrg1"));
-			
-			Peer peer = channel.getPeers().iterator().next();
-			channel.queryInstantiatedChaincodes(peer);
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			channelManager.initialize("mychannel2", config.getOrganization("peerOrg1"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testInitialize() {
+		
+		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
+		FabricKeyValueStore store = config.getDefaultKeyValueStore();
+
+		HFClient client = HFClient.createNewInstance();
+		try {
+			client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		UserManager manager = new UserManager(config, store);
+		ChannelManager channelManager = new ChannelManager(config, client, store);
+		
+		try {
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			channelManager.initialize("mychannel", config.getOrganization("peerOrg1"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testInitialize2() {
+		
+		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
+		FabricKeyValueStore store = config.getDefaultKeyValueStore();
+
+		HFClient client = HFClient.createNewInstance();
+		try {
+			client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		UserManager manager = new UserManager(config, store);
+		ChannelManager channelManager = new ChannelManager(config, client, store);
+		
+		try {
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			channelManager.initialize("mychannel", config.getOrganization("peerOrg1"));
+			channelManager.initialize("mychannel2", config.getOrganization("peerOrg1"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testInitialize3() {
+		
+		FabricConfiguration config = FabricPropertiesConfiguration.getInstance();
+		FabricKeyValueStore store = config.getDefaultKeyValueStore();
+
+		HFClient client = HFClient.createNewInstance();
+		try {
+			client.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		UserManager manager = new UserManager(config, store);
+		ChannelManager channelManager = new ChannelManager(config, client, store);
+		
+		try {
+			manager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), config.getUsers());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			channelManager.initialize("mychannel", config.getOrganization("peerOrg1"));
+			channelManager.initialize("mychannel2", config.getOrganization("peerOrg2"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
