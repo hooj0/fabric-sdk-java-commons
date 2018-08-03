@@ -4,14 +4,20 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 
+import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
+import org.hyperledger.fabric.sdk.exception.ChaincodeEndorsementPolicyParseException;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 
 import com.google.common.base.Strings;
+import com.google.common.io.Files;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
+import io.github.hooj0.fabric.sdk.commons.FabricChaincodeInstantiateException;
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeOperationException;
 import io.github.hooj0.fabric.sdk.commons.config.DefaultFabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
@@ -149,13 +155,13 @@ public abstract class AbstractOperationSupport extends AbstractObject implements
 		if (options instanceof QueryOptions) {
 			QueryOptions queryOptions = (QueryOptions) options;
 			if (queryOptions.getClientUserContext() == null) {
-				queryOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
+				//queryOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
 			}
 		}
 		if (options instanceof InvokeOptions) {
 			InvokeOptions invokeOptions = (InvokeOptions) options;
 			if (invokeOptions.getClientUserContext() == null) {
-				invokeOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
+				//invokeOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
 			}
 		}
 		
@@ -164,6 +170,8 @@ public abstract class AbstractOperationSupport extends AbstractObject implements
 			if (instantiateOptions.getClientUserContext() == null) {
 				instantiateOptions.setClientUserContext(getOrganization().getPeerAdmin());
 			}
+			
+			instantiateOptions.setEndorsementPolicy(getChaincodeEndorsementPolicy(instantiateOptions));
 		}
 		if (options instanceof InstallOptions) {
 			InstallOptions installOptions = (InstallOptions) options;
@@ -215,5 +223,53 @@ public abstract class AbstractOperationSupport extends AbstractObject implements
 	 */
 	public Organization getOrganization() {
 		return this.config.getOrganization(this.orgName);
+	}
+	
+	/**
+	 * 设置背书策略配置
+	 * @author hoojo
+	 * @createDate 2018年6月25日 下午1:02:33
+	 */
+	private ChaincodeEndorsementPolicy getChaincodeEndorsementPolicy(InstantiateOptions options) {
+		ChaincodeEndorsementPolicy policy = null;
+
+		try {
+			File policyFile = null;
+			if (options.getEndorsementPolicyFile() != null) {
+				policy = new ChaincodeEndorsementPolicy();
+
+				policyFile = options.getEndorsementPolicyFile();
+				logger.info("chaincode endorse ment policy file location：{}", policyFile.getAbsolutePath());
+
+				String suffix = Files.getFileExtension(policyFile.getName());
+				if ("yaml".equalsIgnoreCase(suffix) || "yml".equalsIgnoreCase(suffix)) {
+					policy.fromYamlFile(policyFile);
+				} else {
+					policy.fromFile(policyFile);
+				}
+				
+			} else if (options.getEndorsementPolicyInputStream() != null) {
+				
+				policy = new ChaincodeEndorsementPolicy();
+				
+				policy.fromStream(options.getEndorsementPolicyInputStream());
+				
+			} else if (options.getEndorsementPolicy() != null) {
+				
+				policy = options.getEndorsementPolicy();
+				
+			} else {
+				policy = new ChaincodeEndorsementPolicy();
+				
+				policyFile = Paths.get(config.getCommonRootPath(), config.getEndorsementPolicyFilePath()).toFile();
+				logger.info("chaincode endorse ment policy file location：{}", policyFile.getAbsolutePath());
+				
+				policy.fromYamlFile(policyFile);
+			}
+		} catch (ChaincodeEndorsementPolicyParseException | IOException e) {
+			throw new FabricChaincodeInstantiateException(e, "重建背书文件发生异常");
+		}
+
+		return policy;
 	}
 }
