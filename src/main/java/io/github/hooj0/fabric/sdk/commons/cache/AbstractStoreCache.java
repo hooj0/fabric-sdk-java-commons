@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
+import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfigurationPropertyKey;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
@@ -22,9 +23,9 @@ import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Serialization<T> {
+public abstract class AbstractStoreCache<T> extends AbstractObject implements FabricStoreCache<T>, Serialization<T> {
 
-	private Map<String, T> caches = Maps.newConcurrentMap();
+	private volatile Map<String, T> caches = Maps.newConcurrentMap();
 	private FabricKeyValueStore keyValueStore;
 	private CacheKeyPrefix keyPrefix;
 	
@@ -37,8 +38,12 @@ public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Seri
 	}
 	
 	public AbstractStoreCache(CacheKeyPrefix keyPrefix, FabricKeyValueStore keyValueStore) {
+		super(AbstractStoreCache.class);
+		
 		this.keyValueStore = keyValueStore;
 		this.keyPrefix = keyPrefix;
+		
+		logger.debug("FabricKeyValueStore support: {}, keyPrefix: {}", keyValueStore.getClass(), keyPrefix);
 	}
 	
 	public static FabricKeyValueStore newDefaultKeyValueStore() {
@@ -48,39 +53,46 @@ public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Seri
 	}
 	
 	@Override
-	public void setStore(String[] storeKey, T store) {
+	public synchronized void setStore(String[] storeKey, T store) {
 		if (store == null) {
+			logger.warn("store is null, do not cache '{}'", new Object[] { storeKey });
 			return;
 		}
 		
 		String key = keyPrefix.getKeyPrefix(storeKey);
-		caches.put(key, store);
+		logger.trace("store cache: '{}'", new Object[] { storeKey });
 
+		caches.put(key, store);
 		keyValueStore.set(key, this.serialize(store));
 	}
 	
 	@Override
-	public void setStore(String storeKey, T store) {
+	public synchronized void setStore(String storeKey, T store) {
 		if (store == null) {
+			logger.warn("store is null, do not cache '{}'", new Object[] { storeKey });
 			return;
 		}
 		
 		String key = keyPrefix.getKeyPrefix(storeKey);
+		logger.trace("store cache: '{}'", new Object[] { storeKey });
+		
 		caches.put(key, store);
-
 		keyValueStore.set(key, this.serialize(store));
 	}
 
 	@Override
-	public T getStore(String... storeKey) {
+	public synchronized T getStore(String... storeKey) {
 		String key = keyPrefix.getKeyPrefix(storeKey);
 		
 		if (caches.containsKey(key)) {
+			logger.debug("find store cache: '{}'", new Object[] { storeKey });
 			return caches.get(key);
 		}
 		
 		String value = keyValueStore.get(key);
 		if (StringUtils.isNotBlank(value)) {
+			logger.debug("find properties store cache: '{}'", new Object[] { storeKey });
+			
 			T store = this.deserialize(value);
 			caches.put(key, store);
 			return store;
@@ -90,12 +102,22 @@ public abstract class AbstractStoreCache<T> implements FabricStoreCache<T>, Seri
 	}
 
 	@Override
-	public boolean hasStore(String... storeKey) {
+	public synchronized boolean hasStore(String... storeKey) {
 		return keyValueStore.contains(keyPrefix.getKeyPrefix(storeKey));
 	}
 	
 	@Override
-	public boolean removeStore(String... storeKey) {
+	public synchronized T getCache(String... storeKey) {
+		return caches.get(keyPrefix.getKeyPrefix(storeKey));
+	}
+	
+	@Override
+	public synchronized boolean hasCache(String... storeKey) {
+		return caches.containsKey(keyPrefix.getKeyPrefix(storeKey));
+	}
+	
+	@Override
+	public synchronized boolean removeStore(String... storeKey) {
 		String key = keyPrefix.getKeyPrefix(storeKey);
 		
 		if (keyValueStore.remove(key)) {
