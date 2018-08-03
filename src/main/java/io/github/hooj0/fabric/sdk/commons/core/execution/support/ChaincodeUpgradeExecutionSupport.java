@@ -60,6 +60,10 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 	private void checkArgs(UpgradeOptions options, FuncOptions funcOptions) {
 		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
 		checkNotNull(options.getEndorsementPolicy(), "endorsementPolicy 背书策略文件为必填项");
+		
+		logger.debug("options: {}", options);
+		logger.debug("func: {}", funcOptions.getFunc());
+		logger.debug("args: {}", new Object[] { funcOptions.getArgs() });
 	}
 	
 	@Override
