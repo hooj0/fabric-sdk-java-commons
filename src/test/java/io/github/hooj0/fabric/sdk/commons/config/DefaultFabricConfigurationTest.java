@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultFabricConfigurationTest {
 
+	@SuppressWarnings("static-access")
 	@Test
 	public void testSettings() {
 		
@@ -75,7 +76,7 @@ public class DefaultFabricConfigurationTest {
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_CA_ADMIN_PASSWD, "adminpw2");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_ORGS_MEMBER_USERS, "user1");
 
-		config.printConfig("custom class properties");
+		config.printConfig(config.SDK_COMMONS_PROPERTIES, "propus");
 	}
 	
 	@Test
