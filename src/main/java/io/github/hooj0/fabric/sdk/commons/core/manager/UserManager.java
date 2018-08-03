@@ -18,10 +18,12 @@ import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
+import org.hyperledger.fabric_ca.sdk.HFCAIdentity;
 import org.hyperledger.fabric_ca.sdk.HFCAInfo;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.hyperledger.fabric_ca.sdk.exception.EnrollmentException;
 import org.hyperledger.fabric_ca.sdk.exception.InvalidArgumentException;
+import org.hyperledger.fabric_ca.sdk.exception.RegistrationException;
 
 import io.github.hooj0.fabric.sdk.commons.FabricRootException;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
@@ -70,7 +72,7 @@ public class UserManager extends AbstractManager {
 	}
 	
 	public void initialize(String adminName, String adminSecret, String... userNames) throws Exception {
-		logger.info("init organization user");
+		logger.info("initialize organization user.");
 
 		initializeCaClient();
 		enrollOrganizationUsers(adminName, adminSecret, userNames);
@@ -84,7 +86,7 @@ public class UserManager extends AbstractManager {
 	 * @throws InvalidArgumentException
 	 */
 	public void initializeCaClient() throws Exception {
-		logger.info("初始化 CA 客户端……");
+		logger.info("initialize all organization peer node Ca Client");
 
 		// 创建 CA client
 		for (Organization org : organizations) {
@@ -93,7 +95,6 @@ public class UserManager extends AbstractManager {
 			if (org.getCAClient() != null) {
 				continue;
 			}
-
 			if (StringUtils.isNotBlank(caName)) {
 				org.setCAClient(HFCAClient.createNewInstance(caName, org.getCALocation(), org.getCAProperties()));
 			} else {
@@ -109,10 +110,10 @@ public class UserManager extends AbstractManager {
 	 * @throws Exception
 	 */
 	private void enrollOrganizationUsers(String adminName, String adminSecret, String... userNames) throws Exception {
-		logger.info("Start -> Enroll Organization: CA Admin、User、Peer Admin、TLS ");
+		logger.info("Start Enroll Organization: CA Admin、User、Peer Admin(TLS) ");
 
 		for (Organization org : organizations) {
-			logger.info("orgName: {} / mspID: {} 进行用户注册和认证", org.getName(), org.getMSPID());
+			logger.debug("iterator Organization orgName: `{}`, mspID: `{}` enroll & register user", org.getName(), org.getMSPID());
 
 			HFCAClient ca = org.getCAClient();
 			// PKI密钥创建/签署/验证
@@ -122,13 +123,12 @@ public class UserManager extends AbstractManager {
 			if (config.isEnabledFabricTLS()) {
 				enrollAdminTLS(org, adminName, adminSecret);
 			} else {
-				logger.debug("TLS 证书模式：{}", config.isEnabledFabricTLS());
+				logger.debug("TLS Enabled：{}", config.isEnabledFabricTLS());
 			}
 
 			HFCAInfo info = ca.info();
-			logger.debug("ca info: {}", info);
-
 			checkNotNull(info, "HFCAInfo is null");
+			
 			if (!StringUtils.isBlank(info.getCAName())) {
 				checkArgument(StringUtils.equals(info.getCAName(), ca.getCAName()), "HFCAInfo.CAName 和  CaInfo.CAName 不等");
 			}
@@ -161,7 +161,7 @@ public class UserManager extends AbstractManager {
 	 * @createDate 2018年6月13日 上午10:38:55
 	 */
 	public Enrollment enrollAdminTLS(Organization org, String adminName, String adminSecret) throws EnrollmentException, InvalidArgumentException, IOException {
-		logger.info("管理员 TLS 模式——认证……");
+		logger.info("the Admin `{}` `TLS` authenticates by account 'adminName' & 'adminSecret'", adminName);
 
 		HFCAClient ca = org.getCAClient();
 
@@ -194,7 +194,7 @@ public class UserManager extends AbstractManager {
 	 * @createDate 2018年6月13日 上午10:41:54
 	 */
 	public OrganizationUser enrollAdmin(Organization org, String adminName, String adminSecret) throws EnrollmentException, InvalidArgumentException {
-		logger.info("管理员CA——认证……");
+		logger.info("the Admin `{}` authenticates by account 'adminName' & 'adminSecret'", adminName);
 
 		HFCAClient ca = org.getCAClient();
 
@@ -220,7 +220,7 @@ public class UserManager extends AbstractManager {
 	 * @createDate 2018年6月13日 上午10:48:39
 	 */
 	public OrganizationUser registerAndEnrollUser(Organization org, String userName, String affiliation) throws Exception {
-		logger.info("普通用户——注册和认证……");
+		logger.info("the User `{}` authenticates by account 'userName' & 'affiliation'", userName);
 
 		HFCAClient ca = org.getCAClient();
 
@@ -231,18 +231,38 @@ public class UserManager extends AbstractManager {
 			final RegistrationRequest request = new RegistrationRequest(user.getName(), affiliation);
 
 			// 利用管理员权限进行普通user注册
-			String secret = ca.register(request, org.getAdmin());
-			logger.trace("用户 {} 注册，秘钥：{}", user, secret);
-
-			user.setAffiliation(request.getAffiliation());
-			user.setEnrollmentSecret(secret);
+			String secret = null;
+			try {
+				secret = ca.register(request, org.getAdmin());
+				logger.trace("用户 {} 注册，秘钥：{}", user, secret);
+				
+				user.setAffiliation(request.getAffiliation());
+				user.setEnrollmentSecret(secret);
+			} catch (RegistrationException e) {
+				HFCAIdentity ident = ca.newHFCAIdentity(userName);
+				
+				if (ident.read(org.getAdmin()) == 200) {
+					user.setAffiliation(ident.getAffiliation());
+					user.setEnrollmentSecret(ident.getSecret());
+				}
+			}
 		}
 
 		if (!user.isEnrolled()) { // 未认证
-			// 用户认证
-			Enrollment enrollment = ca.enroll(user.getName(), user.getEnrollmentSecret());
-			logger.trace("用户：{} 进行认证: {}", user.getName(), enrollment);
+			Enrollment enrollment = null;
+			try {
+				// 用户认证
+				enrollment = ca.enroll(user.getName(), user.getEnrollmentSecret());
+				logger.trace("用户：{} 进行认证: {}", user.getName(), enrollment);
+				
+			} catch (Exception e) {
+				// reason = null，无理由撤销用户证书
+				ca.revoke(org.getAdmin(), user.getName(), null); 
+				enrollment = ca.reenroll(user); // 重新认证
+			}
 
+			checkNotNull(enrollment, "OrganizationUser '%s' enrollment secret is not set", user.getName());
+			
 			user.setEnrollment(enrollment);
 			user.setMspId(org.getMSPID());
 		}
@@ -263,7 +283,7 @@ public class UserManager extends AbstractManager {
 	 * @throws IOException
 	 */
 	public OrganizationUser createPeerAdmin(Organization org) throws Exception {
-		logger.info("节点管理员——认证……");
+		logger.info("the PeerAdmin `{}` cert & key by account", org.getName() + "Admin");
 
 		final String orgName = org.getName();
 		final String mspid = org.getMSPID();
@@ -280,7 +300,7 @@ public class UserManager extends AbstractManager {
 		logger.trace("certificateFile: {}", certificateFile.getAbsolutePath());
 		
 		if (!privateKeyFile.exists()) {
-			throw new FabricRootException("sk file not found: %s", privateKeyFile.getAbsolutePath());
+			throw new FabricRootException("*_sk file not found: %s", privateKeyFile.getAbsolutePath());
 		}
 
 		// 从缓存或store中获取用户
