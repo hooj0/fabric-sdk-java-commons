@@ -64,6 +64,8 @@ public class ChaincodeInstallExecutionSupport extends AbstractChaincodeExecution
 		
 		checkNotNull(options.getChaincodeId(), "ChaincodeId 是必填参数");
 		checkNotNull(options.getChaincodeType(), "ChaincodeType 是必填参数");
+		
+		logger.debug("options: {}", options);
 	}
 	
 	private Collection<ProposalResponse> execute(InstallOptions options, InputStream chaincodeInputStream, File chaincodeSourceFile) {
