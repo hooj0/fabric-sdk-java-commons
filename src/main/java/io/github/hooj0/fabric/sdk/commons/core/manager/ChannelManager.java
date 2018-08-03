@@ -1,7 +1,8 @@
 package io.github.hooj0.fabric.sdk.commons.core.manager;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static java.lang.String.format;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +20,10 @@ import org.hyperledger.fabric.sdk.Orderer;
 import org.hyperledger.fabric.sdk.Peer;
 import org.hyperledger.fabric.sdk.Peer.PeerRole;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import io.github.hooj0.fabric.sdk.commons.FabricManagerException;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
@@ -59,16 +62,18 @@ public class ChannelManager extends AbstractManager {
 	public Channel initialize(String channelName, Organization org) throws Exception {
 		logger.info("initialize channel -> Organization: {} , Constructing channel: {}", org.getName(), channelName);
 
+		checkArgument(!Strings.isNullOrEmpty(channelName), "channel name is not null!");
+		checkNotNull(org, "Organization is not null!");
+		checkNotNull(org.getPeerAdmin(), "Organization PeerAdmin is not null!");
+		
 		/** 设置 peer 管理员User上下文 */
 		client.setUserContext(org.getPeerAdmin());
-		//client.setUserContext(org.getUser("user1"));
 
 		/** 恢复或创建通道 */
 		Channel channel = channelStoreCache.getStore(org.getName(), channelName);
 		if (channel == null) {
 			try {
 				/** 创建 Orderer 共识服务 */
-				logger.info("create orderer service");
 				List<Orderer> orderers = createOrderer(org);
 
 				/** 选择第一个 Orderer 创建通道 */
@@ -79,28 +84,25 @@ public class ChannelManager extends AbstractManager {
 				orderers.remove(anOrderer);
 
 				/** 创建通道 */
-				logger.info("Created channel: {}", channelName);
 				channel = createChannel(channelName, anOrderer, org);
 
 				/** 创建 peer，channel加入Peer */
-				logger.info("Created Peer Join Channel: {}", channelName);
 				createPeer(channel, true, org);
 
 				/** 为通道添加其他 Orderer服务 */
 				logger.info("Add Orderer to Channel: {}", channelName);
 				for (Orderer orderer : orderers) {
 					channel.addOrderer(orderer);
-					logger.trace("Add Channel Orderer: {}->{}", orderer.getName(), orderer.getUrl());
+					logger.trace("Add Channel Orderer: {} -> {}", orderer.getName(), orderer.getUrl());
 				}
 			} catch (Exception e) {
-				logger.warn("准备通道发生异常：{}", e);
+				logger.warn("准备通道发生异常，尝试重建从缓存中恢复通道：{}", e.getMessage());
 				/** 重建通道 */
 				channel = recreateChannel(channelName, org);
 			}
 		}
 
 		/** 添加事件总线 */
-		logger.info("Add EventHub: {}", channelName);
 		createEventHub(channel, org);
 		
 		/** 初始化 */
@@ -110,11 +112,10 @@ public class ChannelManager extends AbstractManager {
 		}
 		
 		if (channel.isShutdown() || !channel.isInitialized()) {
-			System.out.println("=============> 通道关闭或为初始化，需要重新开启");
-			
+			logger.warn("=============> 通道关闭或为初始化，需要重新开启");
+			channel = checkChannelSerialize(channel);
 		}
-		channel = checkChannelSerialize(channel);
-		
+
 		checkChannel(channelName, channel);
 		logger.info("Organization: {} , Finished initialization channel： {}", org.getName(), channelName);
 		
@@ -124,11 +125,12 @@ public class ChannelManager extends AbstractManager {
 	}
 
 	/**
-	 * 在store恢复失败的情况下，重新创建通道
+	 * 在store恢复失败的时候，重新创建通道
 	 * @author hoojo
 	 * @createDate 2018年6月26日 下午4:50:46
 	 */
 	public Channel recreateChannel(String channelName, Organization org) throws Exception {
+		logger.info("Restore failed in store, recreate channel '{}.{}'", org.getName(), channelName);
 		/** 创建通道 */
 		Channel channel = createChannel(channelName);
 
@@ -146,10 +148,17 @@ public class ChannelManager extends AbstractManager {
 	 * @createDate 2018年6月25日 下午12:58:42
 	 */
 	public Channel restoreChannel(String channelName, Organization org) throws Exception {
-
+		logger.info("Restore channel in store '{}.{}'", org.getName(), channelName);
+		
+		checkArgument(!Strings.isNullOrEmpty(channelName), "channel name is not null!");
+		checkNotNull(org, "Organization is not null!");
+		checkNotNull(org.getPeerAdmin(), "Organization PeerAdmin is not null!");
+		
+		client.setUserContext(org.getPeerAdmin());
 		// client.setUserContext(org.getUser(USER_NAME));
+		
 		/** 恢复或创建通道 */
-		Channel channel = channelStoreCache.getStore(channelName);
+		Channel channel = channelStoreCache.getStore(org.getName(), channelName);
 		if (channel == null) {
 			/** 创建通道 */
 			channel = createChannel(channelName);
@@ -163,11 +172,20 @@ public class ChannelManager extends AbstractManager {
 		}
 
 		/** 初始化 */
-		channel.initialize();
-
-		channel = checkChannelSerialize(channel);
+		if (!channel.isInitialized()) {
+			logger.info("initialize channel: {}.{}", org.getName(), channelName);
+			channel.initialize();
+		}
+		
+		if (channel.isShutdown() || !channel.isInitialized()) {
+			logger.warn("=============> 通道关闭或为初始化，需要重新开启");
+			channel = checkChannelSerialize(channel);
+		}
 
 		checkChannel(channelName, channel);
+		logger.info("Organization: {} , Finished initialization channel： {}", org.getName(), channelName);
+		
+		channelStoreCache.setStore(new String[] { org.getName(), channelName }, channel);
 
 		return channel;
 	}
@@ -188,7 +206,6 @@ public class ChannelManager extends AbstractManager {
 		/** 设置 peer 管理员User上下文 */
 		client.setUserContext(org.getPeerAdmin());
 
-		logger.info("create orderer service");
 		/** 创建 Orderer 共识服务 */
 		List<Orderer> orderers = createOrderer(org);
 
@@ -199,11 +216,9 @@ public class ChannelManager extends AbstractManager {
 		/** 剔除已选择 Orderer */
 		orderers.remove(anOrderer);
 
-		logger.info("Created channel: {}", channelName);
 		/** 创建通道 */
 		Channel channel = createChannel(channelName, anOrderer, org);
 
-		logger.info("Created Peer Join Channel: {}", channelName);
 		/** 创建 peer，channel加入Peer */
 		createPeer(channel, true, org);
 
@@ -214,7 +229,6 @@ public class ChannelManager extends AbstractManager {
 			logger.trace("Add Channel Orderer: {}->{}", orderer.getName(), orderer.getUrl());
 		}
 
-		logger.info("Add EventHub: {}", channelName);
 		/** 添加事件总线 */
 		createEventHub(channel, org);
 
@@ -233,7 +247,7 @@ public class ChannelManager extends AbstractManager {
 	 */
 	private Orderer createOrderer(String ordererName, Organization org) throws Exception {
 		String grpcURL = org.getOrdererLocation(ordererName);
-		logger.info("构建 Orderer 服务：{}，URL：{}", ordererName, grpcURL);
+		logger.debug("create Orderer：{}, URL：{}", ordererName, grpcURL);
 
 		Properties ordererProps = config.getOrdererProperties(ordererName);
 		// 5分钟以下需要更改服务器端才能接受更快的Ping速率。
@@ -253,7 +267,7 @@ public class ChannelManager extends AbstractManager {
 	 * @createDate 2018年6月13日 下午4:33:20
 	 */
 	private List<Orderer> createOrderer(Organization org) throws Exception {
-		logger.info("开始创建 Orderer 服务……");
+		logger.info("create Orderer service");
 		List<Orderer> orderers = Lists.newLinkedList();
 
 		for (String ordererName : org.getOrdererNames()) {
@@ -269,10 +283,10 @@ public class ChannelManager extends AbstractManager {
 	 * @createDate 2018年6月13日 下午4:33:20
 	 */
 	private void createOrderer(Channel channel, Organization org) throws Exception {
-		logger.info("在通道：{} 添加Orderer节点", channel.getName());
+		logger.info("In the channel: `{}` create the Orderer node", channel.getName());
 
 		for (String ordererName : org.getOrdererNames()) {
-			logger.debug("Channel add Orderer: {}", ordererName);
+			logger.debug("in the Channel add Orderer: {}", ordererName);
 
 			channel.addOrderer(createOrderer(ordererName, org));
 		}
@@ -285,23 +299,27 @@ public class ChannelManager extends AbstractManager {
 	 * @throws Exception
 	 */
 	private Channel createChannel(String channelName, Orderer anOrderer, Organization org) throws Exception {
-		logger.info("开始创建通道：{}", channelName);
+		logger.info("create channel：{}", channelName);
 
 		// 通道配置文件
 		File channelFile = new File(config.getChannelArtifactsPath(), channelName + ".tx");
-		logger.debug("通道配置文件：{}", channelFile.getAbsolutePath());
+		if (!channelFile.exists()) {
+			throw new FabricManagerException("channel tx config file not found: %s", channelFile.getPath());
+		}
+		
+		logger.debug("channel tx config file location：{}", channelFile.getAbsolutePath());
 		ChannelConfiguration channelConfiguration = new ChannelConfiguration(channelFile);
 
 		byte[] channelConfigurationSignatures = client.getChannelConfigurationSignature(channelConfiguration, org.getPeerAdmin());
 		// 创建只有一个管理员(orgs peer admin)签名的通道。 如果通道创建策略需要更多签名，则需要添加更多管理员签名。
 		Channel channel = client.newChannel(channelName, anOrderer, channelConfiguration, channelConfigurationSignatures);
-		logger.info("创建通道：{}，配置：{}", channel.getName(), channelFile.getAbsolutePath());
+		logger.info("create channel '{}' success", channel.getName());
 
 		return channel;
 	}
 
 	private Channel createChannel(String channelName) throws Exception {
-		logger.info("创建新的通道：{}", channelName);
+		logger.info("create new channel：{}", channelName);
 		Channel channel = client.newChannel(channelName);
 
 		return channel;
@@ -313,11 +331,11 @@ public class ChannelManager extends AbstractManager {
 	 * @createDate 2018年6月13日 下午4:21:51
 	 */
 	private void createPeer(Channel channel, boolean joining, Organization org) throws Exception {
-		logger.info("开始创建 peer/加入Peer：{}", channel.getName());
+		logger.info("created peer add/join channel: {}", channel.getName(), joining);
 
 		for (String peerName : org.getPeerNames()) {
 			String grpcURL = org.getPeerLocation(peerName);
-			logger.info("创建对等节点:{}，URL：{}", peerName, grpcURL);
+			logger.debug("create peer node:{}, URL：{}", peerName, grpcURL);
 
 			Properties peerProps = config.getPeerProperties(peerName);
 			peerProps.put("grpc.NettyChannelBuilderOption.maxInboundMessageSize", 9000000);
@@ -341,7 +359,7 @@ public class ChannelManager extends AbstractManager {
 				channel.addPeer(peer, options);
 			}
 
-			logger.debug("对等节点:{}，角色：{}， 加入通道：{}", peerName, options.getPeerRoles(), channel.getName());
+			logger.debug("peer node '{}' role '{}' join channel：{}", peerName, options.getPeerRoles(), channel.getName());
 		}
 	}
 
@@ -351,11 +369,11 @@ public class ChannelManager extends AbstractManager {
 	 * @createDate 2018年6月13日 下午4:15:45
 	 */
 	private void createEventHub(Channel channel, Organization org) throws Exception {
-		logger.info("开始添加事件总线：{}", channel.getName());
+		logger.info("in the channel '{}', create event hub", channel.getName());
 
 		for (String eventHubName : org.getEventHubNames()) {
 			String grpcURL = org.getEventHubLocation(eventHubName);
-			logger.info("添加事件监听：{}，URL：{}", eventHubName, grpcURL);
+			logger.info("add event hub：{}, URL：{}", eventHubName, grpcURL);
 
 			Properties eventHubProps = config.getEventHubProperties(eventHubName);
 
@@ -377,7 +395,7 @@ public class ChannelManager extends AbstractManager {
 	 * @createDate 2018年6月13日 下午4:26:08
 	 */
 	private Channel checkChannelSerialize(Channel channel) throws Exception {
-		logger.info("检查通道可否序列化：{}", channel.getName());
+		logger.info("check channel '{}' serialize", channel.getName());
 
 		if (!channel.isInitialized()) {
 			logger.warn("通道还未初始化操作");
@@ -390,8 +408,6 @@ public class ChannelManager extends AbstractManager {
 		byte[] serializedChannelBytes = channel.serializeChannel();
 		// 关闭所有释放资源的频道
 		channel.shutdown(true);
-		logger.debug("serializedChannelBytes: {}", serializedChannelBytes.length);
-
 		// 从通道序列化数据中恢复通道
 		channel = client.deSerializeChannel(serializedChannelBytes).initialize();
 
@@ -407,15 +423,15 @@ public class ChannelManager extends AbstractManager {
 	 * @createDate 2018年6月25日 下午1:01:43
 	 */
 	private void checkChannel(String channelName, Channel channel) throws Exception {
-		logger.info("检查通道中是否包含通道：{}", channelName);
+		logger.info("Check channel '{}' is installed on the Peer node.", channelName);
 
 		// 查找指定通道是否在Peer节点中存在
 		for (Peer peer : channel.getPeers()) {
 			Set<String> channels = client.queryChannels(peer);
-			logger.debug("通过对等节点：{} 找到通道：{}", peer.getName(), channels);
+			logger.debug("In the peer node '{}' find channels：{}", peer.getName(), channels);
 
 			if (!channels.contains(channelName)) {
-				throw new AssertionError(format("对等节点  %s 中没有通道 %s ", peer.getName(), channelName));
+				throw new FabricManagerException("peer node '%s' not found channel '%s'", peer.getName(), channelName);
 			}
 		}
 	}
