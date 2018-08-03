@@ -10,6 +10,8 @@ import org.hyperledger.fabric.sdk.User;
 
 import com.google.common.collect.ImmutableMap;
 
+import io.github.hooj0.fabric.sdk.commons.AbstractObject;
+
 /**
  * Chaincode Operation execution Options
  * @changelog updated chaincode getter & setter method, add chaincodeID setter getter method
@@ -22,7 +24,7 @@ import com.google.common.collect.ImmutableMap;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class Options {
+public class Options extends AbstractObject {
 
 	/** Chaincode 名称 */
 	private String chaincodeName;
