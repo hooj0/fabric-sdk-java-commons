@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 
+import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeBasicExecution;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.FuncOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstantiateOptions;
@@ -27,7 +28,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface ChaincodeDeployOperations extends ChaincodeBasicOperations {
+public interface ChaincodeDeployOperations extends ChaincodeBasicOperations, ChaincodeBasicExecution {
 
 	// install
 	
