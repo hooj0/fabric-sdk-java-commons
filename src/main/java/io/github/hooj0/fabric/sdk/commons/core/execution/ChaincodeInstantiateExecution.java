@@ -19,6 +19,6 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface ChaincodeInstantiateExecution extends ChaincodeExecution<ResultSet, InstantiateOptions, FuncOptions>, TransactionExecution<CompletableFuture<TransactionEvent>, InstantiateOptions, FuncOptions> {
+public interface ChaincodeInstantiateExecution extends ChaincodeBasicExecution, ChaincodeExecution<ResultSet, InstantiateOptions, FuncOptions>, TransactionExecution<CompletableFuture<TransactionEvent>, InstantiateOptions, FuncOptions> {
 
 }
