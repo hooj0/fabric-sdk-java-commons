@@ -1,5 +1,6 @@
 package io.github.hooj0.fabric.sdk.commons.core.support;
 
+import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.TransactionRequest.Type;
 
 /**
@@ -25,4 +26,7 @@ public class BasedTemplateTest {
 	static String CHAIN_CODE_VERSION = "1";
 	static String CHAIN_CODE_VERSION_11 = "11";
 	static Type CHAIN_CODE_LANG = Type.GO_LANG;
+	
+	ChaincodeID chaincodeID_1 = ChaincodeID.newBuilder().setName(CHAIN_CODE_NAME).setPath(CHAIN_CODE_PATH).setVersion(CHAIN_CODE_VERSION).build();
+	ChaincodeID chaincodeID_11 = ChaincodeID.newBuilder().setName(CHAIN_CODE_NAME).setPath(CHAIN_CODE_PATH).setVersion(CHAIN_CODE_VERSION_11).build();
 }
