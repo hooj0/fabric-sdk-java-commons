@@ -17,7 +17,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface ChaincodeQueryExecution extends ChaincodeExecution<String, QueryOptions, FuncOptions> {
+public interface ChaincodeQueryExecution extends ChaincodeBasicExecution, ChaincodeExecution<String, QueryOptions, FuncOptions> {
 
     ResultSet executeFor(QueryOptions options, String func);
 
