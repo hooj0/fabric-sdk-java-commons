@@ -78,11 +78,11 @@ public final class GzipUtils {
 		File[] matches = directory.listFiles((dir, name) -> name.endsWith("_sk"));
 
 		if (null == matches) {
-			throw new FabricRootException(format("Matches returned null does %s directory exist?", directory.getAbsoluteFile().getName()));
+			throw new FabricRootException(format("Matches returned null does '%s' directory exist?", directory.getAbsoluteFile()));
 		}
 
 		if (matches.length != 1) {
-			throw new FabricRootException(format("Expected in %s only 1 sk file but found %d", directory.getAbsoluteFile().getName(), matches.length));
+			throw new FabricRootException(format("Expected in '%s' only 1 sk file but found %d", directory.getAbsoluteFile(), matches.length));
 		}
 
 		return matches[0];
