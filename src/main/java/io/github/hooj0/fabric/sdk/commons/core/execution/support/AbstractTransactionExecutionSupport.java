@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,7 @@ import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeTransactionException;
+import io.github.hooj0.fabric.sdk.commons.core.execution.TransactionExecution;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.FuncOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.TransactionsOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
@@ -30,16 +32,25 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public abstract class AbstractTransactionExecutionSupport<T extends TransactionsOptions, S extends FuncOptions> extends AbstractChaincodeExecutionSupport {
+public abstract class AbstractTransactionExecutionSupport<T extends TransactionsOptions> extends AbstractChaincodeExecutionSupport<ResultSet, T> implements TransactionExecution<CompletableFuture<TransactionEvent>, T, FuncOptions> {
 
 	public AbstractTransactionExecutionSupport(HFClient client, Channel channel, Class<?> clazz) {
 		super(client, channel, clazz);
 	}
 	
-	public abstract ResultSet execute(T options, S funcOptions);
+	/**
+	 * 发起交易，准备交易，还未发送到交易提议到peer节点
+	 * @author hoojo
+	 * @createDate 2018年8月3日 上午11:24:27
+	 * @param options TransactionsOptions
+	 * @param funcOptions FuncOptions
+	 * @return ResultSet
+	 */
+	protected abstract ResultSet prepareTransaction(T options, FuncOptions funcOptions);
 	
-	public CompletableFuture<TransactionEvent> executeAsync(T options, S funcOptions) {
-		Collection<ProposalResponse> responses = this.execute(options, funcOptions).getResponses();
+	protected ResultSet executeTransaction(T options, FuncOptions funcOptions) {
+		ResultSet resultSet = this.prepareTransaction(options, funcOptions);
+		Collection<ProposalResponse> responses = resultSet.getResponses();
 		
 		CompletableFuture<TransactionEvent> future = null;
 		if (options.getOrderers() != null && options.getTransactionsUser() != null) {
@@ -53,20 +64,20 @@ public abstract class AbstractTransactionExecutionSupport<T extends Transactions
 		} else {
 			future = channel.sendTransaction(responses);
 		}
+		resultSet.setFuture(future);
 		
-		return future;
+		return resultSet;
 	}
 	
-	/**
-	 * 执行交易初始化动作，返回交易事件
-	 * @author hoojo
-	 * @createDate 2018年6月15日 上午11:54:46
-	 */
-	public TransactionEvent executeFor(T options, S funcOptions) {
+	public ResultSet execute(T options, FuncOptions funcOptions) {
 		TransactionEvent transactionEvent = null;
 		
+		ResultSet resultSet = executeTransaction(options, funcOptions);
 		try {
-			transactionEvent = executeAsync(options, funcOptions).get(options.getTransactionWaitTime(), TimeUnit.SECONDS);
+			transactionEvent = resultSet.getFuture().get(options.getTransactionWaitTime(), TimeUnit.SECONDS);
+			
+			resultSet.setTransactionEvent(transactionEvent);
+			resultSet.setTransactionId(transactionEvent.getTransactionID());
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			logger.error(e.getMessage(), e);
 			throw new FabricChaincodeTransactionException(e, "chaincode transaction fail exception");
@@ -79,6 +90,46 @@ public abstract class AbstractTransactionExecutionSupport<T extends Transactions
 		// 必须有交易区块事件发生
 		checkNotNull(transactionEvent.getBlockEvent(), "交易事件的区块事件对象为空");
 		
-		return transactionEvent;
+		return resultSet;
+	}
+
+	@Override
+	public CompletableFuture<TransactionEvent> executeAsync(T options, String func) {
+		return this.executeAsync(options, new FuncOptions(func));
+	}
+
+	@Override
+	public CompletableFuture<TransactionEvent> executeAsync(T options, String func, Object... args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public CompletableFuture<TransactionEvent> executeAsync(T options, String func, Map<String, Object> args) {
+		return this.executeAsync(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public CompletableFuture<TransactionEvent> executeAsync(T options, FuncOptions funcOptions) {
+		return this.executeTransaction(options, funcOptions).getFuture();
+	}
+
+	@Override
+	public TransactionEvent executeFor(T options, String func) {
+		return this.executeFor(options, new FuncOptions(func));
+	}
+
+	@Override
+	public TransactionEvent executeFor(T options, String func, Object... args) {
+		return this.executeFor(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(T options, String func, Map<String, Object> args) {
+		return this.executeFor(options, new FuncOptions(func, args));
+	}
+
+	@Override
+	public TransactionEvent executeFor(T options, FuncOptions funcOptions) {
+		return this.execute(options, funcOptions).getTransactionEvent();
 	}
 }
