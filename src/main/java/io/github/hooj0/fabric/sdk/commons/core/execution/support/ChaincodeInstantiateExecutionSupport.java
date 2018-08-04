@@ -5,12 +5,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.InstantiateProposalRequest;
@@ -35,26 +32,10 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExecutionSupport<InstantiateOptions, FuncOptions> implements ChaincodeInstantiateExecution {
+public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExecutionSupport<InstantiateOptions> implements ChaincodeInstantiateExecution {
 
 	public ChaincodeInstantiateExecutionSupport(HFClient client, Channel channel) {
 		super(client, channel, ChaincodeInstantiateExecutionSupport.class);
-	}
-
-	@Override
-	public ResultSet execute(InstantiateOptions options, String func) {
-		return this.execute(options, new FuncOptions(func));
-	}
-
-	@Override
-	public ResultSet execute(InstantiateOptions options, String func, Object... args) {
-		return this.execute(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public ResultSet execute(InstantiateOptions options, String func, LinkedHashMap<String, Object> args) {
-		
-		return this.execute(options, new FuncOptions(func, args));
 	}
 
 	private void checkArgs(InstantiateOptions options) {
@@ -63,7 +44,7 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 	}
 	
 	@Override
-	public ResultSet execute(InstantiateOptions options, FuncOptions funcOptions) {
+	protected ResultSet prepareTransaction(InstantiateOptions options, FuncOptions funcOptions) {
 		logger.info("在通道：{} 实例化Chaincode：{}", channel.getName(), options.getChaincodeId());
 
 		checkArgs(options);
@@ -113,7 +94,6 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 				responses = channel.sendInstantiationProposal(instantiateRequest);
 				logger.info("向CHAINCODE_QUERY/ENDORSING_PEER Peer——发送实例化Chaincode请求：{}", instantiateRequest);
 			}
-			logger.info("发送实例化Chaincode参数：{}", instantiateRequest.getArgs());
 
 			Collection<ProposalResponse> successResponses = new LinkedList<>();
 			Collection<ProposalResponse> failedResponses = new LinkedList<>();
@@ -147,34 +127,5 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
             throw new FabricChaincodeInstantiateException(e, "实例化chaincode时发生异常： %s", e.getMessage());
 		}
 	}
-
-	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(InstantiateOptions options, String func) {
-		return this.executeAsync(options, new FuncOptions(func));
-	}
-
-	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(InstantiateOptions options, String func, Object... args) {
-		return this.executeAsync(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(InstantiateOptions options, String func, Map<String, Object> args) {
-		return this.executeAsync(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public TransactionEvent executeFor(InstantiateOptions options, String func) {
-		return super.executeFor(options, new FuncOptions(func));
-	}
-
-	@Override
-	public TransactionEvent executeFor(InstantiateOptions options, String func, Object... args) {
-		return super.executeFor(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public TransactionEvent executeFor(InstantiateOptions options, String func, Map<String, Object> args) {
-		return super.executeFor(options, new FuncOptions(func, args));
-	}
+	
 }
