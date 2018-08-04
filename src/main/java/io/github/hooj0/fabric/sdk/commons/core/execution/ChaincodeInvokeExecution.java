@@ -19,5 +19,5 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface ChaincodeInvokeExecution extends ChaincodeExecution<ResultSet, InvokeOptions, FuncOptions>, TransactionExecution<CompletableFuture<TransactionEvent>, InvokeOptions, FuncOptions> {
+public interface ChaincodeInvokeExecution extends ChaincodeBasicExecution, ChaincodeExecution<ResultSet, InvokeOptions, FuncOptions>, TransactionExecution<CompletableFuture<TransactionEvent>, InvokeOptions, FuncOptions> {
 }
