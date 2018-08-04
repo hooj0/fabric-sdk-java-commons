@@ -32,10 +32,13 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class ChaincodeInstallExecutionSupport extends AbstractChaincodeExecutionSupport implements ChaincodeInstallExecution {
+public class ChaincodeInstallExecutionSupport extends ChaincodeBasicExecutionSupport implements ChaincodeInstallExecution {
 
 	public ChaincodeInstallExecutionSupport(HFClient client, Channel channel) {
-		super(client, channel, ChaincodeInstallExecutionSupport.class);
+		super(ChaincodeInstallExecutionSupport.class);
+		
+		super.setClient(client);
+		super.setChannel(channel);
 	}
 
 	@Override
