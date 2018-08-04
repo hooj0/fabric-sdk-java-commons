@@ -26,17 +26,17 @@ public interface ChaincodeBasicOperations {
      * 在指定的orgName节点上初始化通道 channelName
 	 * @author hoojo
 	 * @createDate 2018年7月23日 下午3:10:28
-	 * @return Channel initialization channel
+	 * @return Channel initialize channel
 	 */
-	public Channel init(String channelName, String orgName);
+	public Channel initialize(String channelName, String orgName);
 	
 	/**
-	 * 初始化系统会员用户
+	 * 实例化化系统会员用户
 	 * @author hoojo
 	 * @createDate 2018年7月27日 下午4:40:43
 	 * @param users
 	 */
-	public void init(String... users);
+	public void instantiate(String... users);
 	
 	public HFClient getClient();
 
