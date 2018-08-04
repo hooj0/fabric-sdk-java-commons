@@ -34,7 +34,7 @@ public enum DefaultFabricConfiguration {
 	}
 
 	private DefaultFabricConfiguration() {
-		this.setLocalSettings();
+		//this.setLocalSettings();
 	}
 	
 	@SuppressWarnings("unused")
