@@ -16,12 +16,12 @@ import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
-import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeInstantiateException;
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeOperationException;
 import io.github.hooj0.fabric.sdk.commons.config.DefaultFabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.core.ChaincodeBasicOperations;
+import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeBasicExecution;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstantiateOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InvokeOptions;
@@ -29,6 +29,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.option.Options;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.QueryOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.TransactionsOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.UpgradeOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.support.ChaincodeBasicExecutionSupport;
 import io.github.hooj0.fabric.sdk.commons.core.manager.ChannelManager;
 import io.github.hooj0.fabric.sdk.commons.core.manager.UserManager;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
@@ -47,7 +48,7 @@ import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public abstract class AbstractOperationSupport extends AbstractObject implements ChaincodeBasicOperations {
+public abstract class AbstractOperationSupport extends ChaincodeBasicExecutionSupport implements ChaincodeBasicOperations, ChaincodeBasicExecution {
 
 	protected HFClient client;
 	protected UserManager userManager;
@@ -78,6 +79,8 @@ public abstract class AbstractOperationSupport extends AbstractObject implements
 	
 	private void initialize(String channelName, String orgName, FabricConfiguration config, FabricKeyValueStore store) {
 		checkNotNull(config, "FabricConfiguration is not null!");
+		checkArgument(!Strings.isNullOrEmpty(channelName), "channelName is null!");
+		checkArgument(!Strings.isNullOrEmpty(orgName), "orgName is null!");
 		
 		this.client = HFClient.createNewInstance();
 		try {
@@ -95,17 +98,20 @@ public abstract class AbstractOperationSupport extends AbstractObject implements
 			this.channelManager = new ChannelManager(config, client);
 		}
 		
-		this.init(config.getUsers());
-		this.channel = init(channelName, orgName);
+		this.instantiate(config.getUsers());
+		this.channel = initialize(channelName, orgName);
 		
 		this.orgName = orgName;
 		this.channelName = channelName;
+		
+		super.setClient(client);
+		super.setChannel(channel);
 	}
 	
 	@Override
-	public void init(String... users) {
+	public void instantiate(String... users) {
 		checkNotNull(users, "FabricConfiguration is not null!");
-		checkArgument(users.length > 0, "FabricConfiguration.getUsers() result is not null!");
+		checkArgument(users.length > 0, "users result is not null!");
 		
 		try {
 			userManager.initialize(config.getCaAdminName(), config.getCaAdminPassword(), users);
@@ -117,7 +123,7 @@ public abstract class AbstractOperationSupport extends AbstractObject implements
 	}
 	
 	@Override
-	public Channel init(String channelName, String orgName) {
+	public Channel initialize(String channelName, String orgName) {
 		checkArgument(!Strings.isNullOrEmpty(channelName), "channelName is not null!");
 		checkArgument(!Strings.isNullOrEmpty(orgName), "orgName is not null!");
 		
@@ -261,13 +267,14 @@ public abstract class AbstractOperationSupport extends AbstractObject implements
 			} else {
 				policy = new ChaincodeEndorsementPolicy();
 				
-				policyFile = Paths.get(config.getCommonRootPath(), config.getEndorsementPolicyFilePath()).toFile();
+				policyFile = Paths.get(config.getEndorsementPolicyFilePath()).toFile();
 				logger.info("chaincode endorse ment policy file location：{}", policyFile.getAbsolutePath());
 				
 				policy.fromYamlFile(policyFile);
 			}
 		} catch (ChaincodeEndorsementPolicyParseException | IOException e) {
-			throw new FabricChaincodeInstantiateException(e, "重建背书文件发生异常");
+			logger.error(e.getMessage(), e);
+			throw new FabricChaincodeInstantiateException(e, "重建背书文件发生异常, %s", e.getMessage());
 		}
 
 		return policy;
