@@ -6,7 +6,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,27 +34,12 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSupport implements ChaincodeQueryExecution {
+public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSupport<String, QueryOptions> implements ChaincodeQueryExecution {
 
 	public ChaincodeQueryExecutionSupport(HFClient client, Channel channel) {
 		super(client, channel, ChaincodeQueryExecutionSupport.class);
 	}
 	
-	@Override
-	public String execute(QueryOptions options, String func) {
-		return this.execute(options, new FuncOptions(func));
-	}
-
-	@Override
-	public String execute(QueryOptions options, String func, Object... args) {
-		return this.execute(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public String execute(QueryOptions options, String func, LinkedHashMap<String, Object> args) {
-		return this.execute(options, new FuncOptions(func, args));
-	}
-
 	@Override
 	public String execute(QueryOptions options, FuncOptions funcOptions) {
 		return this.executeFor(options, funcOptions).getResult();
@@ -78,9 +62,9 @@ public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSu
 	}
 
 	private void checkArgs(QueryOptions options, FuncOptions funcOptions) {
-		checkArgument(!Strings.isNullOrEmpty(funcOptions.getFunc()), "func 参数为必填项");
-		checkArgument(!Objects.isNull(funcOptions.getArgs()), "args 参数为必填项");
-		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
+		checkArgument(!Strings.isNullOrEmpty(funcOptions.getFunc()), "`func` parameter is required!");
+		checkArgument(!Objects.isNull(funcOptions.getArgs()), "`args` parameter is required!");
+		checkNotNull(options.getClientUserContext(), "`client user` parameter is required!");
 		
 		logger.debug("options: {}", options);
 		logger.debug("func: {}", funcOptions.getFunc());
@@ -93,8 +77,6 @@ public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSu
 		
 		checkArgs(options, funcOptions);
 		
-		Collection<ProposalResponse> responses = null;
-		String payload = null;
 		try {
 			client.setUserContext(options.getClientUserContext());
 			
@@ -118,6 +100,7 @@ public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSu
             	request.setUserContext(options.getRequestUser());
             }
             
+            Collection<ProposalResponse> responses = null;
             if (options.getSend2Peers() != null) { // 向指定的Peer节点发送请求
             	responses = channel.queryByChaincode(request, options.getSend2Peers());
             } else if (options.isSpecificPeers()) { // 向所有Peer节点发送查询请求
@@ -125,21 +108,22 @@ public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSu
             } else {
             	responses = channel.queryByChaincode(request);
             }
-            logger.info("向 channel.Peers——发起Chaincode查询请求：{}", request);
             
+            String payload = null, transactionId = null;
             for (ProposalResponse response : responses) {
                 if (!response.isVerified() || response.getStatus() != Status.SUCCESS) {
                     throw new FabricChaincodeQueryException("查询失败， peer %s, status: %s, Messages: %s, Was verified: %s", response.getPeer().getName(), response.getStatus(), response.getMessage(), response.isVerified());
                 } else {
+                	transactionId = response.getTransactionID();
                     payload = response.getProposalResponse().getResponse().getPayload().toStringUtf8();
                     logger.debug("查询来自对等点：{} ，返回结果：{}", response.getPeer().getName(), payload);
                 }
             }
+
+            return new ResultSet(payload).setResponses(responses).setTransactionId(transactionId);
 		} catch (Exception e) {
 			logger.error("调用chaincode时发生异常：", e);
             throw new FabricChaincodeQueryException(e, "调用Chaincode Query Exection查询时发生异常: %s", e.getMessage());
 		}
-		
-		return new ResultSet(payload).setResponses(responses);
 	}
 }
