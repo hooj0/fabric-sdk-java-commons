@@ -1,7 +1,7 @@
 package io.github.hooj0.fabric.sdk.commons.cache;
 
 /**
- * fabric store KeyValue 持久化存储接口
+ * fabric KeyValue persistent storage interface
  * @author hoojo
  * @createDate 2018年7月21日 下午9:38:03
  * @file FabricStoreCache.java
