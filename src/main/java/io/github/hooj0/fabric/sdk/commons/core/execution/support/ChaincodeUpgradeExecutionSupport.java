@@ -3,12 +3,8 @@ package io.github.hooj0.fabric.sdk.commons.core.execution.support;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.ChaincodeResponse.Status;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
@@ -36,27 +32,12 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecutionSupport<UpgradeOptions, FuncOptions> implements ChaincodeUpgradeExecution {
+public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecutionSupport<UpgradeOptions> implements ChaincodeUpgradeExecution {
 
 	public ChaincodeUpgradeExecutionSupport(HFClient client, Channel channel) {
 		super(client, channel, ChaincodeUpgradeExecutionSupport.class);
 	}
 	
-	@Override
-	public ResultSet execute(UpgradeOptions options, String func) {
-		return this.execute(options, new FuncOptions(func));
-	}
-
-	@Override
-	public ResultSet execute(UpgradeOptions options, String func, Object... args) {
-		return this.execute(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public ResultSet execute(UpgradeOptions options, String func, LinkedHashMap<String, Object> args) {
-		return this.execute(options, new FuncOptions(func, args));
-	}
-
 	private void checkArgs(UpgradeOptions options, FuncOptions funcOptions) {
 		checkNotNull(options.getClientUserContext(), "client user 参数不可忽略设置");
 		checkNotNull(options.getEndorsementPolicy(), "endorsementPolicy 背书策略文件为必填项");
@@ -67,7 +48,7 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 	}
 	
 	@Override
-	public ResultSet execute(UpgradeOptions options, FuncOptions funcOptions) {
+	protected ResultSet prepareTransaction(UpgradeOptions options, FuncOptions funcOptions) {
 		logger.info("通道：{} 升级安装 chaincode: {}", channel.getName(), options.getChaincodeId());
 
 		checkArgs(options, funcOptions);
@@ -101,19 +82,17 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 			} else {
 				responses = channel.sendUpgradeProposal(upgradeProposalRequest); // default
 			}
-			logger.debug("向channel节点——发送安装升级chaincode请求：{}", upgradeProposalRequest);
 
 			final Collection<ProposalResponse> successResponses = new LinkedList<>();
 			final Collection<ProposalResponse> failedResponses = new LinkedList<>();
 			
-			String transactionID = null;
+			String transactionID = null, payload = null;
 			for (ProposalResponse response : responses) {
 				if (response.getStatus() == Status.SUCCESS) {
 					successResponses.add(response);
 					logger.debug("成功升级 Txid: {} , peer: {}", response.getTransactionID(), response.getPeer().getName());
-					if (transactionID == null) {
-						transactionID = response.getTransactionID();
-					}
+					payload = response.getProposalResponse().getResponse().getPayload().toStringUtf8();
+					transactionID = response.getTransactionID();
 				} else {
 					failedResponses.add(response);
 					logger.debug("失败升级 Txid: {} , peer: {}", response.getTransactionID(), response.getPeer().getName());
@@ -126,40 +105,10 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 				throw new FabricChaincodeUpgradeException("没有足够的 endorsers 安装 : %s, Message: ", successResponses.size(), first.getMessage());
 			}
 
-			return new ResultSet(successResponses).setTransactionId(transactionID);
+			return new ResultSet(successResponses).setTransactionId(transactionID).setResult(payload);
 		} catch (InvalidArgumentException | ProposalException e) {
 			logger.error("升级chaincode时发生异常：", e);
             throw new FabricChaincodeUpgradeException(e, "升级chaincode时发生异常： %s", e.getMessage());
 		}
-	}
-
-	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(UpgradeOptions options, String func) {
-		return this.executeAsync(options, new FuncOptions(func));
-	}
-
-	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(UpgradeOptions options, String func, Object... args) {
-		return this.executeAsync(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public CompletableFuture<TransactionEvent> executeAsync(UpgradeOptions options, String func, Map<String, Object> args) {
-		return this.executeAsync(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public TransactionEvent executeFor(UpgradeOptions options, String func) {
-		return super.executeFor(options, new FuncOptions(func));
-	}
-
-	@Override
-	public TransactionEvent executeFor(UpgradeOptions options, String func, Object... args) {
-		return super.executeFor(options, new FuncOptions(func, args));
-	}
-
-	@Override
-	public TransactionEvent executeFor(UpgradeOptions options, String func, Map<String, Object> args) {
-		return super.executeFor(options, new FuncOptions(func, args));
 	}
 }
