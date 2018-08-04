@@ -19,7 +19,7 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public interface ChaincodeInstallExecution {
+public interface ChaincodeInstallExecution extends ChaincodeBasicExecution {
 
 	Collection<ProposalResponse> execute(InstallOptions options, String chaincodeSourceLocation);
 
