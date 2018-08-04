@@ -6,9 +6,9 @@ import java.util.Set;
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.User;
 
-import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCache;
 import io.netty.util.internal.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * fabric user organization domain
@@ -21,7 +21,8 @@ import io.netty.util.internal.StringUtil;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class OrganizationUser extends AbstractObject implements User, Serializable {
+@Slf4j
+public class OrganizationUser implements User, Serializable {
 
 	private static final long serialVersionUID = -383568751809394444L;
 
@@ -52,7 +53,6 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 	 * @param fileStore 文件缓存
 	 */
 	public OrganizationUser(String name, String org, FabricStoreCache<OrganizationUser> storeCache) {
-		super(OrganizationUser.class);
 		
 		this.name = name;
 		this.organization = org;
@@ -76,7 +76,7 @@ public class OrganizationUser extends AbstractObject implements User, Serializab
 			this.enrollment = user.enrollment;
 			this.mspId = user.mspId;
 			
-			logger.debug("Restore User from store cache: {}", this);
+			log.debug("Restore User from store cache: {}", this);
 		}
 	}
 	
