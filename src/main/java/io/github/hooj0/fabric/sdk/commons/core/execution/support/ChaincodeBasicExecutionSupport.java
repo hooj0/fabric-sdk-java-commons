@@ -9,29 +9,27 @@ import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric.sdk.Peer;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
+import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeBasicExecution;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 
 /**
- * chaincode execution abstract basic implements
+ * chaincode execution basic interface implements
  * @author hoojo
  * @createDate 2018年7月24日 下午4:25:13
- * @file AbstractChaincodeExecutionSupport.java
+ * @file ChaincodeBasicExecutionSupport.java
  * @package io.github.hooj0.fabric.sdk.commons.core.execution.support
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
  * @version 1.0
  */
-public abstract class AbstractChaincodeExecutionSupport extends AbstractObject {
+public abstract class ChaincodeBasicExecutionSupport extends AbstractObject implements ChaincodeBasicExecution {
 
 	protected Channel channel;
 	protected HFClient client;
 	
-	public AbstractChaincodeExecutionSupport(HFClient client, Channel channel, Class<?> clazz) {
+	public ChaincodeBasicExecutionSupport(Class<?> clazz) {
 		super(clazz);
-		
-		this.channel = channel;
-		this.client = client;
 	}
 	
 	/**
@@ -145,5 +143,13 @@ public abstract class AbstractChaincodeExecutionSupport extends AbstractObject {
 		}
 
 		return found;
+	}
+
+	public void setChannel(Channel channel) {
+		this.channel = channel;
+	}
+
+	public void setClient(HFClient client) {
+		this.client = client;
 	}
 }
