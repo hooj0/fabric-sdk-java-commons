@@ -66,7 +66,9 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 			upgradeProposalRequest.setFcn(func);
 			upgradeProposalRequest.setArgs(args); // no arguments don't change the ledger see chaincode.
 
-			upgradeProposalRequest.setTransientMap(options.getTransientData());
+			if (options.getTransientData() != null) {
+				upgradeProposalRequest.setTransientMap(options.getTransientData());
+			}
 			// 设置背书策略
 			upgradeProposalRequest.setChaincodeEndorsementPolicy(options.getEndorsementPolicy());
 			if (options.getRequestUser() != null) {
