@@ -79,7 +79,7 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             Map<String, byte[]> transientMap = new HashMap<>();
             transientMap.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8)); //Just some extra junk in transient map
             transientMap.put("method", "TransactionProposalRequest".getBytes(UTF_8)); // ditto
-            transientMap.put("result", ":)".getBytes(UTF_8));  // This should be returned see chaincode why.
+            transientMap.put("result", "invoke success".getBytes(UTF_8));  // This should be returned see chaincode why.
 
             if (options.getTransientData() != null) {
 				transientMap.putAll(options.getTransientData());
