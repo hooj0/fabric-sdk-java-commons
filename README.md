@@ -557,4 +557,4 @@ public void testQueryTransactionTemplate2() {
 ```
 
 ## 5、问题反馈
-如果有任何疑问或交流的想法，请在 [issues](https://github.com/hooj0/fabric-sdk-java-commons/issues) 发布话题。
+如果有任何疑问或交流的想法，欢迎在 [issues](https://github.com/hooj0/fabric-sdk-java-commons/issues) 发布话题，我会及时跟进。
