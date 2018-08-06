@@ -26,7 +26,7 @@ public class FuncOptions {
 	private String[] args;
 	
 	public FuncOptions(String func) {
-		this(func, new Object[0]);
+		this(func, new Object[] {});
 	}
 
 	public FuncOptions(String func, Object... values) {
