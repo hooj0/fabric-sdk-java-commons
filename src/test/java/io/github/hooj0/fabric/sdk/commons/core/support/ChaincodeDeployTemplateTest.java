@@ -2,12 +2,10 @@ package io.github.hooj0.fabric.sdk.commons.core.support;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Sets.synchronizedNavigableSet;
-import static org.junit.Assert.fail;
 import static java.lang.String.format;
+import static org.junit.Assert.fail;
 
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -15,12 +13,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.hyperledger.fabric.sdk.BlockEvent;
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.exception.TransactionEventException;
-import org.apache.commons.lang3.StringUtils;
-import org.hyperledger.fabric.protos.peer.Chaincode.ChaincodeID;
-import org.hyperledger.fabric.sdk.BlockEvent;
-import org.hyperledger.fabric.sdk.ProposalResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +28,6 @@ import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstantiateOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.UpgradeOptions;
 import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
-import io.github.hooj0.fabric.sdk.commons.store.support.MemoryKeyValueStore;
 
 /**
  * chaincode deploy template 'Install & Instantiate & Upgrade' test units
@@ -62,7 +57,6 @@ public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 	public void testInstallDeployTemplate() {
 		
 		InstallOptions options = new InstallOptions();
-		
 		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG);
 		
 		String chaincodeSourceFile = operations.getConfig().getChaincodeRootPath();
@@ -73,7 +67,6 @@ public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 	public void testInstantiateDeployTemplate() {
 		
 		InstantiateOptions options = new InstantiateOptions();
-		
 		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG);
 		options.setEndorsementPolicyFile(Paths.get(operations.getConfig().getEndorsementPolicyFilePath()).toFile());
 		
@@ -182,53 +175,85 @@ public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 	}
 	
 	@Test
-	public void testUpgradeDeployTemplate() {
+	public void testUpgradeDeployTemplate() throws Exception {
 		
-		UpgradeOptions options = new UpgradeOptions();
+		if (!operations.checkChaincode(chaincodeID_11, operations.getOrganization())) {
+			fail(chaincodeID_11 + " not install | instantiate.");
+		}
 		
-		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG);
-		options.setEndorsementPolicyFile(Paths.get(operations.getConfig().getEndorsementPolicyFilePath()).toFile());
+		if (!operations.checkInstallChaincode(chaincodeID_11_2)) {
+			InstallOptions options = new InstallOptions();
+			options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG);
+			options.setChaincodeUpgradeVersion("11.2");
+			
+			operations.install(options, operations.getConfig().getChaincodeRootPath());
+		}
 		
-		InstallOptions installOptions = new InstallOptions();
-		installOptions.setChaincodeId(options.getChaincodeId());
-		
-		String chaincodeSourceFile = operations.getConfig().getChaincodeRootPath();
-		operations.install(installOptions, chaincodeSourceFile);
-
-		ResultSet rs = operations.upgrade(options, "init");
+		if (operations.checkInstallChaincode(chaincodeID_11_2) && !operations.checkInstantiatedChaincode(chaincodeID_11_2)) {
+			UpgradeOptions upgradeOptions = new UpgradeOptions();
+			
+			upgradeOptions.setChaincodeId(chaincodeID_11_2).setChaincodeType(CHAIN_CODE_LANG);
+			upgradeOptions.setEndorsementPolicyFile(Paths.get(operations.getConfig().getEndorsementPolicyFilePath()).toFile());
+			
+			ResultSet rs = operations.upgrade(upgradeOptions, "init");
+			System.out.println("-------------->>>>>>>" + rs);
+		}
 	}
 	
 	@Test
-	public void testUpgrade2DeployTemplate() {
+	public void testUpgrade2DeployTemplate() throws Exception {
 		
 		UpgradeOptions options = new UpgradeOptions();
 		
-		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG);
+		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG).setChaincodeVersion("11.2");
 		options.setEndorsementPolicyFile(Paths.get(operations.getConfig().getEndorsementPolicyFilePath()).toFile());
 		
-		InstallOptions installOptions = new InstallOptions();
-		installOptions.setChaincodeId(options.getChaincodeId());
+		InstallOptions installOptions = new InstallOptions().setChaincodeUpgradeVersion("11.2");
+		installOptions.setChaincodeId(options.getChaincodeId()).setChaincodeType(CHAIN_CODE_LANG);
 		
 		String chaincodeSourceFile = operations.getConfig().getChaincodeRootPath();
-		operations.install(installOptions, chaincodeSourceFile);
+		if (!operations.checkInstallChaincode(installOptions.getChaincodeId())) {
+			operations.install(installOptions, chaincodeSourceFile);
+		}
 
-		CompletableFuture<TransactionEvent> future = operations.upgradeAsync(options, "init");
+		CompletableFuture<TransactionEvent> future = operations.upgradeAsync(options, "init", "a", "100", "b", "100");
+		Object result = future.thenApply((TransactionEvent event) -> {
+			
+			System.out.println(event.isValid());
+			System.out.println(event.getBlockEvent());
+			System.out.println(event.getChannelId());
+			System.out.println(event.getTimestamp());
+			System.out.println(event.getSignature());
+			System.out.println(event.getValidationCode());
+			System.out.println(event.getType());
+			
+			return event.getTransactionID();
+		}).exceptionally(e -> {
+			e.printStackTrace();
+			return null;
+		}).get(10000, TimeUnit.MILLISECONDS);
+		
+		System.out.println("-------------->>>>>>>" + result);
 	}
 	
 	@Test
-	public void testUpgrade3DeployTemplate() {
+	public void testUpgrade3DeployTemplate() throws Exception {
 		
 		UpgradeOptions options = new UpgradeOptions();
 		
-		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG);
+		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG).setChaincodeVersion("11.2");
 		options.setEndorsementPolicyFile(Paths.get(operations.getConfig().getEndorsementPolicyFilePath()).toFile());
 		
-		InstallOptions installOptions = new InstallOptions();
-		installOptions.setChaincodeId(options.getChaincodeId());
+		InstallOptions installOptions = new InstallOptions().setChaincodeUpgradeVersion("11.2");
+		installOptions.setChaincodeId(options.getChaincodeId()).setChaincodeType(CHAIN_CODE_LANG);
 		
 		String chaincodeSourceFile = operations.getConfig().getChaincodeRootPath();
-		operations.install(installOptions, chaincodeSourceFile);
+		if (!operations.checkInstallChaincode(installOptions.getChaincodeId())) {
+			operations.install(installOptions, chaincodeSourceFile);
+		}
 
 		TransactionEvent event = operations.upgradeFor(options, "init");
+		
+		System.out.println("-------------->>>>>>>" + event);
 	}
 }
