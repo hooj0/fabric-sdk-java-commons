@@ -7,10 +7,10 @@
 
 ## 1、基本配置
 
-### 添加 `Chaincode` 必要的配置资源
+### 1.1、添加 `Chaincode` 必要的配置资源
 在项目文件夹中添加目录 `/fabric-sdk-commons/src/test/fixture/integration`，目录中增加资源配置。必须了解 `end-to-end sample` 实例的运行方式，这里不增加额外的赘述。
 
-### 添加 `fabric`区块链网络链接配置	
+### 1.2、添加 `fabric`区块链网络链接配置	
 根据自己的需要可以适当的修改配置内容，这里的配置依赖上面配置资源`/fabric-sdk-commons/src/test/fixture/integration`。配置文件位置 `fabric-sdk-commons/src/test/resources/fabric-chaincode.properties`。
  内容如下：
 ```properties
@@ -41,7 +41,7 @@ hyperledger.fabric.sdk.commons.endorsement.policy.file.path=chaincode-endorsemen
 hyperledger.fabric.sdk.commons.network.config.root.path=network_configs
 ```
 
-### 添加 `Key Value` 持久化存储配置
+### 1.3、添加 `Key Value` 持久化存储配置
 持久化缓存配置文件 `/fabric-sdk-commons/fabric-kv-store.properties`，存储通道或用户的缓存信息，方便下次直接使用而不用重复创建用户和通道。
 
 
@@ -54,12 +54,14 @@ public ChaincodeDeployTemplate(String channelName, String orgName, FabricConfigu
 }
 ```
 
-### 自定义 `config` 配置
+### 2.1、自定义 `config` 配置
 `FabricConfiguration`支持两种网络链接配置方式，一种是 `properties` 配置文件的实现方式，参考代码：`FabricPropertiesConfiguration.java`，另一种则是 `class` 内存的配置方式，参考代码：`FabricClassConfiguration.java`。
 可以在创建 `ChaincodeDeployTemplate` 或 `ChaincodeTransactionTemplate` 模板实例的时候，传入自己想要的配置模式。
 
-#### `properties config` 配置的模板
-以下是 `properties config` 配置的模板，可以在模板的基础上修改配置定制
++ `properties config` 配置的模板
+
+  以下是 `properties config` 配置的模板，可以在模板的基础上修改配置定制
+
 ```properties
 #@changelog properties file fabric configuration
 #Sat Jul 28 20:10:31 CST 2018
@@ -101,8 +103,10 @@ hyperledger.fabric.sdk.commons.network.org.peerOrg2.peer_locations=peer0.org2.ex
 hyperledger.fabric.sdk.commons.network.org.peerOrg2.eventhub_locations=peer0.org2.example.com@grpc\://192.168.8.8\:8053, peer1.org2.example.com@grpc\://192.168.8.8\:8058
 ```
 
-#### `class config` 配置的模板
-以下是 `class config` 配置的模板，可以调用`FabricClassConfiguration.getInstance()`修改配置定制
++ `class config` 配置的模板
+
+  以下是 `class config` 配置的模板，可以调用`FabricClassConfiguration.getInstance()`修改配置定制
+
 ```java
 FabricClassConfiguration config = FabricClassConfiguration.getInstance();
 
@@ -150,7 +154,7 @@ config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_CA_ADMIN_PASS
 config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_ORGS_MEMBER_USERS, "user1");
 ```
 
-### 自定义 `store` 配置
+### 2.2、自定义 `store` 配置
 `FabricKeyValueStore`是KV持久化缓存配置，KV 也支持两种配置方式，一种是 `FileSystemKeyValueStore` 文件系统的配置方式，另一种是 `MemoryKeyValueStore` 内存系统的配置方式。如果有必要可以实现自己的持久化缓存存储，具体可以实现接口 `io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore`，同样可以在创建 `ChaincodeDeployTemplate` 或 `ChaincodeTransactionTemplate` 模板实例的时候，传入自己想要的配置模式。
 
 
@@ -176,7 +180,7 @@ public class BasedTemplateTest {
 }
 ```
 
-### 创建 `Chaincode` 部署模板类实例
+### 3.1、创建 `Chaincode` 部署模板类实例
 ```java
 private ChaincodeDeployOperations operations;
 
@@ -191,7 +195,7 @@ public void setup() {
 }
 ```
 
-### 安装 `Chaincode`
+### 3.2、安装 `Chaincode`
 传入必要的参数 `chaincodeID` 和 `Chaincode` 的文件路径，以及 `chaincode` 的类型
 ```java
 @Test
@@ -205,7 +209,7 @@ public void testInstallDeployTemplate() {
 }
 ```
 
-### 实例化 `Chaincode`
+### 3.3、实例化 `Chaincode`
 实例化支持多种结果返回形式，以及多种参数签名发送。
 
 ```java
@@ -309,7 +313,7 @@ public void testInstantiate4DeployTemplate() {
 }
 ```
 
-### 升级 `Chaincode`
+### 3.4、升级 `Chaincode`
 升级后，每笔交易会发生在两个链码上。
 ```java
 @Test
@@ -399,7 +403,7 @@ public void testUpgrade3DeployTemplate() throws Exception {
 ## 4、交易 `Chaincode`
 交易是最常用的业务接口调用方式，一般交易分为查询交易和修改交易请求两种。
 
-### 创建交易模板类 `ChaincodeTransactionOperations`
+### 4.1、创建交易模板类 `ChaincodeTransactionOperations`
 同样可以支持自定义传入 `config` 和 `store` 的实现
 ```java
 private ChaincodeTransactionOperations operations;
@@ -413,7 +417,7 @@ public void setup() {
 ```
 
 
-### `Chaincode invoke` 
+### 4.2、`Chaincode invoke` 
 执行交易执行3种不同方式的结果返回形式，普通的结果封装 `ResultSet` 和 异步线程模型结果 `CompletableFuture<TransactionEvent>` 以及 `TransactionEvent` 结果返回，适用于不同的业务场景需求。
 ```java
 @Test
@@ -514,7 +518,7 @@ public void testInvokeTransactionTemplate3() {
 ```
 
 
-### `Chaincode query` 
+### 4.3、`Chaincode query` 
 查询支持两种结果返回的方式，返回字符串和封装的结果集 `ResultSet`。
 ```java
 @Test
