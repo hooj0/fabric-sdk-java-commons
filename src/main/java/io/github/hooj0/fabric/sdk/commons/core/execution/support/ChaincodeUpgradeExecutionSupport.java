@@ -104,7 +104,7 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 			logger.debug("接收安装请求数量： {}， 成功安装并验证通过数量: {} . 失败数量: {}", channel.getPeers().size(), successResponses.size(), failedResponses.size());
 			if (failedResponses.size() > 0) {
 				ProposalResponse first = failedResponses.iterator().next();
-				throw new FabricChaincodeUpgradeException("没有足够的 endorsers 安装 : %s, Message: ", successResponses.size(), first.getMessage());
+				throw new FabricChaincodeUpgradeException("没有足够的 endorsers 安装 : %s, Message: %s", successResponses.size(), first.getMessage());
 			}
 
 			return new ResultSet(successResponses).setTransactionId(transactionID).setResult(payload);
