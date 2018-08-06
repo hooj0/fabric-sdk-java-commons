@@ -62,7 +62,7 @@ public class FileSystemKeyValueStore extends AbstractObject implements FabricKey
 		
 		try (OutputStream output = new FileOutputStream(storeFile)) {
 			properties.setProperty(key, value);
-			properties.store(output, "");
+			properties.store(output, "Fabric File System KeyValue Store");
 			output.close();
 		} catch (IOException e) {
 			logger.warn("Could not set the keyvalue store, reason: {}", e.getMessage());
@@ -88,7 +88,7 @@ public class FileSystemKeyValueStore extends AbstractObject implements FabricKey
 		try (OutputStream output = new FileOutputStream(storeFile)) {
 			
 			properties.remove(key);
-			properties.store(output, "");
+			properties.store(output, "Fabric File System KeyValue Store");
 			output.close();
 			
 			return true;
