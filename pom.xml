@@ -3,7 +3,7 @@
 
 	<groupId>io.github.hooj0</groupId>
 	<artifactId>fabric-sdk-commons</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<modelVersion>4.0.0</modelVersion>
 	
 	<name>Hyperledger fabric java sdk commons</name>
