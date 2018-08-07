@@ -117,7 +117,7 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
 			// 检查请求——响应结果有效且不为空
 			Collection<Set<ProposalResponse>> proposalConsistencySets = SDKUtils.getProposalConsistencySets(responses);
             if (proposalConsistencySets.size() != 1) {
-                logger.error("成功响应请求结果的数量等于1，实际响应数量： %d", proposalConsistencySets.size());
+                logger.error("成功响应请求结果的数量等于1，实际响应数量： {}", proposalConsistencySets.size());
             }
             logger.info("接收交易请求响应： {} ，Successful+verified: {}， Failed: {}", responses.size(), successResponses.size(), failedResponses.size());
             
