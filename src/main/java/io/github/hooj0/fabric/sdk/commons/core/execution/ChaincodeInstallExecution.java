@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.hyperledger.fabric.sdk.ProposalResponse;
 
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
  * chaincode deploy operation install execution interface
@@ -26,4 +27,10 @@ public interface ChaincodeInstallExecution extends ChaincodeBasicExecution {
 	Collection<ProposalResponse> execute(InstallOptions options, File chaincodeSourceFile);
 	
 	Collection<ProposalResponse> execute(InstallOptions options, InputStream chaincodeInputStream);
+	
+	ResultSet executeFor(InstallOptions options, String chaincodeSourceLocation);
+
+	ResultSet executeFor(InstallOptions options, File chaincodeSourceFile);
+	
+	ResultSet executeFor(InstallOptions options, InputStream chaincodeInputStream);
 }
