@@ -20,6 +20,7 @@ import org.hyperledger.fabric.sdk.exception.ProposalException;
 import io.github.hooj0.fabric.sdk.commons.FabricChaincodeInstallException;
 import io.github.hooj0.fabric.sdk.commons.core.execution.ChaincodeInstallExecution;
 import io.github.hooj0.fabric.sdk.commons.core.execution.option.InstallOptions;
+import io.github.hooj0.fabric.sdk.commons.core.execution.result.ResultSet;
 
 /**
  * chaincode deploy operation install execution interface support
@@ -52,14 +53,14 @@ public class ChaincodeInstallExecutionSupport extends ChaincodeBasicExecutionSup
 	public Collection<ProposalResponse> execute(InstallOptions options, File chaincodeSourceFile) {
 		checkNotNull(chaincodeSourceFile, "Chaincode sourcecode file is null");
 		
-		return execute(options, null, chaincodeSourceFile);
+		return execute(options, null, chaincodeSourceFile).getResponses();
 	}
 
 	@Override
 	public Collection<ProposalResponse> execute(InstallOptions options, InputStream chaincodeInputStream) {
 		checkNotNull(chaincodeInputStream, "Chaincode InputStream is null");
 		
-		return execute(options, chaincodeInputStream, null);
+		return execute(options, chaincodeInputStream, null).getResponses();
 	}
 	
 	private void checkArgs(InstallOptions options) {
@@ -71,7 +72,7 @@ public class ChaincodeInstallExecutionSupport extends ChaincodeBasicExecutionSup
 		logger.debug("options: {}", options);
 	}
 	
-	private Collection<ProposalResponse> execute(InstallOptions options, InputStream chaincodeInputStream, File chaincodeSourceFile) {
+	private ResultSet execute(InstallOptions options, InputStream chaincodeInputStream, File chaincodeSourceFile) {
 		logger.info("通道：{} 安装chaincode: {}", channel.getName(), options.getChaincodeId());
 
 		checkArgs(options);
@@ -112,9 +113,12 @@ public class ChaincodeInstallExecutionSupport extends ChaincodeBasicExecutionSup
 			}
 			logger.info("向channel.Peers节点——发送安装chaincode请求：{}", installRequest);
 
+			String txId = null, payload = null;
 			for (ProposalResponse response : responses) {
 				if (response.getStatus() == Status.SUCCESS) {
 					successful.add(response);
+					txId = response.getTransactionID();
+					payload = response.getProposalResponse().getResponse().getPayload().toStringUtf8();
 					logger.debug("成功安装 Txid: {} , peer: {}", response.getTransactionID(), response.getPeer().getName());
 				} else {
 					failed.add(response);
@@ -128,10 +132,31 @@ public class ChaincodeInstallExecutionSupport extends ChaincodeBasicExecutionSup
 				throw new FabricChaincodeInstallException("没有足够的 endorsers 安装 : %s， %s", successful.size(), first.getMessage());
 			}
 			
-			return responses;
+			return new ResultSet(responses).setTransactionId(txId).setResult(payload);
 		} catch (InvalidArgumentException | ProposalException e) {
 			logger.error("安装Chaincode失败", e);
 			throw new FabricChaincodeInstallException(e, "安装Chaincode失败 : %s", e.getMessage());
 		}
+	}
+
+	@Override
+	public ResultSet executeFor(InstallOptions options, String chaincodeSourceLocation) {
+		checkNotNull(chaincodeSourceLocation, "Chaincode sourcecode file is null");
+		
+		return executeFor(options, new File(chaincodeSourceLocation));
+	}
+
+	@Override
+	public ResultSet executeFor(InstallOptions options, File chaincodeSourceFile) {
+		checkNotNull(chaincodeSourceFile, "Chaincode sourcecode file is null");
+		
+		return execute(options, null, chaincodeSourceFile);
+	}
+
+	@Override
+	public ResultSet executeFor(InstallOptions options, InputStream chaincodeInputStream) {
+		checkNotNull(chaincodeInputStream, "Chaincode InputStream is null");
+		
+		return execute(options, chaincodeInputStream, null);
 	}
 }
