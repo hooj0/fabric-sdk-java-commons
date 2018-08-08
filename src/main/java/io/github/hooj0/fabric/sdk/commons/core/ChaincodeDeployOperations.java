@@ -38,6 +38,15 @@ public interface ChaincodeDeployOperations extends ChaincodeBasicOperations, Cha
 	
 	Collection<ProposalResponse> install(InstallOptions options, InputStream chaincodeInputStream);
 	
+	// install result set return
+	ResultSet installFor(InstallOptions options, String chaincodeSourceLocation);
+
+	ResultSet installFor(InstallOptions options, File chaincodeSourceFile);
+
+	ResultSet installFor(InstallOptions options, InputStream chaincodeInputStream);
+	
+	
+	
 	// instantiate
 	
 	ResultSet instantiate(InstantiateOptions options, FuncOptions funcOptions);
