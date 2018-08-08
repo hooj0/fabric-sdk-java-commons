@@ -88,6 +88,27 @@ public class ChaincodeDeployTemplate extends AbstractOperationSupport implements
 		
 		return installExecution.execute(options, chaincodeInputStream);
 	}
+	
+	@Override
+	public ResultSet installFor(InstallOptions options, String chaincodeSourceLocation) {
+		super.afterOptionSet(options);
+		
+		return installExecution.executeFor(options, chaincodeSourceLocation);
+	}
+
+	@Override
+	public ResultSet installFor(InstallOptions options, File chaincodeSourceFile) {
+		super.afterOptionSet(options);
+		
+		return installExecution.executeFor(options, chaincodeSourceFile);
+	}
+
+	@Override
+	public ResultSet installFor(InstallOptions options, InputStream chaincodeInputStream) {
+		super.afterOptionSet(options);
+		
+		return installExecution.executeFor(options, chaincodeInputStream);
+	}
 
 	@Override
 	public ResultSet instantiate(InstantiateOptions options, FuncOptions funcOptions) {
