@@ -6,14 +6,11 @@ import static java.lang.String.format;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
-import java.security.PrivateKey;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
@@ -29,14 +26,16 @@ import io.github.hooj0.fabric.sdk.commons.FabricRootException;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreator;
 import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl;
+import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl.UserEnrollement;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 import io.github.hooj0.fabric.sdk.commons.util.GzipUtils;
+import io.github.hooj0.fabric.sdk.commons.util.PrivateKeyConvertUtils;
 
 /**
  * fabric user manager support
- * @changelog Add key value store & file constructor super support
+ * @changelog Add peerAdmin & adimn cache store support
  * @author hoojo
  * @createDate 2018年6月22日 下午5:23:50
  * @file UserManager.java
@@ -68,7 +67,7 @@ public class UserManager extends AbstractManager {
 
 	private void init() {
 		this.organizations = config.getOrganizations();
-		this.userCreator = new OrganizationUserCreatorImpl(userStoreCache);
+		this.userCreator = new OrganizationUserCreatorImpl(userStoreCache, certStoreCache, keyStoreCache);
 	}
 	
 	public void initialize(String adminName, String adminSecret, String... userNames) throws Exception {
@@ -160,29 +159,36 @@ public class UserManager extends AbstractManager {
 	 * @author hoojo
 	 * @createDate 2018年6月13日 上午10:38:55
 	 */
-	public Enrollment enrollAdminTLS(Organization org, String adminName, String adminSecret) throws EnrollmentException, InvalidArgumentException, IOException {
+	public Enrollment enrollAdminTLS(Organization org, String adminName, String adminSecret) throws EnrollmentException, InvalidArgumentException, Exception {
 		logger.info("the Admin `{}` `TLS` authenticates by account 'adminName' & 'adminSecret'", adminName);
 
-		HFCAClient ca = org.getCAClient();
-
-		// 构建认证请求
-		final EnrollmentRequest request = new EnrollmentRequest();
-		request.addHost("localhost");
-		request.setProfile("tls");
-		logger.trace("ca admin request: {}", request);
-
-		// 发起请求进行认证
-		final Enrollment enrollment = ca.enroll(adminName, adminSecret, request); // 设置 ca 管理员名称和密码，对应
-																					// docker-compose.yaml
-		final String tlsCertPEM = enrollment.getCert();
-		final String tlsKeyPEM = getPEMString(enrollment.getKey());
-
-		logger.trace("enrollment: {}", enrollment);
-		logger.trace("tlsKeyPEM: {}, tlsCertPEM: {}", tlsKeyPEM, tlsCertPEM);
-
-		// 保存证书 key、cert
-		certStoreCache.setStore(org.getName(), tlsCertPEM);
-		keyStoreCache.setStore(org.getName(), tlsKeyPEM);
+		String[] key = new String[] { org.getName(), adminName };
+		String storeCert = certStoreCache.getStore(key), storeKey = keyStoreCache.getStore(key);
+		
+		Enrollment enrollment = null;
+		if (StringUtils.isBlank(storeCert) || StringUtils.isBlank(storeKey)) {
+			HFCAClient ca = org.getCAClient();
+			
+			// 构建认证请求
+			final EnrollmentRequest request = new EnrollmentRequest();
+			request.addHost("localhost");
+			request.setProfile("tls");
+			logger.trace("ca admin request: {}", request);
+			
+			// 发起请求进行认证
+			enrollment = ca.enroll(adminName, adminSecret, request); // 设置 ca 管理员名称和密码，对应 docker-compose.yaml
+			final String tlsCertPEM = enrollment.getCert();
+			final String tlsKeyPEM = PrivateKeyConvertUtils.getStringFromPrivateKey(enrollment.getKey());
+			
+			logger.trace("enrollment: {}", enrollment);
+			logger.trace("tlsKeyPEM: {}, tlsCertPEM: {}", tlsKeyPEM, tlsCertPEM);
+			
+			// 保存证书 key、cert
+			certStoreCache.setStore(key, tlsCertPEM);
+			keyStoreCache.setStore(key, tlsKeyPEM);
+		} else {
+			enrollment = new UserEnrollement(PrivateKeyConvertUtils.getPrivateKey(storeKey), storeCert);
+		}
 
 		return enrollment;
 	}
@@ -288,35 +294,33 @@ public class UserManager extends AbstractManager {
 		final String orgName = org.getName();
 		final String mspid = org.getMSPID();
 		final String domain = org.getDomainName();
-
-		// src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
-		String peerOrgs = "crypto-config/peerOrganizations/";
-		File keydir = Paths.get(config.getCryptoChannelConfigRootPath(), peerOrgs, domain, format("/users/Admin@%s/msp/keystore", domain)).toFile();
-		File privateKeyFile = GzipUtils.findFileSk(keydir);
-		File certificateFile = Paths.get(config.getCryptoChannelConfigRootPath(), peerOrgs, domain, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", domain, domain)).toFile();
-
-		logger.trace("privateKeyDir: {}", keydir.getAbsolutePath());
-		logger.trace("privateKeyFile: {}", privateKeyFile.getAbsolutePath());
-		logger.trace("certificateFile: {}", certificateFile.getAbsolutePath());
+		final String userName = orgName + "Admin";
 		
-		if (!privateKeyFile.exists()) {
-			throw new FabricRootException("*_sk file not found: %s", privateKeyFile.getAbsolutePath());
+		String[] key = new String[] { org.getName(), userName };
+		String storeCert = certStoreCache.getStore(key), storeKey = keyStoreCache.getStore(key);
+
+		File privateKeyFile = null, certificateFile = null;
+		if (StringUtils.isBlank(storeCert) || StringUtils.isBlank(storeKey)) {
+			
+			// src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
+			String peerOrgs = "crypto-config/peerOrganizations/";
+			File keydir = Paths.get(config.getCryptoChannelConfigRootPath(), peerOrgs, domain, format("/users/Admin@%s/msp/keystore", domain)).toFile();
+			privateKeyFile = GzipUtils.findFileSk(keydir);
+			certificateFile = Paths.get(config.getCryptoChannelConfigRootPath(), peerOrgs, domain, format("/users/Admin@%s/msp/signcerts/Admin@%s-cert.pem", domain, domain)).toFile();
+			
+			logger.trace("privateKeyDir: {}", keydir.getAbsolutePath());
+			logger.trace("privateKeyFile: {}", privateKeyFile.getAbsolutePath());
+			logger.trace("certificateFile: {}", certificateFile.getAbsolutePath());
+			
+			if (!privateKeyFile.exists()) {
+				throw new FabricRootException("*_sk file not found: %s", privateKeyFile.getAbsolutePath());
+			}
 		}
 
 		// 从缓存或store中获取用户
-		OrganizationUser peerAdmin = userCreator.create(orgName + "Admin", orgName, mspid, privateKeyFile, certificateFile);
+		OrganizationUser peerAdmin = userCreator.create(userName, orgName, mspid, privateKeyFile, certificateFile);
 		logger.trace("构建Peer Admin用户：{}", peerAdmin);
 
 		return peerAdmin;
-	}
-
-	public String getPEMString(PrivateKey privateKey) throws IOException {
-		StringWriter stringWriter = new StringWriter();
-
-		JcaPEMWriter writer = new JcaPEMWriter(stringWriter);
-		writer.writeObject(privateKey);
-		writer.close();
-
-		return writer.toString();
 	}
 }
