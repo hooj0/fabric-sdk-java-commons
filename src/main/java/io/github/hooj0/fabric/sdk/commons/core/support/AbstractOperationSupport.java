@@ -118,7 +118,7 @@ public abstract class AbstractOperationSupport extends ChaincodeBasicExecutionSu
 			logger.debug("Successfully initialize admin: {} & users: {}", config.getCaAdminName(), users);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			throw new FabricChaincodeOperationException("Instantiate administrator, user, authentication, registration failed.");
+			throw new FabricChaincodeOperationException(e, "Instantiate administrator, user, authentication, registration failed.");
 		}
 	}
 	
@@ -139,7 +139,7 @@ public abstract class AbstractOperationSupport extends ChaincodeBasicExecutionSu
 			return channel;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			throw new FabricChaincodeOperationException("Instantiate preparing the channel '%s' failed.", channelName);
+			throw new FabricChaincodeOperationException(e, "Instantiate preparing the channel '%s' failed.", channelName);
 		}
 	}
 	
