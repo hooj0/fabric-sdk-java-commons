@@ -19,8 +19,6 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
-import sun.misc.BASE64Decoder;
-
 /**
  * private key converter utils
  * @author hoojo
@@ -37,7 +35,7 @@ public abstract class PrivateKeyConvertUtils {
 	private static final Pattern compile = Pattern.compile("^-----BEGIN CERTIFICATE-----$" + "(.*?)" + "\n-----END CERTIFICATE-----\n", Pattern.DOTALL | Pattern.MULTILINE);
 	
 	/**
-	 * 将byte字节私钥转换成 PrivateKey 对象
+	 * 将byte字节私钥转换成 PrivateKey 对象，适用于 文件类型的证书
 	 * @author hoojo
 	 * @createDate 2018年6月13日 上午11:28:54
 	 * @param data key
@@ -57,6 +55,14 @@ public abstract class PrivateKeyConvertUtils {
 		return privateKey;
 	}
 	
+	/**
+	 * 将 私钥证书 转换成字符串，适合是文件类型的私钥证书
+	 * @author hoojo
+	 * @createDate 2018年8月10日 上午10:44:42
+	 * @param privateKey PrivateKey
+	 * @return String
+	 * @throws IOException
+	 */
 	public static String getStringFromPrivateKey(PrivateKey privateKey) throws IOException {
 		StringWriter stringWriter = new StringWriter();
 
@@ -67,19 +73,24 @@ public abstract class PrivateKeyConvertUtils {
 		return stringWriter.toString();
 	}
 	
-    /**
-     * 转换私钥
-     * @param base64 String to PrivateKey
-     * @throws Exception
-     */
-    public static PrivateKey getPrivateKey(String key) throws Exception {
-          byte[] keyBytes;
-          keyBytes = (new BASE64Decoder()).decodeBuffer(key);
-          PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-          KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-          PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-          return privateKey;
+    public static String toString(PrivateKey privateKey) {
+		return new String(Base64.getEncoder().encodeToString(privateKey.getEncoded()));
     }
+    
+    @Deprecated
+	public static PrivateKey toPrivateKey(String privateKey) {
+		byte[] base64 = Base64.getDecoder().decode(privateKey.getBytes());
+
+		KeyFactory keyFactory;
+		try {
+			keyFactory = KeyFactory.getInstance("RSA");
+			PKCS8EncodedKeySpec pKCS8EncodedKeySpec = new PKCS8EncodedKeySpec(base64);
+			return keyFactory.generatePrivate(pKCS8EncodedKeySpec);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 	public static String formatPEM(String pemFormat) {
         String ret = pemFormat;
