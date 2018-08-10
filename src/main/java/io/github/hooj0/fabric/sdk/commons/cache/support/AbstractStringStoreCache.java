@@ -7,28 +7,28 @@ import io.github.hooj0.fabric.sdk.commons.cache.CacheKeyPrefix;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 
 /**
- * simple store cache support
+ * based string store cache support
  * @author hoojo
  * @createDate 2018年7月22日 下午2:49:05
- * @file SimpleStoreCache.java
+ * @file AbstractStringStoreCache.java
  * @package io.github.hooj0.fabric.sdk.commons.cache.support
  * @project fabric-sdk-commons
  * @blog http://hoojo.cnblogs.com
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class SimpleStoreCache extends AbstractStoreCache<String> {
+public abstract class AbstractStringStoreCache extends AbstractStoreCache<String> {
 
-	public SimpleStoreCache(CacheKeyPrefix keyPrefix) {
-		super(keyPrefix);
+	public AbstractStringStoreCache(CacheKeyPrefix keyPrefix, Class<?> clazz) {
+		super(keyPrefix, clazz);
 	}
 	
-	public SimpleStoreCache(CacheKeyPrefix keyPrefix, File keyValueStoreFile) {
-		super(keyPrefix, keyValueStoreFile);
+	public AbstractStringStoreCache(CacheKeyPrefix keyPrefix, File keyValueStoreFile, Class<?> clazz) {
+		super(keyPrefix, keyValueStoreFile, clazz);
 	}
 	
-	public SimpleStoreCache(CacheKeyPrefix keyPrefix, FabricKeyValueStore keyValueStore) {
-		super(keyPrefix, keyValueStore);
+	public AbstractStringStoreCache(CacheKeyPrefix keyPrefix, FabricKeyValueStore keyValueStore, Class<?> clazz) {
+		super(keyPrefix, keyValueStore, clazz);
 	}
 
 	@Override
