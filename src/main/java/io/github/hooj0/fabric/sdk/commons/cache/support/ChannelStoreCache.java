@@ -29,19 +29,19 @@ public class ChannelStoreCache extends AbstractStoreCache<Channel> {
 	private HFClient client;
 	
 	public ChannelStoreCache(HFClient client) {
-		super(CacheKeyPrefix.CHANNEL_PREFIX);
+		super(CacheKeyPrefix.CHANNEL_PREFIX, ChannelStoreCache.class);
 		
 		this.client = client;
 	}
 	
 	public ChannelStoreCache(File keyValueStoreFile, HFClient client) {
-		super(CacheKeyPrefix.CHANNEL_PREFIX, keyValueStoreFile);
+		super(CacheKeyPrefix.CHANNEL_PREFIX, keyValueStoreFile, ChannelStoreCache.class);
 		
 		this.client = client;
 	}
 	
 	public ChannelStoreCache(FabricKeyValueStore keyValueStore, HFClient client) {
-		super(CacheKeyPrefix.CHANNEL_PREFIX, keyValueStore);
+		super(CacheKeyPrefix.CHANNEL_PREFIX, keyValueStore, ChannelStoreCache.class);
 		
 		this.client = client;
 	}
