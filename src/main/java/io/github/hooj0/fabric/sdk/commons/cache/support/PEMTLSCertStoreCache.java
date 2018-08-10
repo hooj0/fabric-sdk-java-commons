@@ -16,17 +16,17 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class PEMTLSCertStoreCache extends SimpleStoreCache {
+public class PEMTLSCertStoreCache extends AbstractStringStoreCache {
 
 	public PEMTLSCertStoreCache() {
-		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX);
+		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX, PEMTLSCertStoreCache.class);
 	}
 	
 	public PEMTLSCertStoreCache(File keyValueStoreFile) {
-		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX, keyValueStoreFile);
+		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX, keyValueStoreFile, PEMTLSCertStoreCache.class);
 	}
 	
 	public PEMTLSCertStoreCache(FabricKeyValueStore keyValueStore) {
-		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX, keyValueStore);
+		super(CacheKeyPrefix.PEM_TLS_CERT_PREFIX, keyValueStore, PEMTLSCertStoreCache.class);
 	}
 }
