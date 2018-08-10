@@ -15,6 +15,7 @@ public enum CacheKeyPrefix {
 
 	CHANNEL_PREFIX("channel"),
 	ORGANIZATION_USER_PREFIX("user"),
+	ENROLLEMENT_USER_PREFIX("ca.enroll"),
 	PEM_TLS_CERT_PREFIX("clientPEMTLSCertificate"),
 	PEM_TLS_KEY_PREFIX("clientPEMTLSKey");
 	
