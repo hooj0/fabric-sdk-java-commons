@@ -15,6 +15,7 @@ import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
+import org.hyperledger.fabric_ca.sdk.HFCAEnrollment;
 import org.hyperledger.fabric_ca.sdk.HFCAIdentity;
 import org.hyperledger.fabric_ca.sdk.HFCAInfo;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
@@ -26,7 +27,7 @@ import io.github.hooj0.fabric.sdk.commons.FabricRootException;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
 import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreator;
 import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl;
-import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl.UserEnrollement;
+import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl.UserEnrollment;
 import io.github.hooj0.fabric.sdk.commons.domain.Organization;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
@@ -67,7 +68,7 @@ public class UserManager extends AbstractManager {
 
 	private void init() {
 		this.organizations = config.getOrganizations();
-		this.userCreator = new OrganizationUserCreatorImpl(userStoreCache, certStoreCache, keyStoreCache);
+		this.userCreator = new OrganizationUserCreatorImpl(enrollmentStoreCache, userStoreCache, certStoreCache, keyStoreCache);
 	}
 	
 	public void initialize(String adminName, String adminSecret, String... userNames) throws Exception {
@@ -162,11 +163,9 @@ public class UserManager extends AbstractManager {
 	public Enrollment enrollAdminTLS(Organization org, String adminName, String adminSecret) throws EnrollmentException, InvalidArgumentException, Exception {
 		logger.info("the Admin `{}` `TLS` authenticates by account 'adminName' & 'adminSecret'", adminName);
 
-		String[] key = new String[] { org.getName(), adminName };
-		String storeCert = certStoreCache.getStore(key), storeKey = keyStoreCache.getStore(key);
-		
-		Enrollment enrollment = null;
-		if (StringUtils.isBlank(storeCert) || StringUtils.isBlank(storeKey)) {
+		String[] key = new String[] { org.getName(), adminName, "tls" };
+		Enrollment enrollment = hfcaEnrollmentStoreCache.getStore(key);
+		if (enrollment == null) {
 			HFCAClient ca = org.getCAClient();
 			
 			// 构建认证请求
@@ -183,12 +182,11 @@ public class UserManager extends AbstractManager {
 			logger.trace("enrollment: {}", enrollment);
 			logger.trace("tlsKeyPEM: {}, tlsCertPEM: {}", tlsKeyPEM, tlsCertPEM);
 			
+			hfcaEnrollmentStoreCache.setStore(key, (HFCAEnrollment) enrollment);
 			// 保存证书 key、cert
 			certStoreCache.setStore(key, tlsCertPEM);
 			keyStoreCache.setStore(key, tlsKeyPEM);
-		} else {
-			enrollment = new UserEnrollement(PrivateKeyConvertUtils.getPrivateKey(storeKey), storeCert);
-		}
+		} 
 
 		return enrollment;
 	}
@@ -296,12 +294,9 @@ public class UserManager extends AbstractManager {
 		final String domain = org.getDomainName();
 		final String userName = orgName + "Admin";
 		
-		String[] key = new String[] { org.getName(), userName };
-		String storeCert = certStoreCache.getStore(key), storeKey = keyStoreCache.getStore(key);
-
 		File privateKeyFile = null, certificateFile = null;
-		if (StringUtils.isBlank(storeCert) || StringUtils.isBlank(storeKey)) {
-			
+		UserEnrollment enrollment = enrollmentStoreCache.getStore(new String[] { org.getName(), userName });
+		if (enrollment == null) {
 			// src/test/fixture/sdkintegration/e2e-2Orgs/channel/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
 			String peerOrgs = "crypto-config/peerOrganizations/";
 			File keydir = Paths.get(config.getCryptoChannelConfigRootPath(), peerOrgs, domain, format("/users/Admin@%s/msp/keystore", domain)).toFile();
