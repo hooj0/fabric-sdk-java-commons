@@ -100,13 +100,13 @@ public class ChannelManager extends AbstractManager {
 				/** 重建通道 */
 				channel = recreateChannel(channelName, org);
 			}
+			
+			/** 添加事件总线 */
+			createEventHub(channel, org);
 		} else {
 			logger.debug("used store cache channel '{}_{}'", org.getName(), channelName);
 		}
 
-		/** 添加事件总线 */
-		createEventHub(channel, org);
-		
 		/** 初始化 */
 		if (!channel.isInitialized()) {
 			logger.info("initialize channel: {}.{}", org.getName(), channelName);
