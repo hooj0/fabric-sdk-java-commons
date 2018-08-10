@@ -29,18 +29,57 @@ import io.github.hooj0.fabric.sdk.commons.util.PrivateKeyConvertUtils;
  */
 public class OrganizationUserCreatorImpl extends AbstractObject implements OrganizationUserCreator {
 	
+	private FabricStoreCache<UserEnrollment> enrollmentStoreCache;
 	private FabricStoreCache<OrganizationUser> storeCache;
 	private FabricStoreCache<String> certStoreCache;
 	private FabricStoreCache<String> keyStoreCache;
 	
-	public OrganizationUserCreatorImpl(FabricStoreCache<OrganizationUser> storeCache, FabricStoreCache<String> certStoreCache, FabricStoreCache<String> keyStoreCache) {
+	public OrganizationUserCreatorImpl(FabricStoreCache<UserEnrollment> enrollmentStoreCache, FabricStoreCache<OrganizationUser> storeCache, FabricStoreCache<String> certStoreCache, FabricStoreCache<String> keyStoreCache) {
 		this.storeCache = storeCache;
 		this.certStoreCache = certStoreCache;
 		this.keyStoreCache = keyStoreCache;
+		this.enrollmentStoreCache = enrollmentStoreCache;
 	}
 	
 	@Override
 	public OrganizationUser create(String name, String org, String mspId, File privateKeyFile, File certificateFile) {
+		logger.debug("create organization User '{}' by Org '{}'", name, org);
+		
+		try {
+			OrganizationUser user = storeCache.getCache(org, name);
+			if (user != null) {
+				return user;
+			}
+			user = new OrganizationUser(name, org, storeCache);
+
+			String[] key = new String[] { org, name };
+			
+			UserEnrollment enrollment = enrollmentStoreCache.getStore(key);
+			if (enrollment == null) {
+				String certificate = new String(IOUtils.toByteArray(new FileInputStream(certificateFile)), "UTF-8");
+				byte[] keyBytes = IOUtils.toByteArray(new FileInputStream(privateKeyFile));
+				
+				PrivateKey privateKey = PrivateKeyConvertUtils.getPrivateKeyFromBytes(keyBytes);
+				enrollment = new UserEnrollment(privateKey, certificate);
+				
+				// 缓存认证合同
+				enrollmentStoreCache.setStore(key, enrollment);
+				// 保存证书 key、cert
+				certStoreCache.setStore(key, certificate);
+				keyStoreCache.setStore(key, new String(keyBytes, "UTF-8"));
+			} 
+
+			user.setMspId(mspId);
+			// 登记认证
+			user.setEnrollment(enrollment);
+			
+			return user;
+		} catch (Exception e) {
+			throw new FabricCreatorException(e, "Get '%s.%s' OrganizationUser Member from cache exception: %s", org, name, e.getMessage());
+		}	
+	}
+	
+	public OrganizationUser createForStore(String name, String org, String mspId, File privateKeyFile, File certificateFile) {
 		logger.debug("create organization User '{}' by Org '{}'", name, org);
 		
 		try {
@@ -60,13 +99,13 @@ public class OrganizationUserCreatorImpl extends AbstractObject implements Organ
 				byte[] keyBytes = IOUtils.toByteArray(new FileInputStream(privateKeyFile));
 				
 				PrivateKey privateKey = PrivateKeyConvertUtils.getPrivateKeyFromBytes(keyBytes);
-				enrollment = new UserEnrollement(privateKey, certificate);
+				enrollment = new UserEnrollment(privateKey, certificate);
 				
 				// 保存证书 key、cert
 				certStoreCache.setStore(key, certificate);
 				keyStoreCache.setStore(key, new String(keyBytes, "UTF-8"));
 			} else {
-				enrollment = new UserEnrollement(PrivateKeyConvertUtils.getPrivateKeyFromBytes(storeKey.getBytes("UTF-8")), storeCert);
+				enrollment = new UserEnrollment(PrivateKeyConvertUtils.getPrivateKeyFromBytes(storeKey.getBytes("UTF-8")), storeCert);
 			}
 
 			user.setMspId(mspId);
@@ -92,13 +131,13 @@ public class OrganizationUserCreatorImpl extends AbstractObject implements Organ
 		return user;
 	}
 	
-	public static final class UserEnrollement implements Enrollment, Serializable {
+	public static final class UserEnrollment implements Enrollment, Serializable {
 
 		private static final long serialVersionUID = -2784835212445309006L;
 		private final PrivateKey privateKey;
 		private final String certificate;
 
-		public UserEnrollement(PrivateKey privateKey, String certificate) {
+		public UserEnrollment(PrivateKey privateKey, String certificate) {
 			this.certificate = certificate;
 			this.privateKey = privateKey;
 		}
