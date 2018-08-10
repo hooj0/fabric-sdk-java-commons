@@ -29,16 +29,16 @@ public abstract class AbstractStoreCache<T> extends AbstractObject implements Fa
 	private FabricKeyValueStore keyValueStore;
 	private CacheKeyPrefix keyPrefix;
 	
-	public AbstractStoreCache(CacheKeyPrefix keyPrefix) {
-		this(keyPrefix, newDefaultKeyValueStore());
+	public AbstractStoreCache(CacheKeyPrefix keyPrefix, Class<?> clazz) {
+		this(keyPrefix, newDefaultKeyValueStore(), clazz);
 	}
 
-	public AbstractStoreCache(CacheKeyPrefix keyPrefix, File keyValueStoreFile) {
-		this(keyPrefix, new FileSystemKeyValueStore(keyValueStoreFile));
+	public AbstractStoreCache(CacheKeyPrefix keyPrefix, File keyValueStoreFile, Class<?> clazz) {
+		this(keyPrefix, new FileSystemKeyValueStore(keyValueStoreFile), clazz);
 	}
 	
-	public AbstractStoreCache(CacheKeyPrefix keyPrefix, FabricKeyValueStore keyValueStore) {
-		super(AbstractStoreCache.class);
+	public AbstractStoreCache(CacheKeyPrefix keyPrefix, FabricKeyValueStore keyValueStore, Class<?> clazz) {
+		super(clazz);
 		
 		this.keyValueStore = keyValueStore;
 		this.keyPrefix = keyPrefix;
