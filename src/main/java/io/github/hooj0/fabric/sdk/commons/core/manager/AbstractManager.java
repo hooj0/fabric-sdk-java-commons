@@ -4,14 +4,18 @@ import java.io.File;
 
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
+import org.hyperledger.fabric_ca.sdk.HFCAEnrollment;
 
 import io.github.hooj0.fabric.sdk.commons.AbstractObject;
 import io.github.hooj0.fabric.sdk.commons.cache.FabricStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.support.ChannelStoreCache;
+import io.github.hooj0.fabric.sdk.commons.cache.support.HFCAEnrollmentStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.support.OrganizationUserStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.support.PEMTLSCertStoreCache;
 import io.github.hooj0.fabric.sdk.commons.cache.support.PEMTLSKeyStoreCache;
+import io.github.hooj0.fabric.sdk.commons.cache.support.UserEnrollmentStoreCache;
 import io.github.hooj0.fabric.sdk.commons.config.FabricConfiguration;
+import io.github.hooj0.fabric.sdk.commons.core.creator.OrganizationUserCreatorImpl.UserEnrollment;
 import io.github.hooj0.fabric.sdk.commons.domain.OrganizationUser;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
@@ -30,6 +34,8 @@ import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
  */
 public abstract class AbstractManager extends AbstractObject {
 
+	protected FabricStoreCache<HFCAEnrollment> hfcaEnrollmentStoreCache;
+	protected FabricStoreCache<UserEnrollment> enrollmentStoreCache;
 	protected FabricStoreCache<OrganizationUser> userStoreCache;
 	protected FabricStoreCache<Channel> channelStoreCache;
 	protected FabricStoreCache<String> certStoreCache;
@@ -70,6 +76,8 @@ public abstract class AbstractManager extends AbstractObject {
 		
 		this.config = config;
 		
+		this.hfcaEnrollmentStoreCache = new HFCAEnrollmentStoreCache(keyValueStore);
+		this.enrollmentStoreCache = new UserEnrollmentStoreCache(keyValueStore);
 		this.userStoreCache = new OrganizationUserStoreCache(keyValueStore);
 		this.certStoreCache = new PEMTLSCertStoreCache(keyValueStore);
 		this.keyStoreCache = new PEMTLSKeyStoreCache(keyValueStore);
