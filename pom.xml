@@ -173,15 +173,4 @@
 		</plugins>
 	</build>
 	
-	<distributionManagement>
-	    <repository>
-	        <id>releases</id>
-	        <url>http://maven.masget.com:7078/nexus/content/repositories/releases/</url>
-	    </repository>
-	
-	    <snapshotRepository>
-	        <id>Snapshots</id>
-	        <url>http://maven.masget.com:7078/nexus/content/repositories/snapshots/</url>
-	    </snapshotRepository>
-	</distributionManagement>
 </project>
