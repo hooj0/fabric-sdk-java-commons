@@ -79,7 +79,6 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             Map<String, byte[]> transientMap = new HashMap<>();
             transientMap.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8)); //Just some extra junk in transient map
             transientMap.put("method", "TransactionProposalRequest".getBytes(UTF_8)); // ditto
-            transientMap.put("result", "invoke success".getBytes(UTF_8));  // This should be returned see chaincode why.
 
             if (options.getTransientData() != null) {
 				transientMap.putAll(options.getTransientData());
@@ -132,10 +131,9 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             String resultAsString = null;
             if (chaincodeBytes != null) {
                 resultAsString = new String(chaincodeBytes, UTF_8);
+                logger.debug("transient ledger data: {}", resultAsString);
             }
             
-            String result = new String(transientMap.get("result"), UTF_8);
-            checkArgument(StringUtils.equals(result, resultAsString), "%s :和定义的账本数据 '%s'不一致", resultAsString, result);
             checkState(response.getChaincodeActionResponseStatus() == Status.SUCCESS.getStatus(), "%s：非正常的响应状态码", response.getChaincodeActionResponseStatus());
             
             TxReadWriteSetInfo readWriteSetInfo = response.getChaincodeActionResponseReadWriteSetInfo();
