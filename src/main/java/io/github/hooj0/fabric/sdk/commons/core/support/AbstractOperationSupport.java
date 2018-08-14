@@ -161,13 +161,13 @@ public abstract class AbstractOperationSupport extends ChaincodeBasicExecutionSu
 		if (options instanceof QueryOptions) {
 			QueryOptions queryOptions = (QueryOptions) options;
 			if (queryOptions.getClientUserContext() == null) {
-				//queryOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
+				queryOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
 			}
 		}
 		if (options instanceof InvokeOptions) {
 			InvokeOptions invokeOptions = (InvokeOptions) options;
 			if (invokeOptions.getClientUserContext() == null) {
-				//invokeOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
+				invokeOptions.setClientUserContext(getOrganization().getUser(config.getUsers()[0]));
 			}
 		}
 		
