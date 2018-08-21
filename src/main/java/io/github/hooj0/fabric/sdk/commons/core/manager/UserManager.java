@@ -129,8 +129,8 @@ public class UserManager extends AbstractManager {
 			HFCAInfo info = ca.info();
 			checkNotNull(info, "HFCAInfo is null");
 			
-			if (!StringUtils.isBlank(info.getCAName())) {
-				checkArgument(StringUtils.equals(info.getCAName(), ca.getCAName()), "HFCAInfo.CAName 和  CaInfo.CAName 不等");
+			if (!StringUtils.isBlank(org.getCAName())) {
+				checkArgument(StringUtils.equals(info.getCAName(), ca.getCAName()), "HFCAInfo.CAName [%s] 和  CaInfo.CAName [%s] 不等", info.getCAName(), ca.getCAName());
 			}
 
 			// admin enroll
