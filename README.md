@@ -89,7 +89,7 @@ hyperledger.fabric.sdk.commons.network.config.root.path=network_configs
 hyperledger.fabric.sdk.commons.network.org.peerOrg1.mspid=Org1MSP
 hyperledger.fabric.sdk.commons.network.org.peerOrg1.caName=ca0
 hyperledger.fabric.sdk.commons.network.org.peerOrg1.domname=org1.example.com
-hyperledger.fabric.sdk.commons.network.org.peerOrg1.ca_location=http\://192.168.8.8\:8054
+hyperledger.fabric.sdk.commons.network.org.peerOrg1.ca_location=http\://192.168.8.8\:7054
 hyperledger.fabric.sdk.commons.network.org.peerOrg1.orderer_locations=orderer.example.com@grpc\://192.168.8.8\:7050
 hyperledger.fabric.sdk.commons.network.org.peerOrg1.peer_locations=peer0.org1.example.com@grpc\://192.168.8.8\:7051, peer1.org1.example.com@grpc\://192.168.8.8\:7056
 hyperledger.fabric.sdk.commons.network.org.peerOrg1.eventhub_locations=peer0.org1.example.com@grpc\://192.168.8.8\:7053, peer1.org1.example.com@grpc\://192.168.8.8\:7058
@@ -97,7 +97,7 @@ hyperledger.fabric.sdk.commons.network.org.peerOrg1.eventhub_locations=peer0.org
 
 hyperledger.fabric.sdk.commons.network.org.peerOrg2.mspid=Org2MSP
 hyperledger.fabric.sdk.commons.network.org.peerOrg2.domname=org2.example.com
-hyperledger.fabric.sdk.commons.network.org.peerOrg2.ca_location=http\://192.168.8.8\:7054
+hyperledger.fabric.sdk.commons.network.org.peerOrg2.ca_location=http\://192.168.8.8\:8054
 hyperledger.fabric.sdk.commons.network.org.peerOrg2.orderer_locations=orderer.example.com@grpc\://192.168.8.8\:7050
 hyperledger.fabric.sdk.commons.network.org.peerOrg2.peer_locations=peer0.org2.example.com@grpc\://192.168.8.8\:8051, peer1.org2.example.com@grpc\://192.168.8.8\:8056
 hyperledger.fabric.sdk.commons.network.org.peerOrg2.eventhub_locations=peer0.org2.example.com@grpc\://192.168.8.8\:8053, peer1.org2.example.com@grpc\://192.168.8.8\:8058
@@ -117,7 +117,7 @@ config.setNetworkDomain("example.com");
 config.setMspId(orgName, "Org1MSP");
 config.setOrgDomain(orgName, "org1." + config.getNetworkDomain());
 config.setCaName(orgName, "ca0");
-config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":8054");
+config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":7054");
 config.setOrdererLocation(orgName, "orderer.example.com@grpc://" + config.getFabricNetworkHost() + ":7050");
 config.setPeerLocation(orgName, "peer0.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7051, peer1.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7056");
 config.setEventHubLocation(orgName, "peer0.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7053, peer1.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7058");
@@ -126,7 +126,7 @@ orgName = "peerOrg2";
 config.setMspId(orgName, "Org2MSP");
 config.setOrgDomain(orgName, "org2." + config.getNetworkDomain());
 // config.setCaName(orgName, "ca1");
-config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":7054");
+config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":8054");
 config.setOrdererLocation(orgName, "orderer.example.com@grpc://" + config.getFabricNetworkHost() + ":7050");
 config.setPeerLocation(orgName, "peer0.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8051, peer1.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8056");
 config.setEventHubLocation(orgName, "peer0.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8053, peer1.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8058");
