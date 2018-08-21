@@ -48,7 +48,7 @@ public enum DefaultFabricConfiguration {
 		config.setMspId(orgName, "Org1MSP");
 		config.setOrgDomain(orgName, "org1." + config.getNetworkDomain());
 		config.setCaName(orgName, "ca0");
-		config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":8054");
+		config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":7054");
 		config.setOrdererLocation(orgName, "orderer.example.com@grpc://" + config.getFabricNetworkHost() + ":7050");
 		config.setPeerLocation(orgName, "peer0.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7051, peer1.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7056");
 		config.setEventHubLocation(orgName, "peer0.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7053, peer1.org1.example.com@grpc://" + config.getFabricNetworkHost() + ":7058");
@@ -57,7 +57,7 @@ public enum DefaultFabricConfiguration {
 		config.setMspId(orgName, "Org2MSP");
 		config.setOrgDomain(orgName, "org2." + config.getNetworkDomain());
 		// config.setCaName(orgName, "ca1");
-		config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":7054");
+		config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":8054");
 		config.setOrdererLocation(orgName, "orderer.example.com@grpc://" + config.getFabricNetworkHost() + ":7050");
 		config.setPeerLocation(orgName, "peer0.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8051, peer1.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8056");
 		config.setEventHubLocation(orgName, "peer0.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8053, peer1.org2.example.com@grpc://" + config.getFabricNetworkHost() + ":8058");
