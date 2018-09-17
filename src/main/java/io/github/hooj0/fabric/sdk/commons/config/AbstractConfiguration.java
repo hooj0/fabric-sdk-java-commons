@@ -314,10 +314,9 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 			File clientCert;
 			File clientKey;
 			
-			String topDomain = this.getNetworkDomain();
 			if ("orderer".equals(type)) {
-				clientCert = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", topDomain, "/users/Admin@" + topDomain, "/tls/client.crt").toFile();
-				clientKey = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", topDomain, "/users/Admin@" + topDomain, "/tls/client.key").toFile();
+				clientCert = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", domainName, "/users/Admin@" + domainName, "/tls/client.crt").toFile();
+				clientKey = Paths.get(txconfigRootPath, "crypto-config/ordererOrganizations/", domainName, "/users/Admin@" + domainName, "/tls/client.key").toFile();
 			} else {
 				clientCert = Paths.get(txconfigRootPath, "crypto-config/peerOrganizations/", domainName, "users/User1@" + domainName, "tls/client.crt").toFile();
 				clientKey = Paths.get(txconfigRootPath, "crypto-config/peerOrganizations/", domainName, "users/User1@" + domainName, "tls/client.key").toFile();
