@@ -81,10 +81,6 @@ public interface FabricConfiguration {
 	 **/
 	public String getNetworkConfigRootPath();
 	
-	/** 区块链网络使用的域名，对应 crypto-config.yaml 中的 OrdererOrgs.domain */ 
-	public String getNetworkDomain();
-	
-	
 	/** fabric网络 Ca 节点 管理员 密码  */
 	public String getCaAdminPassword();
 	
