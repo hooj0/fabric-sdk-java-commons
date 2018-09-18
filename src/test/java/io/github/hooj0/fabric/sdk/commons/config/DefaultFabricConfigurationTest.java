@@ -33,11 +33,8 @@ public class DefaultFabricConfigurationTest {
 
 		String orgName = "peerOrg1";
 		
-		// config.setNetworkDomain("example.com");
-		config.setNetworkDomain("hoojo.cnblogs.com");
-		
 		config.setMspId(orgName, "Org1MSP");
-		config.setOrgDomain(orgName, "org1." + config.getNetworkDomain());
+		config.setOrgDomain(orgName, "org1.hoojo.cnblogs.com");
 		config.setCaName(orgName, "ca0");
 		config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":8054");
 		config.setOrdererLocation(orgName, "orderer.example.com@grpc://" + config.getFabricNetworkHost() + ":7050");
@@ -46,7 +43,7 @@ public class DefaultFabricConfigurationTest {
 
 		orgName = "peerOrg2";
 		config.setMspId(orgName, "Org2MSP");
-		config.setOrgDomain(orgName, "org2." + config.getNetworkDomain());
+		config.setOrgDomain(orgName, "org2.hoojo.cnblogs.com");
 		// config.setCaName(orgName, "ca1");
 		config.setCaLocation(orgName, "http://" + config.getFabricNetworkHost() + ":7054");
 		config.setOrdererLocation(orgName, "orderer.example.com@grpc://" + config.getFabricNetworkHost() + ":7050");
@@ -102,8 +99,6 @@ public class DefaultFabricConfigurationTest {
 		assertEquals(classConf.getFabricNetworkHost(), "192.168.8.8");
 		assertEquals(classConf.getConfigtxlaterURL(), "http://127.0.0.1:70599");
 
-		assertEquals(classConf.getNetworkDomain(), "hoojo.cnblogs.com");
-
 		assertEquals(classConf.getCommonRootPath(), "src/test/fixture/integration");
 		assertEquals(classConf.getChaincodeRootPath(), "src\\test\\fixture\\integration\\gocc\\sample11");
 		assertEquals(classConf.getCryptoChannelConfigRootPath(), "src\\test\\fixture\\integration\\e2e-2Orgs\\v1.0");
@@ -156,8 +151,6 @@ public class DefaultFabricConfigurationTest {
 
 		assertEquals(classConf.getFabricNetworkHost(), "192.168.8.8");
 		assertEquals(classConf.getConfigtxlaterURL(), "http://127.0.0.1:70599");
-
-		assertEquals(classConf.getNetworkDomain(), "example.com");
 
 		assertEquals(classConf.getCommonRootPath(), "src/test/fixture/integration");
 		assertEquals(classConf.getChaincodeRootPath(), "src\\test\\fixture\\integration\\gocc\\sample11");
