@@ -63,11 +63,6 @@ public abstract class FabricConfigurationPropertyKey extends AbstractObject {
 	/** 发起proposal等待时间 */
 	public static final String PROPOSAL_WAIT_TIME = PREFIX + "proposal.wait.time";
 	
-	
-	
-	
-	/** fabric 网络使用的域名，对应 crypto-config.yaml 中的 OrdererOrgs.domain */
-	public static final String NETWORK_DOMAIN = PREFIX + "network.domain";
 	/** fabric 网络是否启用 TLS 安全证书模式，true | false */
 	public static final String NETWORK_TLS_ENABLED = PREFIX + "network.tls.enable";
 
