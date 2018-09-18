@@ -57,9 +57,6 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 	protected void defaultValueSettings() {
 		logger.info("开始进行系统默认配置");
 		
-		// Default network domain
-		defaultProperty(NETWORK_DOMAIN, "example.com");
-		
 		// Default values
 		defaultProperty(INVOKE_WAIT_TIME, "120");
 		defaultProperty(DEPLOY_WAIT_TIME, "120000");
