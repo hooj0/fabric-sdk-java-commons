@@ -52,12 +52,6 @@ public final class FabricClassConfiguration extends AbstractConfigurationSupport
 		return this;
 	}
 	
-	public FabricClassConfiguration setNetworkDomain(String domain) {
-		settingPropertyValue(NETWORK_DOMAIN, domain);
-		
-		return this;
-	}
-	
 	public FabricClassConfiguration setMspId(String orgName, String mspId) {
 		settingPropertyValue(NETWORK_KEY_PREFIX + orgName +  ".mspid", mspId); // "Org2MSP"
 		
