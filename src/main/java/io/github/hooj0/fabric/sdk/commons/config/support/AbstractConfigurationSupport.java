@@ -121,12 +121,6 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 		return Paths.get(getCommonRootPath(), getProperty(NETWORK_CONFIG_ROOT_PATH)).toString();
 	}
 	
-	/** 区块链网络使用的域名，对应 crypto-config.yaml 中的 OrdererOrgs.domain */ 
-	public String getNetworkDomain() {
-		return this.getProperty(NETWORK_DOMAIN);
-	}
-	
-	
 	/** fabric网络 Ca 节点 管理员 密码  */
 	public String getCaAdminPassword() {
 		return getProperty(NETWORK_CA_ADMIN_PASSWD);
