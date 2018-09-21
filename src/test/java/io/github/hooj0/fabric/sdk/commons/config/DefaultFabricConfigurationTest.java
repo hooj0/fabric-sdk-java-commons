@@ -72,6 +72,9 @@ public class DefaultFabricConfigurationTest {
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_CA_ADMIN_NAME, "admin2");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_CA_ADMIN_PASSWD, "adminpw2");
 		config.settingPropertyValue(FabricConfigurationPropertyKey.NETWORK_ORGS_MEMBER_USERS, "user1");
+		
+		config.settingPropertyValue(FabricConfigurationPropertyKey.COMMONS_PREFIX + "orderer.example.com.test", "11111");
+		config.settingPropertyValue(FabricConfigurationPropertyKey.COMMONS_PREFIX + "orderer.example.com.wait_time", "100");
 
 		config.printConfig(config.SDK_COMMONS_PROPERTIES, "propus");
 	}
