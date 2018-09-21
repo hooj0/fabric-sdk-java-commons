@@ -262,6 +262,7 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 	/** 节点配置 */
 	public Properties getPeerProperties(String name) {
 		Properties props = getTLSCertKeyProperties("peer", name);
+		props.putAll(getExternalProperties(name));
 		
 		logger.debug("{} properties: {}", name, props);
 		printConfig(props, name + " peer");
@@ -271,6 +272,7 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 	/** orderer 服务配置 */
 	public Properties getOrdererProperties(String name) {
 		Properties props = getTLSCertKeyProperties("orderer", name);
+		props.putAll(getExternalProperties(name));
 		
 		logger.debug("{} properties: {}", name, props);
 		printConfig(props, name + " orderer");
@@ -280,6 +282,7 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 	/** 事件机制配置 */
 	public Properties getEventHubProperties(String name) {
 		Properties props = getTLSCertKeyProperties("peer", name); // uses same as named peer
+		props.putAll(getExternalProperties(name));
 		
 		logger.debug("{} properties: {}", name, props);
 		printConfig(props, name + " peer");
@@ -334,6 +337,28 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 		props.setProperty("hostnameOverride", name);
 		props.setProperty("sslProvider", "openSSL");
 		props.setProperty("negotiationType", "TLS");
+		
+		return props;
+	}
+	
+	/** 
+	 * 获取额外的外部配置，具体的额外配置从配置文件fabric-chaincode.properties中读取，
+	 * 外部配置可以覆盖hyperledger fabric的默认配置 config.properties中的配置。
+	 **/
+	private Properties getExternalProperties(final String name) {
+		Properties props = new Properties();
+		
+		for (Map.Entry<Object, Object> item : SDK_COMMONS_PROPERTIES.entrySet()) {
+			final String key = item.getKey() + "";
+			final String val = item.getValue() + "";
+
+			final String propsKey = PREFIX + name + ".";
+			if (key.startsWith(propsKey)) {
+				props.put(StringUtils.removeIgnoreCase(key, propsKey), val);
+				
+				logger.debug("Add External Props: {} => {}", StringUtils.removeEndIgnoreCase(key, PREFIX), val);
+			}
+		}
 		
 		return props;
 	}
