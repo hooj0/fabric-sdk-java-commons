@@ -24,7 +24,20 @@ public abstract class AbstractConfigurationSupport extends AbstractConfiguration
 	public AbstractConfigurationSupport(Class<?> clazz) {
 		super(clazz);
 	}
+	
+	public boolean isFabricVersionAtOrAfter(String version) {
+		double v = Double.parseDouble(this.getFabricConfigtxVersion().substring(1));
+		if (Double.parseDouble(version) > v) {
+			return false;
+		}
+		
+		return true;
+    }
 
+    public boolean isFabricVersionBefore(String version) {
+        return !isFabricVersionAtOrAfter(version);
+    }
+    
 	/** 是否是使用 fabric configtx 1.0的版本 */
 	public boolean isFabricConfigtxV10() {
 		return getFabricConfigtxVersion().contains("1.0") || getFabricConfigtxVersion().contains("10");
