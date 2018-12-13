@@ -3,6 +3,7 @@ package io.github.hooj0.fabric.sdk.commons.core.manager;
 import java.io.File;
 
 import org.hyperledger.fabric.sdk.Channel;
+import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.HFClient;
 import org.hyperledger.fabric_ca.sdk.HFCAEnrollment;
 
@@ -34,7 +35,7 @@ import io.github.hooj0.fabric.sdk.commons.store.support.FileSystemKeyValueStore;
  */
 public abstract class AbstractManager extends AbstractObject {
 
-	protected FabricStoreCache<HFCAEnrollment> hfcaEnrollmentStoreCache;
+	protected FabricStoreCache<Enrollment> hfcaEnrollmentStoreCache;
 	protected FabricStoreCache<UserEnrollment> enrollmentStoreCache;
 	protected FabricStoreCache<OrganizationUser> userStoreCache;
 	protected FabricStoreCache<Channel> channelStoreCache;
