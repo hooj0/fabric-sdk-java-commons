@@ -12,6 +12,7 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hyperledger.fabric.sdk.Enrollment;
+import org.hyperledger.fabric.sdk.identity.X509Enrollment;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
@@ -181,7 +182,7 @@ public class UserManager extends AbstractManager {
 			logger.trace("enrollment: {}", enrollment);
 			logger.trace("tlsKeyPEM: {}, tlsCertPEM: {}", tlsKeyPEM, tlsCertPEM);
 			
-			hfcaEnrollmentStoreCache.setStore(key, enrollment);
+			hfcaEnrollmentStoreCache.setStore(key, (X509Enrollment) enrollment);
 			// 保存证书 key、cert
 			certStoreCache.setStore(key, tlsCertPEM);
 			keyStoreCache.setStore(key, tlsKeyPEM);
