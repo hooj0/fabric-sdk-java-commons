@@ -2,7 +2,7 @@ package io.github.hooj0.fabric.sdk.commons.cache.support;
 
 import java.io.File;
 
-import org.hyperledger.fabric_ca.sdk.HFCAEnrollment;
+import org.hyperledger.fabric.sdk.identity.X509Enrollment;
 
 import io.github.hooj0.fabric.sdk.commons.cache.CacheKeyPrefix;
 import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
@@ -18,7 +18,7 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class HFCAEnrollmentStoreCache extends AbstractJavaObjectStoreCache<HFCAEnrollment> {
+public class HFCAEnrollmentStoreCache extends AbstractJavaObjectStoreCache<X509Enrollment> {
 
 	public HFCAEnrollmentStoreCache() {
 		super(CacheKeyPrefix.ENROLLEMENT_USER_PREFIX, OrganizationUserStoreCache.class);
