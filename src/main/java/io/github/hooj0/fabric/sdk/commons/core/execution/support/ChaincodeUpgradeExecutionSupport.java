@@ -66,6 +66,10 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 			upgradeProposalRequest.setFcn(func);
 			upgradeProposalRequest.setArgs(args); // no arguments don't change the ledger see chaincode.
 
+			if (options.getCollectionConfiguration() != null) { 
+				logger.debug("Chaincode collection config: {}", options.getCollectionConfiguration());
+				upgradeProposalRequest.setChaincodeCollectionConfiguration(options.getCollectionConfiguration());
+			}
 			if (options.getTransientData() != null) {
 				upgradeProposalRequest.setTransientMap(options.getTransientData());
 			}
@@ -74,6 +78,7 @@ public class ChaincodeUpgradeExecutionSupport extends AbstractTransactionExecuti
 			if (options.getRequestUser() != null) {
 				upgradeProposalRequest.setUserContext(options.getRequestUser());
 			}
+			
 
 			// 发送安装升级chaincode请求
 			Collection<ProposalResponse> responses = null;
