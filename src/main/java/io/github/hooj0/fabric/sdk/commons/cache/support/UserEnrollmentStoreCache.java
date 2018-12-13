@@ -20,14 +20,14 @@ import io.github.hooj0.fabric.sdk.commons.store.FabricKeyValueStore;
 public class UserEnrollmentStoreCache extends AbstractJavaObjectStoreCache<UserEnrollment> {
 
 	public UserEnrollmentStoreCache() {
-		super(CacheKeyPrefix.ENROLLEMENT_USER_PREFIX, OrganizationUserStoreCache.class);
+		super(CacheKeyPrefix.ENROLLEMENT_USER_PREFIX, UserEnrollmentStoreCache.class);
 	}
 	
 	public UserEnrollmentStoreCache(File keyValueStoreFile) {
-		super(CacheKeyPrefix.ENROLLEMENT_USER_PREFIX, keyValueStoreFile, OrganizationUserStoreCache.class);
+		super(CacheKeyPrefix.ENROLLEMENT_USER_PREFIX, keyValueStoreFile, UserEnrollmentStoreCache.class);
 	}
 	
 	public UserEnrollmentStoreCache(FabricKeyValueStore keyValueStore) {
-		super(CacheKeyPrefix.ENROLLEMENT_USER_PREFIX, keyValueStore, OrganizationUserStoreCache.class);
+		super(CacheKeyPrefix.ENROLLEMENT_USER_PREFIX, keyValueStore, UserEnrollmentStoreCache.class);
 	}
 }
