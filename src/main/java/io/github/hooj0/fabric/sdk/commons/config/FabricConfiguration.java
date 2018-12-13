@@ -23,6 +23,12 @@ public interface FabricConfiguration {
 	/** 是否是使用 fabric configtx 1.0的版本 */
 	public boolean isFabricConfigtxV10();
 	
+	/** 在某个版本之前 */
+	public boolean isFabricVersionAtOrAfter(String version);
+	
+	/** 在某个版本之后 */
+	public boolean isFabricVersionBefore(String version);
+	
 	/** 是否启用TLS 安全证书 */ 
 	public boolean isEnabledFabricTLS();
 	
