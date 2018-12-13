@@ -3,6 +3,7 @@ package io.github.hooj0.fabric.sdk.commons.core.execution.option;
 import java.io.File;
 import java.io.InputStream;
 
+import org.hyperledger.fabric.sdk.ChaincodeCollectionConfiguration;
 import org.hyperledger.fabric.sdk.ChaincodeEndorsementPolicy;
 
 /**
@@ -24,6 +25,8 @@ public class InstantiateOptions extends TransactionsOptions {
 	private InputStream endorsementPolicyInputStream;
 	/** 背书策略 */
 	private ChaincodeEndorsementPolicy endorsementPolicy;
+	/** 链码集合配置 */
+	private ChaincodeCollectionConfiguration collectionConfiguration;
 	
 	public File getEndorsementPolicyFile() {
 		return endorsementPolicyFile;
@@ -51,6 +54,16 @@ public class InstantiateOptions extends TransactionsOptions {
 
 	public InstantiateOptions setEndorsementPolicy(ChaincodeEndorsementPolicy endorsementPolicy) {
 		this.endorsementPolicy = endorsementPolicy;
+		
+		return this;
+	}
+
+	public ChaincodeCollectionConfiguration getCollectionConfiguration() {
+		return collectionConfiguration;
+	}
+
+	public InstantiateOptions setCollectionConfiguration(ChaincodeCollectionConfiguration collectionConfiguration) {
+		this.collectionConfiguration = collectionConfiguration;
 		
 		return this;
 	}
