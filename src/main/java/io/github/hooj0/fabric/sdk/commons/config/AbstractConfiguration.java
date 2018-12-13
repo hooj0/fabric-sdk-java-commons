@@ -53,6 +53,17 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 		super(clazz);
 	}
 	
+	protected void checkVersion() {
+		final String version = getFabricConfigtxVersion();
+		if (!StringUtils.startsWith(version, "v")) {
+			throw new IllegalArgumentException("Expected Config 'FABRIC_CONFIG_GENERATOR_VERSION' or Env 'FAB_CONFIG_GEN_VERS' Must start with 'v' (eg: v1.0)");
+		}
+		final String[] versions = version.substring(1).split("\\.");
+        if (versions.length != 2) {
+        	throw new IllegalArgumentException("Expected Config 'FABRIC_CONFIG_GENERATOR_VERSION' or Env 'FAB_CONFIG_GEN_VERS' to be three numbers sperated by dots (v1.0)");
+        }
+	}
+	
 	/** 默认的组织配置信息配置设置 */
 	protected void defaultValueSettings() {
 		logger.info("开始进行系统默认配置");
@@ -108,7 +119,10 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 
 			addPeerLocation(organization, orgName);
 			addOrdererLocation(organization, orgName);
-			addEventHubLocation(organization, orgName);
+			
+			if (isFabricVersionAtOrAfter("1.3")) {
+				addEventHubLocation(organization, orgName);
+			}
 
 			setCAProperties(organization, orgName);
 		}
