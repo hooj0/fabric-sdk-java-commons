@@ -101,6 +101,15 @@ public class ChaincodeInstallExecutionSupport extends ChaincodeBasicExecutionSup
 			} else {
 				installRequest.setChaincodeInputStream(chaincodeInputStream);
 			}
+			
+			if (options.getChaincodeMetaINF() != null) { 
+				logger.debug("Chaincode meta info file path: {}", options.getChaincodeMetaINF().getAbsolutePath());
+				installRequest.setChaincodeMetaInfLocation(options.getChaincodeMetaINF());
+			} 
+			if (options.getCollectionConfiguration() != null) { 
+				logger.debug("Chaincode collection config: {}", options.getCollectionConfiguration());
+				installRequest.setChaincodeCollectionConfiguration(options.getCollectionConfiguration());
+			}
 
 			// 发送安装请求
 			// 只有来自同一组织的客户端才能发出安装请求
