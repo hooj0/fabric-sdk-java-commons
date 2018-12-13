@@ -59,6 +59,7 @@ public final class FabricPropertiesConfiguration extends AbstractConfigurationSu
 			logger.warn("Failed to use the SDK default configuration, SDK configuration file not found: {} ", DEFAULT_SDK_CONFIG_NAME);
 		} finally {
 
+			checkVersion();
 			defaultValueSettings();
 			instantiateConfiguration();
 
