@@ -37,6 +37,7 @@ public final class FabricClassConfiguration extends AbstractConfigurationSupport
 	private FabricClassConfiguration() {
 		super(FabricClassConfiguration.class);
 		
+		checkVersion();
 		defaultValueSettings();
 		instantiateConfiguration();
 	}
