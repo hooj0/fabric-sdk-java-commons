@@ -15,7 +15,6 @@ import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
-import org.hyperledger.fabric_ca.sdk.HFCAEnrollment;
 import org.hyperledger.fabric_ca.sdk.HFCAIdentity;
 import org.hyperledger.fabric_ca.sdk.HFCAInfo;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
@@ -182,7 +181,7 @@ public class UserManager extends AbstractManager {
 			logger.trace("enrollment: {}", enrollment);
 			logger.trace("tlsKeyPEM: {}, tlsCertPEM: {}", tlsKeyPEM, tlsCertPEM);
 			
-			hfcaEnrollmentStoreCache.setStore(key, (HFCAEnrollment) enrollment);
+			hfcaEnrollmentStoreCache.setStore(key, enrollment);
 			// 保存证书 key、cert
 			certStoreCache.setStore(key, tlsCertPEM);
 			keyStoreCache.setStore(key, tlsKeyPEM);
