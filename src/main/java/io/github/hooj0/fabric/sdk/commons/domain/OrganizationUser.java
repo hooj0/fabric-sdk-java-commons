@@ -113,6 +113,10 @@ public class OrganizationUser implements User, Serializable {
 		
 		setStoreCache();
 	}
+	
+	public void setIdemixEnrollment(Enrollment enrollment) {
+        this.enrollment = enrollment;
+    }
 
 	@Override
 	public String getMspId() {
