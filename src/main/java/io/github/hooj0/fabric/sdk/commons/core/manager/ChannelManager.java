@@ -350,11 +350,6 @@ public class ChannelManager extends AbstractManager {
 			if (config.isFabricVersionAtOrAfter("1.3")) {
 				// 默认 所有角色
 				options.setPeerRoles(EnumSet.of(PeerRole.ENDORSING_PEER, PeerRole.LEDGER_QUERY, PeerRole.CHAINCODE_QUERY, PeerRole.EVENT_SOURCE));
-			} else {
-				// 除事件源外的所有角色
-				options.setPeerRoles(PeerRole.NO_EVENT_SOURCE);
-			}
-			if (!config.isFabricConfigtxV10()) {
 				// 默认 所有角色
 				options.registerEventsForBlocks();
 			} else {
