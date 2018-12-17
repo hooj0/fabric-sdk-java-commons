@@ -27,7 +27,7 @@ echo "CRYPTO_CONFIG_FILE: $CRYPTO_CONFIG_FILE"
 
 #version="_v11"
 version=""
-VERSION_DIR="v1.0"
+VERSION_DIR="v1.3"
 
 FABRIC_ROOT="/opt/gopath/src/github.com/hyperledger/fabric"
 export FABRIC_ROOT=$FABRIC_ROOT
@@ -161,8 +161,8 @@ function cleanChannelArtifacts() {
 	echo "==> rm -rf ./$VERSION_DIR/"
     [ -n $VERSION_DIR ] && [ -d "./$VERSION_DIR" ] && rm -rf ./$VERSION_DIR/*
 
-	echo "==> rm -rf ./channel-artifacts/* ./crypto-config/* ./script/v1.*"
-    rm -rfv ./channel-artifacts/* ./crypto-config/* ./script/v1.*
+	echo "==> rm -rf ./channel-artifacts/* ./crypto-config/* "
+    rm -rfv ./channel-artifacts/* ./crypto-config/* 
     
     echo
 }
