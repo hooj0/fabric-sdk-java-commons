@@ -1,7 +1,6 @@
 package io.github.hooj0.fabric.sdk.commons.core.execution.support;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -68,8 +67,6 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 			instantiateRequest.setProposalWaitTime(options.getProposalWaitTime());
 			
 			Map<String, byte[]> transientMap = new HashMap<>();
-			transientMap.put("HyperLedgerFabric", "InstantiateProposalRequest:JavaSDK".getBytes(UTF_8));
-			transientMap.put("method", "InstantiateProposalRequest".getBytes(UTF_8));
 			
 			if (options.getTransientData() != null) {
 				transientMap.putAll(options.getTransientData());
