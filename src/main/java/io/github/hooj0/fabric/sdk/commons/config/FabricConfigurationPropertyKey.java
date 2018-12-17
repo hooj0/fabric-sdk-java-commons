@@ -49,7 +49,7 @@ public abstract class FabricConfigurationPropertyKey extends AbstractObject {
 	
 	
 	/** fabric network host 区块链网络的主机IP地址，如果环境变量没有值，就取这个值 */
-	public static final String FABRIC_NETWORK_HOST = StringUtils.defaultString(System.getenv(ENV_NETWORK_HOST_KEY), "192.168.8.8");
+	public static final String FABRIC_NETWORK_HOST = StringUtils.defaultString(System.getenv(ENV_NETWORK_HOST_KEY), "192.168.99.100");
 	/** configtxlator 配置转换工具URL配置，如：http://127.0.0.1:7059 */
 	public static final String CONFIG_TXLATER_URL = PREFIX + "configtxlater.url";
 	
