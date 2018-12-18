@@ -24,13 +24,13 @@ public class BasedTemplateTest {
 	static String CHAIN_CODE_VERSION = "1";
 	static String CHAIN_CODE_VERSION_11 = "11";
 	
-	static String CHAIN_CODE_NAME = "example_cc_go";
-	static String CHAIN_CODE_PATH = "github.com/example_cc";
-	static Type CHAIN_CODE_LANG = Type.GO_LANG;
+	//static String CHAIN_CODE_NAME = "example_cc_go";
+	//static String CHAIN_CODE_PATH = "github.com/example_cc";
+	//static Type CHAIN_CODE_LANG = Type.GO_LANG;
 	
-	//static String CHAIN_CODE_NAME = "example_cc_java";
-	//static String CHAIN_CODE_PATH = "";
-	//static Type CHAIN_CODE_LANG = Type.JAVA;
+	static String CHAIN_CODE_NAME = "example_cc_java";
+	static String CHAIN_CODE_PATH = "";
+	static Type CHAIN_CODE_LANG = Type.JAVA;
 	
 	ChaincodeID chaincodeID_1 = ChaincodeID.newBuilder().setName(CHAIN_CODE_NAME).setPath(CHAIN_CODE_PATH).setVersion(CHAIN_CODE_VERSION).build();
 	ChaincodeID chaincodeID_11 = ChaincodeID.newBuilder().setName(CHAIN_CODE_NAME).setPath(CHAIN_CODE_PATH).setVersion(CHAIN_CODE_VERSION_11).build();
