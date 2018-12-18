@@ -26,7 +26,7 @@ echo "CRYPTO_CONFIG_OUTPUT_ROOT: $CRYPTO_CONFIG_OUTPUT_ROOT"
 echo "CRYPTO_CONFIG_FILE: $CRYPTO_CONFIG_FILE"
 
 #version="_v11"
-version=""
+version="_v13"
 VERSION_DIR="v1.3"
 
 FABRIC_ROOT="/opt/gopath/src/github.com/hyperledger/fabric"
@@ -114,23 +114,22 @@ function generateChannelArtifacts() {
 	echo "##########################################################"
 	# Note: For some unknown reason (at least for now) the block file can't be
 	# named orderer.genesis.block or the orderer will fail to launch!
-	echo "==> cryptogen -profile TwoOrgsOrdererGenesis${version} -outputBlock ./$CHANNEL_ARTIFACTS_ROOT/genesis.block"
-	$CONFIGTXGEN -profile TwoOrgsOrdererGenesis${version} -outputBlock ./$CHANNEL_ARTIFACTS_ROOT/genesis.block
+	echo "==> configtxgen -profile TwoOrgsOrdererGenesis${version} -outputBlock ./$CHANNEL_ARTIFACTS_ROOT/genesis.block"
+	$CONFIGTXGEN --configPath . -profile TwoOrgsOrdererGenesis${version} -outputBlock ./$CHANNEL_ARTIFACTS_ROOT/genesis.block
 	
+	echo
+	echo "#################################################################"
+	echo "### Generating channel configuration transaction 'channel.tx' ###"
+	echo "#################################################################"
+	echo "==> configtxgen -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME"
+	$CONFIGTXGEN --configPath . -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME
 
 	echo
 	echo "#################################################################"
 	echo "### Generating channel configuration transaction 'channel.tx' ###"
 	echo "#################################################################"
-	echo "==> cryptogen -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME"
-	$CONFIGTXGEN -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/$CHANNEL_NAME.tx -channelID $CHANNEL_NAME
-
-	echo
-	echo "#################################################################"
-	echo "### Generating channel configuration transaction 'channel.tx' ###"
-	echo "#################################################################"
-	echo "==> cryptogen -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/${CHANNEL_NAME}2.tx -channelID ${CHANNEL_NAME}2"
-	$CONFIGTXGEN -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/${CHANNEL_NAME}2.tx -channelID ${CHANNEL_NAME}2
+	echo "==> configtxgen -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/${CHANNEL_NAME}2.tx -channelID ${CHANNEL_NAME}2"
+	$CONFIGTXGEN --configPath . -profile TwoOrgsChannel${version} -outputCreateChannelTx ./$CHANNEL_ARTIFACTS_ROOT/${CHANNEL_NAME}2.tx -channelID ${CHANNEL_NAME}2
 }
 
 function skip() {
@@ -139,14 +138,14 @@ function skip() {
 	echo "#######    Generating anchor peer update for Org1MSP   ##########"
 	echo "#################################################################"
 	echo "==> cryptogen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./$CHANNEL_ARTIFACTS_ROOT/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP"
-	$CONFIGTXGEN -profile TwoOrgsChannel -outputAnchorPeersUpdate ./$CHANNEL_ARTIFACTS_ROOT/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
+	$CONFIGTXGEN --configPath . -profile TwoOrgsChannel -outputAnchorPeersUpdate ./$CHANNEL_ARTIFACTS_ROOT/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
 
 	echo
 	echo "#################################################################"
 	echo "#######    Generating anchor peer update for Org2MSP   ##########"
 	echo "#################################################################"
 	echo "==> cryptogen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./$CHANNEL_ARTIFACTS_ROOT/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP"
-	$CONFIGTXGEN -profile TwoOrgsChannel -outputAnchorPeersUpdate ./$CHANNEL_ARTIFACTS_ROOT/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
+	$CONFIGTXGEN --configPath . -profile TwoOrgsChannel -outputAnchorPeersUpdate ./$CHANNEL_ARTIFACTS_ROOT/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
 	echo
 }
 
