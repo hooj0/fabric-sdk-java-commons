@@ -77,8 +77,6 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             
             // 添加——到分类账的提案中的瞬时数据
             Map<String, byte[]> transientMap = new HashMap<>();
-            transientMap.put("HyperLedgerFabric", "TransactionProposalRequest:JavaSDK".getBytes(UTF_8)); //Just some extra junk in transient map
-            transientMap.put("method", "TransactionProposalRequest".getBytes(UTF_8)); // ditto
 
             if (options.getTransientData() != null) {
 				transientMap.putAll(options.getTransientData());
