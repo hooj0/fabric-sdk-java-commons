@@ -5,17 +5,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hyperledger.fabric.sdk.BlockEvent;
 import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
+import org.hyperledger.fabric.sdk.ChaincodeCollectionConfiguration;
+import org.hyperledger.fabric.sdk.exception.ChaincodeCollectionConfigurationException;
+import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.hyperledger.fabric.sdk.exception.TransactionEventException;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +61,22 @@ public class ChaincodeDeployTemplateTest extends BasedTemplateTest {
 		
 		InstallOptions options = new InstallOptions();
 		options.setChaincodeId(chaincodeID_11).setChaincodeType(CHAIN_CODE_LANG);
+		
+		String chaincodeSourceFile = operations.getConfig().getChaincodeRootPath();
+		operations.install(options, chaincodeSourceFile);
+	}
+
+	@Test
+	public void testInstall2DeployTemplate() {
+		
+		InstallOptions options = new InstallOptions();
+		options.setChaincodeId(chaincodeID_1).setChaincodeType(CHAIN_CODE_LANG);
+		
+		if (operations.getConfig().isFabricVersionAtOrAfter("1.1")) { // Fabric 1.1 added support for  META-INF in the chaincode image.
+			//This sets an index on the variable a in the chaincode // see http://hyperledger-fabric.readthedocs.io/en/master/couchdb_as_state_database.html#using-couchdb-from-chaincode
+			// The file IndexA.json as part of the META-INF will be packaged with the source to create the index.
+			options.setChaincodeMetaINF(Paths.get(operations.getConfig().getCommonRootPath(), "meta-infs/end2endit").toFile());
+		}
 		
 		String chaincodeSourceFile = operations.getConfig().getChaincodeRootPath();
 		operations.install(options, chaincodeSourceFile);
