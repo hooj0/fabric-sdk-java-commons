@@ -10,13 +10,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
+import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.ChaincodeCollectionConfiguration;
 import org.hyperledger.fabric.sdk.ChaincodeID;
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.CollectionConfigPackage;
-import org.hyperledger.fabric.sdk.BlockEvent.TransactionEvent;
 import org.hyperledger.fabric.sdk.TransactionRequest.Type;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,17 +98,17 @@ public class ChaincodePrivateDataTest extends BasedTemplateTest {
 		transientMap.put("A", "a".getBytes(UTF_8));   // test using bytes as args. End2end uses Strings.
         transientMap.put("AVal", "500".getBytes(UTF_8));
         transientMap.put("B", "b".getBytes(UTF_8));
-        transientMap.put("BVal", String.valueOf(200 + "50").getBytes(UTF_8));
+        transientMap.put("BVal", String.valueOf(200 + 50).getBytes(UTF_8));
 		options.setTransientData(transientMap);
 		
 		ResultSet rs = transactionOperations.invoke(options, "set");
 		System.out.println(rs);
 		
 		try {
-			TransactionEvent event = transactionOperations.getChannel().sendTransaction(rs.getResponses()).get();
+			TransactionEvent event = rs.getTransactionEvent();
 			System.out.println(event.isValid());
 			System.out.println(event.getBlockEvent());
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -145,10 +144,10 @@ public class ChaincodePrivateDataTest extends BasedTemplateTest {
 		System.out.println(rs);
 		
 		try {
-			TransactionEvent event = transactionOperations.getChannel().sendTransaction(rs.getResponses()).get();
+			TransactionEvent event = rs.getTransactionEvent();
 			System.out.println(event.isValid());
 			System.out.println(event.getBlockEvent());
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
