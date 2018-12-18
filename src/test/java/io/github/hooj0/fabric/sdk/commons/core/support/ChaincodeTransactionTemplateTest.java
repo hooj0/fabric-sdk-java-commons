@@ -65,10 +65,10 @@ public class ChaincodeTransactionTemplateTest extends BasedTemplateTest {
 		System.out.println(rs);
 		
 		try {
-			TransactionEvent event = operations.getChannel().sendTransaction(rs.getResponses()).get();
+			TransactionEvent event = rs.getTransactionEvent();
 			System.out.println(event.isValid());
 			System.out.println(event.getBlockEvent());
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
