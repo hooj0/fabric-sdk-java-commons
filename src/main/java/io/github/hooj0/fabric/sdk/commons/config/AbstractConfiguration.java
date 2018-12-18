@@ -120,7 +120,7 @@ public abstract class AbstractConfiguration extends FabricConfigurationPropertyK
 			addPeerLocation(organization, orgName);
 			addOrdererLocation(organization, orgName);
 			
-			if (isFabricVersionAtOrAfter("1.3")) {
+			if (isFabricVersionBefore("1.3")) {
 				addEventHubLocation(organization, orgName);
 			}
 
