@@ -14,13 +14,12 @@ services:
       - FABRIC_CA_SERVER_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca0
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
-      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2664d7d2cdb7eedce9a570b9212a08a70cca920e52493e1f72850f37d35edf5b_sk
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d6a17280fe6697226f1271749467762f4f18411b91e63f2add666d1a7cf415b4_sk
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2664d7d2cdb7eedce9a570b9212a08a70cca920e52493e1f72850f37d35edf5b_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d6a17280fe6697226f1271749467762f4f18411b91e63f2add666d1a7cf415b4_sk
       - FABRIC_CA_SERVER_REGISTRY_MAXENROLLMENTS=-1
     ports:
       - "7054:7054"
-    #command: /bin/bash -c './script/check-files.sh ca0'
     command: bash -c 'cp -R /tmp/msp /etc/hyperledger/fabric-ca-server; mv /etc/hyperledger/fabric-ca-server/msp/*PublicKey /etc/hyperledger/fabric-ca-server; fabric-ca-server start -b admin:adminpw ${V11_IDENTITIES_ALLOWREMOVE} ${V11_AFFILIATIONS_ALLOWREMOVE} ${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_CA_TLS} -d'
 
     volumes:
@@ -34,13 +33,12 @@ services:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       
       - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
-      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/1587d2947a09b6a33c8aa2cbd9db8da2fd4bd87ccf509d56ab98a62d277d4a84_sk
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/3827bb362e540cf6cb1e4e8d550c41895a038fb5deae7b027b1924f721b7acf6_sk
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/1587d2947a09b6a33c8aa2cbd9db8da2fd4bd87ccf509d56ab98a62d277d4a84_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/3827bb362e540cf6cb1e4e8d550c41895a038fb5deae7b027b1924f721b7acf6_sk
       - FABRIC_CA_SERVER_REGISTRY_MAXENROLLMENTS=-1
     ports:
       - "8054:7054"
-    #command: /bin/bash -c './script/check-files.sh ca1'
     command: bash -c 'cp -R /tmp/msp /etc/hyperledger/fabric-ca-server; mv /etc/hyperledger/fabric-ca-server/msp/*PublicKey /etc/hyperledger/fabric-ca-server; fabric-ca-server start -b admin:adminpw ${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_CA_TLS} -d'
     volumes:
       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.example.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
