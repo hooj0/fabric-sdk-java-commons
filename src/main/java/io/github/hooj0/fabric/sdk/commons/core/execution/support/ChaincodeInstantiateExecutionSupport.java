@@ -77,7 +77,6 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 				instantiateRequest.setUserContext(options.getRequestUser());
 			}
 			if (options.getCollectionConfiguration() != null) { 
-				logger.debug("Chaincode collection config: {}", options.getCollectionConfiguration());
 				instantiateRequest.setChaincodeCollectionConfiguration(options.getCollectionConfiguration());
 			}
 			// 设置背书策略
