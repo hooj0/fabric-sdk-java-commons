@@ -2,8 +2,6 @@ package io.github.hooj0.fabric.sdk.commons.core.execution.option;
 
 import java.io.File;
 
-import org.hyperledger.fabric.sdk.ChaincodeCollectionConfiguration;
-
 /**
  * chaincode deploy operation install options
  * @author hoojo
@@ -19,8 +17,6 @@ public class InstallOptions extends Options {
 
 	private String chaincodeUpgradeVersion;
 	private File chaincodeMetaINF;
-	/** 链码集合配置 */
-	private ChaincodeCollectionConfiguration collectionConfiguration;
 
 	public String getChaincodeUpgradeVersion() {
 		return chaincodeUpgradeVersion;
@@ -38,16 +34,6 @@ public class InstallOptions extends Options {
 
 	public InstallOptions setChaincodeMetaINF(File chaincodeMetaINF) {
 		this.chaincodeMetaINF = chaincodeMetaINF;
-		
-		return this;
-	}
-
-	public ChaincodeCollectionConfiguration getCollectionConfiguration() {
-		return collectionConfiguration;
-	}
-
-	public InstallOptions setCollectionConfiguration(ChaincodeCollectionConfiguration collectionConfiguration) {
-		this.collectionConfiguration = collectionConfiguration;
 		
 		return this;
 	}
