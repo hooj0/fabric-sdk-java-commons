@@ -4,6 +4,9 @@
 
 ## 发布
 + [v1.3 - 2018-12-20](https://github.com/hooj0/fabric-sdk-java-commons/tree/v1.3)
+	- 增加私有数据功能支持
+	- 增加`META-INF`配置支持
+	- 增加 JavaChaincode 支持 
 + [v1.1 - 2018-08-06](https://github.com/hooj0/fabric-sdk-java-commons/tree/v1.1)
 
 ## 准备
