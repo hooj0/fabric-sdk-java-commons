@@ -2,8 +2,12 @@
 
 :twisted_rightwards_arrows: Hyperledger fabric java sdk assembly of public, core functional methods, providing further calls to other frameworks.
 
+## 发布
++ [v1.3 - 2018-12-20](https://github.com/hooj0/fabric-sdk-java-commons/tree/v1.3)
++ [v1.1 - 2018-08-06](https://github.com/hooj0/fabric-sdk-java-commons/tree/v1.1)
+
 ## 准备
-`fabric sdk java commons framework` 使用 `fabric-sdk-java` 的 `1.1` 版本，目前官方的新版本`1.2`还在持续开发中。
+`fabric sdk java commons framework` 使用 `fabric-sdk-java` 的 `1.3` 版本。
 
 ## 1、基本配置
 
