@@ -253,20 +253,13 @@ public abstract class AbstractOperationSupport extends ChaincodeBasicExecutionSu
 				} else {
 					policy.fromFile(policyFile);
 				}
-				
 			} else if (options.getEndorsementPolicyInputStream() != null) {
-				
 				policy = new ChaincodeEndorsementPolicy();
-				
 				policy.fromStream(options.getEndorsementPolicyInputStream());
-				
 			} else if (options.getEndorsementPolicy() != null) {
-				
 				policy = options.getEndorsementPolicy();
-				
 			} else {
 				policy = new ChaincodeEndorsementPolicy();
-				
 				policyFile = Paths.get(config.getEndorsementPolicyFilePath()).toFile();
 				logger.info("chaincode endorse ment policy file location：{}", policyFile.getAbsolutePath());
 				
