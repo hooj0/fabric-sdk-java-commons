@@ -107,7 +107,6 @@ public class ChaincodeInstallExecutionSupport extends ChaincodeBasicExecutionSup
 				installRequest.setChaincodeMetaInfLocation(options.getChaincodeMetaINF());
 			} 
 			if (options.getCollectionConfiguration() != null) { 
-				logger.debug("Chaincode collection config: {}", options.getCollectionConfiguration());
 				installRequest.setChaincodeCollectionConfiguration(options.getCollectionConfiguration());
 			}
 
