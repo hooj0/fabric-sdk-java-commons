@@ -6,9 +6,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -75,13 +73,10 @@ public class ChaincodeInvokeExecutionSupport extends AbstractTransactionExecutio
             request.setFcn(funcOptions.getFunc());
             request.setArgs(funcOptions.getArgs());
             
-            // 添加——到分类账的提案中的瞬时数据
-            Map<String, byte[]> transientMap = new HashMap<>();
-
-            if (options.getTransientData() != null) {
-				transientMap.putAll(options.getTransientData());
+            if (options.getTransientData() != null && !options.getTransientData().isEmpty()) {
+				logger.debug("transient data: {}", options.getTransientData());;
+				request.setTransientMap(options.getTransientData());
 			}
-            request.setTransientMap(transientMap);
             if (options.getRequestUser() != null) { // 使用特定用户
 				request.setUserContext(options.getRequestUser());
 			}
