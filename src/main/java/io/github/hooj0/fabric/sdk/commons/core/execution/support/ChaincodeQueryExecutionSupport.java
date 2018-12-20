@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -87,12 +86,10 @@ public class ChaincodeQueryExecutionSupport extends AbstractChaincodeExecutionSu
 			request.setFcn(funcOptions.getFunc());
 			request.setArgs(funcOptions.getArgs());
 			
-			Map<String, byte[]> transientMap = new HashMap<>();
-			
-			if (options.getTransientData() != null) {
-				transientMap.putAll(options.getTransientData());
+			if (options.getTransientData() != null && !options.getTransientData().isEmpty()) {
+				logger.debug("transient data: {}", options.getTransientData());;
+				request.setTransientMap(options.getTransientData());
 			}
-            request.setTransientMap(transientMap);
             if (options.getRequestUser() != null) {
             	request.setUserContext(options.getRequestUser());
             }
