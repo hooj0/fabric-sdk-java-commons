@@ -3,9 +3,7 @@ package io.github.hooj0.fabric.sdk.commons.core.execution.support;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 import org.hyperledger.fabric.sdk.Channel;
 import org.hyperledger.fabric.sdk.HFClient;
@@ -66,17 +64,15 @@ public class ChaincodeInstantiateExecutionSupport extends AbstractTransactionExe
 			instantiateRequest.setArgs(args);
 			instantiateRequest.setProposalWaitTime(options.getProposalWaitTime());
 			
-			Map<String, byte[]> transientMap = new HashMap<>();
-			
-			if (options.getTransientData() != null) {
-				transientMap.putAll(options.getTransientData());
+			if (options.getTransientData() != null && !options.getTransientData().isEmpty()) {
+				logger.debug("transient data: {}", options.getTransientData());;
+				instantiateRequest.setTransientMap(options.getTransientData());
 			}
-			instantiateRequest.setTransientMap(transientMap);
-
 			if (options.getRequestUser() != null) {
 				instantiateRequest.setUserContext(options.getRequestUser());
 			}
 			if (options.getCollectionConfiguration() != null) { 
+				logger.debug("chaincode collectin configuration set: {}", options.getCollectionConfiguration());
 				instantiateRequest.setChaincodeCollectionConfiguration(options.getCollectionConfiguration());
 			}
 			// 设置背书策略
